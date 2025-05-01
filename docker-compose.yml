@@ -1,0 +1,63 @@
+version: "3.11"
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DOCKERIZED=1
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+      - celery
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python app/database/init_db.py &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: holidaynepal
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" 
+
+  redis:
+    image: redis:7
+    restart: always
+    container_name: holidaynepal-redis 
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: holidaynepal-celery
+    restart: always
+    command: >
+      sh -c "celery -A app.core.celery_tasks.c_app worker --loglevel=info"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
+
+
+volumes:
+  postgres_data:
