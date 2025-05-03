@@ -13,6 +13,14 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://redis:6379"
 
+    AWS_ACCESS_KEY_ID:str = "test"
+    AWS_SECRET_ACCESS_KEY:str = "test"
+    AWS_REGION:str="us-east-1" 
+    AWS_STORAGE_BUCKET_NAME:str = "holidaynepal"
+    USE_LOCAL_STACK:bool = True
+
+    GOOGLE_CLIENT_SECRET_FILE:str = "credentials.json"
+
     MAIL_USERNAME:str
     MAIL_PASSWORD:str
     MAIL_FROM:str
