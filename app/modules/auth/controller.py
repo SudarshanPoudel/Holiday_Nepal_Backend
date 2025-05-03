@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from datetime import datetime, timedelta, timezone
 import secrets
 
+from app.modules.auth.email_template import get_otp_html, get_password_reset_html
 from app.modules.users.repository import UserRepository
 from app.modules.auth.otp_service import OTPService
 from app.modules.users.models import User
@@ -29,7 +30,7 @@ class AuthController:
 
         otp = await self.otp_service.store_data_and_otp(user.email, user_data)
 
-        html = f"<h1>Your OTP Code</h1><p>Use this code to verify: <b>{otp}</b></p>"
+        html = get_otp_html(otp)
         send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
 
         return BaseResponse(message="OTP sent to email. Verify within 30 minutes.")
@@ -59,7 +60,7 @@ class AuthController:
         if not otp.result:
             raise HTTPException(status_code=429, detail=otp.message)
 
-        html = f"<h1>Your New OTP Code</h1><p>Use this code to verify: <b>{otp.message}</b></p>"
+        html = get_otp_html(otp.message)
         send_email.apply_async(([email], "Your New Verification Code", html), countdown=5)
 
         return BaseResponse(message="Verification code resent successfully.")
@@ -239,7 +240,7 @@ class AuthController:
             raise HTTPException(status_code=404, detail="User not found")
         else:
             token = AuthService.create_url_safe_token(data={"user_id" : user.id})
-            html = f"<h1>Forget Password</h1><p>Click on this link to change your password: <b>{settings.FRONTEND_FORGET_PASSWORD_URL}/{token}</b></p>"
+            html = get_password_reset_html(token)
             send_email.apply_async(([user.email], "Password Reset Link", html), countdown=5)
             return BaseResponse(message="Password reset link sent successfully.")
         

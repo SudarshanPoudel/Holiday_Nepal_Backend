@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request, Response, UploadFile
 from app.modules.auth.controller import AuthController
 from app.modules.auth.schemas import UserLogin, UserRegister
 from app.database.database import get_db
@@ -8,8 +8,12 @@ router = APIRouter()
 controller = AuthController()
 
 @router.post("/register")
-async def register(user_register: UserRegister, db: AsyncSession = Depends(get_db)):
+async def register(user_register: UserRegister, profile_pic: UploadFile = None, db: AsyncSession = Depends(get_db)):
     return await controller.register(user_register, db)
+
+@router.post("/verify_email")
+async def verify_email(email:str, otp:str, db: AsyncSession = Depends(get_db)):
+    return await controller.verify_email(email, otp, db)
 
 @router.post("/login")
 async def login(user_login: UserLogin, response:Response, db: AsyncSession = Depends(get_db)):
@@ -23,10 +27,6 @@ async def me(request: Request, db: AsyncSession = Depends(get_db)):
 @router.delete("/logout")
 async def logout(request: Request, response: Response, db: AsyncSession = Depends(get_db)):
     return await controller.logout(request, response, db)
-
-@router.post("/verify_email")
-async def verify_email(email:str, otp:str, db: AsyncSession = Depends(get_db)):
-    return await controller.verify_email(email, otp, db)
 
 @router.post("/resend_otp")
 async def resend_verification_code(email:str):
