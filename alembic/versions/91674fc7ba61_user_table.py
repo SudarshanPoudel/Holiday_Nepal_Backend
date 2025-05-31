@@ -19,17 +19,16 @@ def upgrade() -> None:
     op.create_table(
         'users',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('email', sa.String(), nullable=False),
-        sa.Column('username', sa.String(), nullable=False),
+        sa.Column('email', sa.String(), unique=True, nullable=False),
+        sa.Column('username', sa.String(), unique=True, nullable=False),
         sa.Column('password', sa.String(), nullable=False),
-        sa.Column('profile_pic', sa.String(), nullable=True, default="user_profile/default.png"),
-        sa.Column('district_id', sa.Integer(), nullable=True),
+        sa.Column('profile_picture_key', sa.String(), nullable=True, default="user_profile/default.png"),
         sa.Column('municipality_id', sa.Integer(), nullable=True),
-        sa.Column('ward_id', sa.Integer(), nullable=True),
+
         sa.Column('created', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=True),
-        sa.ForeignKeyConstraint(['district_id'], ['districts.id'], name='fk_users_district_id'),
+        sa.Column('updated', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=True),
+
         sa.ForeignKeyConstraint(['municipality_id'], ['municipalities.id'], name='fk_users_municipality_id'),
-        sa.ForeignKeyConstraint(['ward_id'], ['wards.id'], name='fk_users_ward_id'),
     )
 
     # Indexes

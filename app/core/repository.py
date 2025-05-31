@@ -180,3 +180,32 @@ class BaseRepository(Generic[ModelType, SchemaType]):
                     query = query.options(selectinload(getattr(self.model, relation)))
 
         return await paginate(self.db , query, params)
+    
+    async def get_all_filtered(
+        self,
+        filters: Optional[Dict[str, Any]] = None,
+        load_relations: list[str] = None
+    ) -> list[ModelType]:
+        query = select(self.model)
+
+        if filters:
+            for field, value in filters.items():
+                if hasattr(self.model, field) and value is not None:
+                    query = query.filter(getattr(self.model, field) == value)
+
+        if load_relations:
+            for relation in load_relations:
+                if '.' in relation:
+                    parts = relation.split('.')
+                    current_model = self.model
+                    option = None
+                    for part in parts:
+                        attr = getattr(current_model, part)
+                        current_model = attr.property.mapper.class_
+                        option = joinedload(attr) if option is None else option.joinedload(attr)
+                    query = query.options(option)
+                else:
+                    query = query.options(selectinload(getattr(self.model, relation)))
+
+        result = await self.db.execute(query)
+        return result.scalars().all()

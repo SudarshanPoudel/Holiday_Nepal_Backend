@@ -1,15 +1,18 @@
 from fastapi import HTTPException , Request, Response
+from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from datetime import datetime, timedelta, timezone
 import secrets
+import re
 
 from app.modules.auth.email_template import get_otp_html, get_password_reset_html
 from app.modules.users.repository import UserRepository
 from app.modules.auth.otp_service import OTPService
 from app.modules.users.models import User
 from app.core.config import settings
-from app.modules.auth.schemas import Token, UserLogin, UserRegister, UserResponse
+from app.modules.auth.schemas import Token, UserLogin
+from app.modules.users.schemas import UserCreate, UserRead
 from app.modules.auth.service import AuthService
 from app.core.schemas import BaseResponse
 from app.modules.auth.models import RefreshToken
@@ -18,11 +21,17 @@ from app.core.celery_tasks import send_email
 class AuthController:
     otp_service = OTPService()
 
-    async def register(self, user: UserRegister, db:AsyncSession):
-        # Check if already registered in DB
+    async def register(self, user: UserCreate, db:AsyncSession):
+        if not bool(re.fullmatch(r"[A-Za-z0-9_-]+", user.username)):
+            raise HTTPException(status_code=400, detail="Invalid username, use only letters, numbers, - and _")
+
         result = await db.execute(select(User).where(User.email == user.email))
         if result.scalar_one_or_none():
             raise HTTPException(status_code=400, detail="Email already registered")
+
+        result = await db.execute(select(User).where(User.username == user.username))
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="This username is already taken..")
 
         hashed_password = AuthService.hash_password(user.password)
         user_data = user.model_dump()
@@ -42,13 +51,11 @@ class AuthController:
             if not user_data:
                 raise HTTPException(status_code=400, detail="User data expired or missing")
 
-            user_obj = User(**user_data)
-            db.add(user_obj)
-            await db.commit()
-            await db.refresh(user_obj)
+            user_obj = UserCreate(**user_data)
+            user = await UserRepository(db_session=db).create(user_obj)
             await self.otp_service.delete_all(email)
 
-            return BaseResponse(message="Email verified and account created.", data=UserResponse.from_orm(user_obj))
+            return BaseResponse(message="Email verified and account created.", data=UserRead.model_validate(user, from_attributes=True))
         else:
             raise HTTPException(status_code=400, detail=verify_otp.message)
 
@@ -68,11 +75,17 @@ class AuthController:
 
     async def login(self, user_login: UserLogin, db: AsyncSession, response: Response):
         result = await db.execute(
-            select(User).where(User.email == user_login.email)
+            select(User).where(
+                or_(
+                    User.email == user_login.email_or_username,
+                    User.username == user_login.email_or_username
+                )
+            )
         )
         user = result.scalars().first()
-
+        
         if user and AuthService.verify_password_hash(user_login.password, user.password):
+            print("HEHE")
             # Generate tokens
             access_token = AuthService.create_access_token(user_id=user.id)
             raw_refresh_token = AuthService.create_refresh_token(user_id=user.id)
@@ -113,7 +126,7 @@ class AuthController:
         user = result.scalar_one_or_none()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        user_read = UserResponse.model_validate(user)
+        user_read = UserRead.model_validate(user, from_attributes=True)
 
         return BaseResponse(message="Profile fetched  success", data=user_read)
 

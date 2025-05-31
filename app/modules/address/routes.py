@@ -1,8 +1,6 @@
 from app.core.repository import BaseRepository
 from app.modules.address.models import District
-from fastapi import APIRouter, Depends, HTTPException, Request
-from app.modules.auth.controller import AuthController
-from app.modules.auth.schemas import UserLogin, UserRegister
+from fastapi import APIRouter, Depends, HTTPException
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
