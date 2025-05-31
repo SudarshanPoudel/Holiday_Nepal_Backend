@@ -18,7 +18,7 @@ serializer = URLSafeTimedSerializer(
     secret_key=settings.SECRET_KEY, salt="This is random salt hehehe"
 )
 
-CLIENT_SECRET_FILE = "app/core/credentials.json"
+CLIENT_SECRET_FILE = settings.GOOGLE_CLIENT_SECRET_FILE
 SCOPES = [
     "openid",
     "https://www.googleapis.com/auth/userinfo.email",

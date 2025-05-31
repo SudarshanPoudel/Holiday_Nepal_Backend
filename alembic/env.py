@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from app.database.database import Base
-from app.modules.address.models import District, Municipality, Ward
+from app.modules.address.models import District, Municipality
 from app.modules.users.models import User
 from app.modules.auth.models import RefreshToken
 target_metadata = Base.metadata
