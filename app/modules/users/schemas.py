@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, model_validator
 from typing import Optional
 
-from app.modules.address.schema import MunicipalityBase, DistrictBase
+from app.modules.storage.schema import ReadImage
 
 # Schema for creating a new user
 class UserCreate(BaseModel):
@@ -15,7 +15,7 @@ class UserRead(BaseModel):
     id: int
     email: EmailStr
     username: str
-    profile_picture_key: Optional[str] = None
+    image_id: Optional[int] = None
     municipality_id: Optional[int] = None
 
     class Config:
@@ -28,13 +28,6 @@ class UserUpdate(BaseModel):
     username: Optional[str]
 
     municipality_id: Optional[int]
-
-    @model_validator(mode="before")
-    def hash_password(cls, values):
-        password = values.get("password")
-        if password:
-            values["password"] = pwd_context.hash(password)
-        return values
 
     class Config:
         from_attributes = True

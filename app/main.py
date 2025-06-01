@@ -1,27 +1,28 @@
 from fastapi import FastAPI
+from fastapi.security import HTTPBearer
+from fastapi.openapi.utils import get_openapi
+
+from app.middlerware.auth import AuthMiddleware
+from app.middlerware.cors import add_cors_middleware
 
 from app.modules.auth.routes import router as auth_router
 from app.modules.address.routes import router as address_router
-from app.middlerware.auth import AuthMiddleware
-from app.middlerware.cors import add_cors_middleware
-from app.utils.scheduler import start_scheduler
+from app.modules.activities.routes import router as activities_router
+from app.modules.places.routes import router as places_router
+from app.modules.storage.routes import router as image_router
 
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 app = FastAPI()
 
 security = HTTPBearer()
 app.add_middleware(AuthMiddleware)
 add_cors_middleware(app)
 
-@app.on_event("startup")
-async def on_startup():
-    start_scheduler()
-
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(image_router, prefix="/image", tags=["Images"])
 app.include_router(address_router, prefix="/address", tags=["Address"])
-
-from fastapi.openapi.utils import get_openapi
-from fastapi import FastAPI
+app.include_router(activities_router, prefix="/activities", tags=["Activities"])
+app.include_router(places_router, prefix="/places", tags=["Places"])
 
 def custom_openapi():
     if app.openapi_schema:
@@ -30,7 +31,6 @@ def custom_openapi():
     openapi_schema = get_openapi(
         title="Your API",
         version="1.0.0",
-        description="Your API description",
         routes=app.routes,
     )
 

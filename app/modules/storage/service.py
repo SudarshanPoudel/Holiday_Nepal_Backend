@@ -37,6 +37,18 @@ class StorageService:
         if self.use_localstack:
             return f"http://localhost:4566/{self.bucket_name}/{key}"
         return f"https://{self.bucket_name}.s3.amazonaws.com/{key}"
+    
+    
+    def file_exists(self, key: str) -> bool:
+        try:
+            self.s3_client.head_object(Bucket=self.bucket_name, Key=key)
+            return True
+        except ClientError as e:
+            if e.response['Error']['Code'] == '404':
+                return False
+            logging.error(f"Error checking if file exists: {e}")
+            raise HTTPException(status_code=500, detail="Failed to check file existence")
+
 
 
     async def delete_file(self, key: str):
@@ -50,7 +62,23 @@ class StorageService:
         except ClientError as e:
             logging.error(f"Failed to delete file: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete file from S3")
-
+   
+    async def copy_file(self, from_key: str, to_key: str):
+        copy_source = {
+            'Bucket': self.bucket_name,
+            'Key': from_key
+        }
+        if self.file_exists(from_key):
+            await run_in_threadpool(
+                self.s3_client.copy_object,
+                Bucket=self.bucket_name,
+                CopySource=copy_source,
+                Key=to_key
+            )
+            return to_key
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
+        
     def generate_presigned_url(self,key: str, expiration: int = 3600):
         try:
             #to use it with sqlalchemy no need for await
@@ -98,7 +126,5 @@ class StorageService:
 
     @staticmethod
     def generate_unique_key(file_extension: str = ".bin") -> str:
-        unique_id = f"{uuid.uuid4()}_{int(time.time())}"
+        unique_id = f"{uuid.uuid4()}_{int(time.time() * 1000)}"
         return f"{unique_id}.{file_extension}"
-        
-    ALLOWED_IMAGE_TYPES = {"jpeg", "png", "jpg", "webp"}

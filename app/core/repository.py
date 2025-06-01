@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from typing import Generic, Type, TypeVar, Optional , Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -45,9 +44,6 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         result = await self.db.execute(query)
         record = result.unique().scalar_one_or_none()
 
-        if record is None:
-            raise HTTPException(status_code=404, detail="Record not found")
-
         return record
 
     async def get_by_fields(self, filters: dict, load_relations: list[str] = None) -> Optional[ModelType]:
@@ -70,9 +66,6 @@ class BaseRepository(Generic[ModelType, SchemaType]):
 
         result = await self.db.execute(query)
         record = result.unique().scalar_one_or_none()
-
-        if record is None:
-            raise HTTPException(status_code=404, detail="Record not found")
 
         return record
 
@@ -103,8 +96,9 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         record = query.scalar_one_or_none()
         if not record:
             return None
-        for key, value in schema.dict(exclude_unset=True).items():
-            setattr(record, key, value)
+        for key, value in schema.model_dump().items():
+            if value is not None:
+                setattr(record, key, value)
         await self.db.commit()
         await self.db.refresh(record)
         return record

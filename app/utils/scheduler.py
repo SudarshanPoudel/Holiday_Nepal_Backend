@@ -4,14 +4,14 @@ from sqlalchemy.future import select
 from sqlalchemy import delete
 from app.database.database import SessionLocal
 from app.modules.auth.models import RefreshToken
-from datetime import datetime
+from datetime import datetime, timezone
 
 scheduler = AsyncIOScheduler()
 
 async def cleanup_expired_refresh_tokens():
     async with SessionLocal() as session:
         await session.execute(
-            delete(RefreshToken).where(RefreshToken.expires_at < datetime.utcnow())
+            delete(RefreshToken).where(RefreshToken.expires_at < datetime.now(timezone.utc))
         )
         await session.commit()
         print("Expired refresh tokens cleaned up.")

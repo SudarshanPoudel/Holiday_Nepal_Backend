@@ -21,6 +21,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         token = request.headers.get("Authorization")
+        # token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjo3NzQ4NzU2NjYxfQ.ArcoICUWdFNr1FMb8EEUw536ZhliuVl8lk8pqBFlgVM"
         if not token:
             response = {"detail": "No token provided"}
             return Response(content=str(response), status_code=401)

@@ -6,7 +6,9 @@ from datetime import datetime, timedelta, timezone
 import secrets
 import re
 
+from app.modules.address.repository import MunicipalityRepository
 from app.modules.auth.email_template import get_otp_html, get_password_reset_html
+from app.modules.storage.repository import ImageRepository
 from app.modules.users.repository import UserRepository
 from app.modules.auth.otp_service import OTPService
 from app.modules.users.models import User
@@ -33,15 +35,26 @@ class AuthController:
         if result.scalar_one_or_none():
             raise HTTPException(status_code=400, detail="This username is already taken..")
 
+        if user.image_id:
+            image_repository = ImageRepository(db)
+            image = await image_repository.get(record_id=user.image_id)
+            if not image:
+                raise HTTPException(status_code=404, detail="Image not found")
+        if user.municipality_id:
+            municipality_repo = MunicipalityRepository(db)
+            municipality = await municipality_repo.get(record_id=user.municipality_id)
+            if not municipality:
+                raise HTTPException(status_code=404, detail="Municipality not found")
+
         hashed_password = AuthService.hash_password(user.password)
         user_data = user.model_dump()
         user_data["password"] = hashed_password
 
         otp = await self.otp_service.store_data_and_otp(user.email, user_data)
 
-        html = get_otp_html(otp)
-        send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
-
+        # html = get_otp_html(otp)
+        # send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
+        print(otp)
         return BaseResponse(message="OTP sent to email. Verify within 30 minutes.")
 
     async def verify_email(self, email: str, otp: str, db: AsyncSession):
@@ -54,8 +67,7 @@ class AuthController:
             user_obj = UserCreate(**user_data)
             user = await UserRepository(db_session=db).create(user_obj)
             await self.otp_service.delete_all(email)
-
-            return BaseResponse(message="Email verified and account created.", data=UserRead.model_validate(user, from_attributes=True))
+            return BaseResponse(message="Email verified and account created.", data={"id": user.id})
         else:
             raise HTTPException(status_code=400, detail=verify_otp.message)
 
@@ -85,7 +97,6 @@ class AuthController:
         user = result.scalars().first()
         
         if user and AuthService.verify_password_hash(user_login.password, user.password):
-            print("HEHE")
             # Generate tokens
             access_token = AuthService.create_access_token(user_id=user.id)
             raw_refresh_token = AuthService.create_refresh_token(user_id=user.id)
@@ -122,12 +133,11 @@ class AuthController:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     async def me(self, user_id: int, db: AsyncSession):
-        result = await db.execute(select(User).filter(User.id == user_id))
-        user = result.scalar_one_or_none()
+        user_repo = UserRepository(db_session=db)
+        user = await user_repo.get(record_id=user_id, load_relations=["image"])
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         user_read = UserRead.model_validate(user, from_attributes=True)
-
         return BaseResponse(message="Profile fetched  success", data=user_read)
 
 

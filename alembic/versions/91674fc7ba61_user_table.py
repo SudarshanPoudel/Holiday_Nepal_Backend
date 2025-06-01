@@ -15,27 +15,33 @@ down_revision: Union[str, None] = 'a9ba372271f7'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+
 def upgrade() -> None:
+    # Enum type for image category
+    image_category_enum = sa.Enum('PLACE', 'ACTIVITY', 'SERVICES', 'USER_PROFILE', 'OTHER', name='imagecategoryenum')
+
     op.create_table(
-        'users',
-        sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('email', sa.String(), unique=True, nullable=False),
-        sa.Column('username', sa.String(), unique=True, nullable=False),
-        sa.Column('password', sa.String(), nullable=False),
-        sa.Column('profile_picture_key', sa.String(), nullable=True, default="user_profile/default.png"),
-        sa.Column('municipality_id', sa.Integer(), nullable=True),
-
-        sa.Column('created', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=True),
-        sa.Column('updated', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=True),
-
-        sa.ForeignKeyConstraint(['municipality_id'], ['municipalities.id'], name='fk_users_municipality_id'),
+        'images',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('key', sa.String, unique=True, index=True, nullable=False),
+        sa.Column('url', sa.String, nullable=True),
+        sa.Column('category', image_category_enum, nullable=True),
     )
 
-    # Indexes
-    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=False)
-    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.create_table(
+        'users',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
+        sa.Column('email', sa.String, unique=True, index=True, nullable=False),
+        sa.Column('username', sa.String, unique=True, index=True, nullable=False),
+        sa.Column('password', sa.String, nullable=False),
+        sa.Column('municipality_id', sa.Integer, sa.ForeignKey('municipalities.id'), index=True, nullable=True),
+        sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
+        sa.Column('created', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column('updated', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
+    )
+
 
 def downgrade() -> None:
-    op.drop_index(op.f('ix_users_email'), table_name='users')
-    op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_table('users')
+    op.drop_table('images')
+    op.execute('DROP TYPE imagecategoryenum')
