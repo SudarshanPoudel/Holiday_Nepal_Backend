@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from app.core.schemas import BaseResponse
-from app.modules.activities.schema import CreateActivityInternal
+from app.modules.activities.schema import ActivityCreateInternal
 from app.modules.place_activities.repository import PlaceActivityRepository
-from app.modules.place_activities.schema import CreatePlaceActivityInternal, UpdatePlaceActivityInternal
+from app.modules.place_activities.schema import PlaceActivityCreateInternal, PlaceActivityUpdateInternal
 from app.modules.places.repository import PlaceRepository
 from app.modules.places.schema import CreatePlace, CreatePlaceInternal, ReadPlace, UpdatePlace, UpdatePlaceInternal
 from app.utils.helper import slugify
@@ -28,7 +28,7 @@ class PlaceController():
         await self.repository.add_images(place_db.id, place.image_ids)
         for activity in place.activities:
             try:
-                place_acitivity = CreatePlaceActivityInternal(place_id=place_db.id, **activity.model_dump())
+                place_acitivity = PlaceActivityCreateInternal(place_id=place_db.id, **activity.model_dump())
                 place_activity = await self.place_activity_repository.create(place_acitivity)
             except:
                 raise HTTPException(status_code=404, detail="Activity not found")
@@ -63,7 +63,7 @@ class PlaceController():
         
         for activity in place.activities:
             try:
-                place_acitivity = UpdatePlaceActivityInternal(place_id=place.id, **activity.model_dump())
+                place_acitivity = PlaceActivityUpdateInternal(place_id=place.id, **activity.model_dump())
                 await self.place_activity_repository.update(activity.id, place_acitivity)
             except:
                 raise HTTPException(status_code=404, detail="Activity not found")

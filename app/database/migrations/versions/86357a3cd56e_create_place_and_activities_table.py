@@ -37,6 +37,7 @@ def upgrade() -> None:
         sa.Column('longitude', sa.Float, nullable=False),
         sa.Column('latitude', sa.Float, nullable=False),
         sa.Column('description', sa.String, nullable=True),
+        sa.Column('municipality_id', sa.Integer, sa.ForeignKey('municipalities.id'), nullable=False),
     )
 
     # Create place_activities association table

@@ -52,9 +52,8 @@ class AuthController:
 
         otp = await self.otp_service.store_data_and_otp(user.email, user_data)
 
-        # html = get_otp_html(otp)
-        # send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
-        print(otp)
+        html = get_otp_html(otp)
+        send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
         return BaseResponse(message="OTP sent to email. Verify within 30 minutes.")
 
     async def verify_email(self, email: str, otp: str, db: AsyncSession):
@@ -98,8 +97,8 @@ class AuthController:
         
         if user and AuthService.verify_password_hash(user_login.password, user.password):
             # Generate tokens
-            access_token = AuthService.create_access_token(user_id=user.id)
-            raw_refresh_token = AuthService.create_refresh_token(user_id=user.id)
+            access_token = AuthService.create_access_token({"user_id":user.id})
+            raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id})
 
             # Hash refresh token for DB
             hashed_token = AuthService.hash_refresh_token(raw_refresh_token)
@@ -187,8 +186,8 @@ class AuthController:
             await db.refresh(user)
 
         # Login logic
-        access_token = AuthService.create_access_token(user_id=user.id)
-        raw_refresh_token = AuthService.create_refresh_token(user_id=user.id)
+        access_token = AuthService.create_access_token({"user_id":user.id})
+        raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id})
         hashed_token = AuthService.hash_refresh_token(raw_refresh_token)
         expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
@@ -232,8 +231,8 @@ class AuthController:
         db_token = result.scalar_one_or_none()
 
         # Generate new access and refresh tokens
-        access_token = AuthService.create_access_token(user_id=user_id)
-        new_raw_refresh_token = AuthService.create_refresh_token(user_id=user_id)
+        access_token = AuthService.create_access_token({"user_id":user_id})
+        new_raw_refresh_token = AuthService.create_refresh_token({"user_id":user_id})
         new_hashed_token = AuthService.hash_refresh_token(new_raw_refresh_token)
         expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 

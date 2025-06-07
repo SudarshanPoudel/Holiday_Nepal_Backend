@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, model_validator
 from typing import Optional
 
-from app.modules.storage.schema import ReadImage
+from app.modules.storage.schema import ImageRead
 
 # Schema for creating a new user
 class UserCreate(BaseModel):

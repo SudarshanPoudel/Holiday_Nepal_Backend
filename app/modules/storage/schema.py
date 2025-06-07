@@ -9,7 +9,7 @@ class ImageCategoryEnum(str, Enum):
     SERVICES = "services"
     OTHER = "other"
 
-class ReadImage(BaseModel):
+class ImageRead(BaseModel):
     id: int
     key: str
     url: str
@@ -17,7 +17,7 @@ class ReadImage(BaseModel):
     class Config:
         from_attributes = True
 
-class CreateImage(BaseModel):
+class ImageCreate(BaseModel):
     key: str
     url: str
     category: ImageCategoryEnum

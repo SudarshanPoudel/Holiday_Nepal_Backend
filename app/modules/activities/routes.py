@@ -3,13 +3,13 @@ from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.activities.controller import ActivityController
-from app.modules.activities.schema import CreateActivity, UpdateActivity
+from app.modules.activities.schema import ActivityCreate, ActivityUpdate
 
 
 router = APIRouter()
 
 @router.post("/")
-async def create_activity(activity: CreateActivity, db: AsyncSession = Depends(get_db)):
+async def create_activity(activity: ActivityCreate, db: AsyncSession = Depends(get_db)):
     try:
         controller = ActivityController(db)
         return await controller.create(activity)
@@ -39,7 +39,7 @@ async def get_activity(activity_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.put("/{activity_id}")
-async def update_activity(activity: UpdateActivity, db: AsyncSession = Depends(get_db)):
+async def update_activity(activity: ActivityUpdate, db: AsyncSession = Depends(get_db)):
     try:
         controller = ActivityController(db)
         return await controller.update(activity.id, activity)

@@ -46,9 +46,7 @@ class AuthService:
         return AuthService.hash_refresh_token(token) == hashed
     
     @staticmethod
-    def create_access_token(user_id: int, expires_delta: Optional[timedelta] = None) -> str:
-        to_encode = {"sub": str(user_id)}  
-        
+    def create_access_token(to_encode: dict = {}, expires_delta: Optional[timedelta] = None) -> str:        
         # Use settings from config
         SECRET_KEY = settings.SECRET_KEY
         ALGORITHM = settings.ALGORITHM
@@ -64,8 +62,7 @@ class AuthService:
         return encoded_jwt
 
     @staticmethod
-    def create_refresh_token(user_id: int, expires_delta: Optional[timedelta] = None) -> str:
-        to_encode = {"sub": str(user_id)}  
+    def create_refresh_token(to_encode: dict = {}, expires_delta: Optional[timedelta] = None) -> str:
         SECRET_KEY = settings.SECRET_KEY
         ALGORITHM = settings.ALGORITHM
         REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS

@@ -97,8 +97,7 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         if not record:
             return None
         for key, value in schema.model_dump().items():
-            if value is not None:
-                setattr(record, key, value)
+            setattr(record, key, value)
         await self.db.commit()
         await self.db.refresh(record)
         return record

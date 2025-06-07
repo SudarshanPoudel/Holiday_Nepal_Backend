@@ -21,7 +21,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         token = request.headers.get("Authorization")
-        # token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjo3NzQ4NzU2NjYxfQ.ArcoICUWdFNr1FMb8EEUw536ZhliuVl8lk8pqBFlgVM"
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjc3NDkyNzk2Mjd9.uww0CX8z1JC2z_SjtRCIkz7AtRPM_EMRHg70PR8SY1o"
         if not token:
             response = {"detail": "No token provided"}
             return Response(content=str(response), status_code=401)
@@ -31,7 +31,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             user = AuthService.verify_access_token(token)
 
             if user:
-                request.state.user_id = user.get("sub")  # User ID from token
+                request.state.user_id = user.get("user_id")  # User ID from token
             else:
                 response = {"detail": "Invalid token"}
                 return Response(content=str(response), status_code=401)

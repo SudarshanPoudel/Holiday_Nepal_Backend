@@ -1,6 +1,6 @@
-from seeder.default_address import seed_default_address
-from seeder.default_bucket import create_bucket_if_not_exists
-from seeder.default_profile_seeder import default_profile_seeder
+from app.database.seeder.default_address import seed_default_address
+from app.database.seeder.default_bucket import create_bucket_if_not_exists
+from app.database.seeder.default_profile_seeder import default_profile_seeder
 from app.database.database import get_db 
 import asyncio
 

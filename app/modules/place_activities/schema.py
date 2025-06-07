@@ -1,30 +1,32 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from app.modules.activities.schema import ReadActivity
-
-class CreatePlaceActivity(BaseModel):
+class PlaceActivityCreate(BaseModel):
     activity_id: int
     description: Optional[str] = None
     average_duration: Optional[int] = None
     average_cost: Optional[float] = None
 
-class CreatePlaceActivityInternal(CreatePlaceActivity):
+class PlaceActivityCreateInternal(PlaceActivityCreate):
     place_id: int
 
-class UpdatePlaceActivity(BaseModel):
+class PlaceActivityUpdate(BaseModel):
     id: int
     activity_id: Optional[int] = None
     description: Optional[str] = None
     average_duration: Optional[int] = None
     average_cost: Optional[float] = None
 
-class UpdatePlaceActivityInternal(UpdatePlaceActivity):
+class PlaceActivityUpdateInternal(PlaceActivityUpdate):
     place_id: int
 
-class ReadPlaceActivity(BaseModel):
+class BaseActivity(BaseModel):
     id: int
-    activity : ReadActivity
+    name: str
+
+class PlaceActivityRead(BaseModel):
+    id: int
+    activity : BaseActivity
     description: Optional[str] = None
     average_duration: Optional[int] = None
     average_cost: Optional[float] = None

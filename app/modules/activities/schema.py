@@ -1,34 +1,34 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from app.modules.storage.schema import ReadImage
+from app.modules.storage.schema import ImageRead
 
 
-class CreateActivity(BaseModel):
+class ActivityCreate(BaseModel):
     name: str
     image_id: int
     description: Optional[str] = None
 
-class CreateActivityInternal(CreateActivity):
+class ActivityCreateInternal(ActivityCreate):
     name_slug: str
 
-class UpdateActivity(BaseModel):
+class ActivityUpdate(BaseModel):
     id: int
     name: Optional[str] = None
     description: Optional[str] = None
 
-class UpdateActivityInternal(BaseModel):
+class ActivityUpdateInternal(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     name_slug: Optional[str] = None
 
 
-class ReadActivity(BaseModel):
+class ActivityRead(BaseModel):
     id: int
     name: str
     name_slug: str
     description: Optional[str] = None
-    image: ReadImage = None
+    image: ImageRead = None
 
     class Config:
         from_attributes = True

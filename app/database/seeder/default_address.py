@@ -1,6 +1,6 @@
 from app.modules.address.schema import DistrictBase, MunicipalityBase
 from app.modules.address.repository import DistrictRepository, MunicipalityRepository
-from seeder.utils import load_data
+from app.database.seeder.utils import load_data
 
 async def seed_default_address(db):
     district_entered = 0
