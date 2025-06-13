@@ -1,9 +1,10 @@
 from fastapi import HTTPException
+from sqlalchemy import delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from app.core.repository import BaseRepository
 from app.modules.transport_route.repository import TransportRouteRepository
-from app.modules.transport_service.models import TransportService, TransportServiceRouteSegment
+from app.modules.transport_service.models import TransportService, TransportServiceRouteSegment, transport_service_images
 from app.modules.transport_service.schema import TransportServiceBase
 
 class TransportServiceRepository(BaseRepository[TransportService, TransportServiceBase]):
@@ -12,7 +13,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
 
 
     async def add_route_segment(self, transport_service_id: int, route_ids: list[int]):
-        last_route_place = None
+        last_place = None
         route_repo = TransportRouteRepository(self.db)
 
         try:
@@ -20,11 +21,16 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 route = await route_repo.get(route_id)
                 if not route:
                     raise HTTPException(status_code=404, detail=f"Route with ID {route_id} not found")
+                if not last_place:
+                    last_place = route.end_municipality_id
+                elif last_place == route.start_municipality_id:
+                    last_place = route.end_municipality_id
+                elif last_place == route.end_municipality_id:
+                    last_place = route.start_municipality_id
+                else:
+                    raise HTTPException(status_code=400, detail="Invalid route sequence")
 
-                if last_route_place and route.start_municipality_id != last_route_place:
-                    raise HTTPException(status_code=400, detail="Route segments must be connected")
-
-                last_route_place = route.end_municipality_id
+                last_place = route.end_municipality_id
 
                 segment = TransportServiceRouteSegment(
                     service_id=transport_service_id,
@@ -35,5 +41,21 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
 
             await self.db.commit()
         except SQLAlchemyError as e:
+            import traceback
+            traceback.print_exc()
             await self.db.rollback()
             raise HTTPException(status_code=500, detail="Failed to add route segments")
+            
+    async def attach_images(self, service_id: int, image_ids: list[int]):
+        await self.db.execute(insert(transport_service_images).values([
+            {"transport_service_id": service_id, "image_id": img_id} for img_id in image_ids
+        ]))
+        await self.db.commit()
+
+    async def replace_images(self, service_id: int, image_ids: list[int]):
+        await self.db.execute(delete(transport_service_images).where(transport_service_images.c.transport_service_id == service_id))
+        await self.attach_images(service_id, image_ids)
+
+    async def clear_route_segments(self, service_id: int):
+        await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.transport_service_id == service_id))
+        await self.db.commit()

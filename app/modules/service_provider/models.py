@@ -23,6 +23,8 @@ class ServiceProvider(Base):
     description = Column(String, nullable=True)
     contact_no = Column(String, nullable=False)
     address = Column(String, nullable=False)
+    longitude = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False)
     category = Column(Enum(ServiceProviderCategoryEnum) , nullable=False)
     is_verified = Column(Boolean, nullable=False, default=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)

@@ -11,7 +11,8 @@ router = APIRouter()
 @router.post("/")
 async def create_transport_service(transport_service: TransportServiceCreate, request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        controller = TransportServiceController(db, request)
+        user_id = request.state.user_id
+        controller = TransportServiceController(db, user_id)
         return await controller.create(transport_service)
     except HTTPException as e:
         raise e
@@ -21,7 +22,8 @@ async def create_transport_service(transport_service: TransportServiceCreate, re
 @router.get("/")
 async def get_all_transport_services(request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        controller = TransportServiceController(db, request)
+        user_id = request.state.user_id
+        controller = TransportServiceController(db, user_id)
         return await controller.get_all()
     except HTTPException as e:
         raise e
@@ -32,7 +34,8 @@ async def get_all_transport_services(request: Request, db: AsyncSession = Depend
 @router.get("/{transport_service_id}")
 async def get_transport_service(transport_service_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        controller = TransportServiceController(db, request)
+        user_id = request.state.user_id
+        controller = TransportServiceController(db, user_id)
         return await controller.get(transport_service_id)
     except HTTPException as e:
         raise e
@@ -42,7 +45,8 @@ async def get_transport_service(transport_service_id: int, request: Request, db:
 @router.put("/{transport_service_id}")
 async def update_transport_service(transport_service_id: int, transport_service: TransportServiceCreate, request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        controller = TransportServiceController(db, request)
+        user_id = request.state.user_id
+        controller = TransportServiceController(db, user_id)
         return await controller.update(transport_service_id, transport_service)
     except HTTPException as e:
         raise e
@@ -52,7 +56,8 @@ async def update_transport_service(transport_service_id: int, transport_service:
 @router.delete("/{transport_service_id}")
 async def delete_transport_service(transport_service_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        controller = TransportServiceController(db, request)
+        user_id = request.state.user_id
+        controller = TransportServiceController(db, user_id)
         return await controller.delete(transport_service_id)
     except HTTPException as e:
         raise e

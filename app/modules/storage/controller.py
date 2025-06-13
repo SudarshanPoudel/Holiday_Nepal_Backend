@@ -35,13 +35,13 @@ class StorageController:
     async def get_image(self, id: int):
         image = await self.repository.get(record_id=id)
         if not image:
-            raise HTTPException(message="Image not found", status_code=404)
+            raise HTTPException(detail="Image not found", status_code=404)
         return BaseResponse(message="Image Fetched Successfully", data=ImageRead.model_validate(image, from_attributes=True))
     
     async def update_image(self, id: int, file: UploadFile):
         image = await self.repository.get(id)
         if not image:
-            raise HTTPException(message="Image not found", status_code=404)
+            raise HTTPException(detail="Image not found", status_code=404)
         image_bytes = await file.read()
         verified_image = validate_and_process_image(image_bytes)
         await self.storage_service.upload_file(
@@ -54,7 +54,7 @@ class StorageController:
     async def delete_image(self, id: int):  
         image = await self.repository.get(id)
         if not image:
-            raise HTTPException(message="Image not found", status_code=404)
+            raise HTTPException(detail="Image not found", status_code=404)
         await self.repository.delete(id)
         await self.storage_service.delete_file(image.key)
         return BaseResponse(message="Image Deleted Successfully")

@@ -11,6 +11,8 @@ class ServiceProviderRegister(BaseModel):
     category: ServiceProviderCategoryEnum
     contact_no : str
     address: str
+    longitude: float
+    latitude: float
     description: Optional[str]
 
 class ServiceProviderUpdate(BaseModel):

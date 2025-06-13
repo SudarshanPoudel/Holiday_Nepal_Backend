@@ -30,6 +30,8 @@ def upgrade() -> None:
         sa.Column('address', sa.String(), nullable=False),
         sa.Column('contact_no', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
+        sa.Column('longitude', sa.Float(), nullable=False),
+        sa.Column('latitude', sa.Float(), nullable=False),
         sa.Column('is_verified', sa.Boolean(), nullable=False, default=False),
         sa.Column('user_id', sa.Integer(), sa.ForeignKey('users.id'), nullable=False, unique=True),
     )   

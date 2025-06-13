@@ -37,13 +37,13 @@ class PlaceController():
     
     
     async def get(self, place_id: int):
-        place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image"])
+        place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image", "municipality"])
         if not place:
             raise HTTPException(status_code=404, detail="Place not found")
         return BaseResponse(message="Place fetched successfully", data=ReadPlace.from_model(place))
     
     async def get_all(self):
-        res = await self.repository.get_all(load_relations=["images", "place_activities.activity.image"])
+        res = await self.repository.get_all(load_relations=["images", "place_activities.activity.image", "municipality"])
         return BaseResponse(message="Places fetched successfully", data=[ReadPlace.from_model(p) for p in res])
 
     async def delete(self, place_id: int):

@@ -14,14 +14,16 @@ class Place(Base):
     __tablename__ = "places"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
     categories = Column(JSON, nullable=True)
     longitude = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     description = Column(String, nullable=True)
+    municipality_id = Column(Integer, ForeignKey("municipalities.id"), nullable=False)
 
     place_activities = relationship("PlaceActivity", back_populates="place", cascade="all, delete-orphan")
     images = relationship("Image", secondary=place_images)
+    municipality = relationship("Municipality", foreign_keys=[municipality_id])
 
     @property
     def activities(self):

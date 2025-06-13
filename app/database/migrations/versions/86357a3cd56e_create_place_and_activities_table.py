@@ -32,7 +32,7 @@ def upgrade() -> None:
     op.create_table(
         'places',
         sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.String, unique=True, index=True, nullable=False),
+        sa.Column('name', sa.String, index=True, nullable=False),
         sa.Column('categories', sa.JSON, nullable=True),
         sa.Column('longitude', sa.Float, nullable=False),
         sa.Column('latitude', sa.Float, nullable=False),

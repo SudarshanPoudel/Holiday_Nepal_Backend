@@ -18,12 +18,12 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-
-
 def upgrade() -> None:
+    # Enum types
     route_category_enum = sa.Enum('WALKING', 'ROAD', 'AIR', name='routecategoryenum')
     transport_category_enum = sa.Enum('BUS', 'TAXI', 'BIKE', 'MINIBUS', 'PLANE', 'HELICOPTER', 'OTHER', name='transportcategoryenum')
 
+    # Create tables
     op.create_table(
         'transport_routes',
         sa.Column('id', sa.Integer(), primary_key=True),
@@ -40,7 +40,6 @@ def upgrade() -> None:
         sa.Column('service_provider_id', sa.Integer(), sa.ForeignKey('service_providers.id'), nullable=False),
         sa.Column('start_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
         sa.Column('end_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
-        sa.Column('image', sa.String(), nullable=True),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('transport_category', transport_category_enum, nullable=False),
@@ -56,12 +55,17 @@ def upgrade() -> None:
         sa.Column('sequence', sa.Integer(), nullable=False)
     )
 
+    op.create_table(
+        'transport_service_images',
+        sa.Column('transport_service_id', sa.Integer(), sa.ForeignKey('transport_services.id'), primary_key=True),
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), primary_key=True)
+    )
+
 
 def downgrade() -> None:
+    op.drop_table('transport_service_images')
     op.drop_table('transport_service_route_segments')
     op.drop_table('transport_services')
     op.drop_table('transport_routes')
     op.execute('DROP TYPE routecategoryenum')
     op.execute('DROP TYPE transportcategoryenum')
-    
-

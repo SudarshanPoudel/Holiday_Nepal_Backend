@@ -13,6 +13,7 @@ from app.modules.storage.routes import router as image_router
 from app.modules.service_provider.routes import router as service_provider_router
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
+from app.modules.accomodation_service.routes import router as accomodation_service_router
 
 app = FastAPI()
 
@@ -28,6 +29,7 @@ app.include_router(places_router, prefix="/places", tags=["Places"])
 app.include_router(service_provider_router, prefix="/service-provider", tags=["Service Provider"])
 app.include_router(transport_route_router, prefix="/transport-route", tags=["Transport Route"])
 app.include_router(transport_service_router, prefix="/transport-service", tags=["Transport Service"])
+app.include_router(accomodation_service_router, prefix="/accomodation-service", tags=["Accomodation Service"])
 
 def custom_openapi():
     if app.openapi_schema:
