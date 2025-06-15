@@ -5,7 +5,6 @@ Revises: 86357a3cd56e
 Create Date: 2025-06-04 12:07:32.069512
 
 """
-from enum import Enum
 from typing import Sequence, Union
 
 from alembic import op
@@ -20,7 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    service_provider_category = sa.Enum('ACCOMMODATION', 'TRANSPORT', name='serviceprovidercategoryenum')
+    service_provider_category = sa.Enum('accommodation', 'transport', name='serviceprovidercategoryenum')
     
     op.create_table(
         'service_providers',

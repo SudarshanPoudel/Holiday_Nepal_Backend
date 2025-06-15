@@ -7,10 +7,10 @@ from enum import Enum
 from app.modules.address.schema import MunicipalityBase
 
 
-class RouteCategoryEnum(Enum):
-    WALKING = 'walking'      
-    ROAD = 'road'            
-    AIR = 'air'
+class RouteCategoryEnum(str, Enum):
+    walking = 'walking'
+    road = 'road'
+    air = 'air'
 
 class TransportRouteCreate(BaseModel):
     start_municipality_id: int

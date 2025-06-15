@@ -25,7 +25,6 @@ class BaseActivity(BaseModel):
     name: str
 
 class PlaceActivityRead(BaseModel):
-    id: int
     activity : BaseActivity
     description: Optional[str] = None
     average_duration: Optional[int] = None

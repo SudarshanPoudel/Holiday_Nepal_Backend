@@ -35,11 +35,6 @@ class AuthController:
         if result.scalar_one_or_none():
             raise HTTPException(status_code=400, detail="This username is already taken..")
 
-        if user.image_id:
-            image_repository = ImageRepository(db)
-            image = await image_repository.get(record_id=user.image_id)
-            if not image:
-                raise HTTPException(status_code=404, detail="Image not found")
         if user.municipality_id:
             municipality_repo = MunicipalityRepository(db)
             municipality = await municipality_repo.get(record_id=user.municipality_id)

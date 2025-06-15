@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.security import HTTPBearer
 from fastapi.openapi.utils import get_openapi
 
+from app.core.all_models import *
 from app.middlerware.auth import AuthMiddleware
 from app.middlerware.cors import add_cors_middleware
 
@@ -14,6 +15,7 @@ from app.modules.service_provider.routes import router as service_provider_route
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
 from app.modules.accomodation_service.routes import router as accomodation_service_router
+from app.modules.plans.routes import router as plans_router
 
 app = FastAPI()
 
@@ -23,6 +25,7 @@ add_cors_middleware(app)
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(image_router, prefix="/image", tags=["Images"])
+app.include_router(plans_router, prefix="/plans", tags=["Plans"])
 app.include_router(address_router, prefix="/address", tags=["Address"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])

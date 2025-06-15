@@ -3,11 +3,11 @@ from pydantic import BaseModel
 from enum import Enum
 
 class ImageCategoryEnum(str, Enum):
-    USER_PROFILE = "user_profile"
-    PLACE = "place"
-    ACTIVITIES = "activities"
-    SERVICES = "services"
-    OTHER = "other"
+    user_profile = "user_profile"
+    place = "place"
+    activities = "activities"
+    services = "services"
+    other = "other"
 
 class ImageRead(BaseModel):
     id: int

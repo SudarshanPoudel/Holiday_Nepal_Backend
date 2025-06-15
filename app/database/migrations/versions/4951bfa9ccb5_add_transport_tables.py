@@ -20,8 +20,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Enum types
-    route_category_enum = sa.Enum('WALKING', 'ROAD', 'AIR', name='routecategoryenum')
-    transport_category_enum = sa.Enum('BUS', 'TAXI', 'BIKE', 'MINIBUS', 'PLANE', 'HELICOPTER', 'OTHER', name='transportcategoryenum')
+    route_category_enum = sa.Enum(
+        'walking', 'road', 'air',
+        name='routecategoryenum'
+    )
+
+    transport_category_enum = sa.Enum(
+        'bus', 'taxi', 'bike', 'minibus', 'plane', 'helicopter', 'other',
+        name='transportcategoryenum'
+    )
 
     # Create tables
     op.create_table(

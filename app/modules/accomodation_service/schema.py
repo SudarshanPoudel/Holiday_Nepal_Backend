@@ -4,13 +4,13 @@ from enum import Enum
 
 from app.modules.storage.schema import ImageRead
 
-class AccomodationCategoryEnum(Enum):
-    HOTEL = 'hotel'
-    MOTEL = 'motel'
-    RESORT = 'resort'
-    HOSTEL = 'hostel'
-    HOMESTAY = 'homestay'
-    OTHER = 'other'
+class AccomodationCategoryEnum(str, Enum):
+    hotel = 'hotel'
+    motel = 'motel'
+    resort = 'resort'
+    hostel = 'hostel'
+    homestay = 'homestay'
+    other = 'other'
 
 class AccomodationServiceCreate(BaseModel):
     description: Optional[str] = None

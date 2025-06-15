@@ -7,14 +7,14 @@ from app.modules.storage.schema import ImageRead
 from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteRead
 
 
-class TransportServiceCategoryEnum(Enum):
-    BUS = 'bus'
-    TAXI = 'taxi'
-    BIKE = 'bike'
-    MINIBUS = 'minibus'
-    PLANE = 'plane'
-    HELICOPTER = 'helicopter'
-    OTHER = 'other'
+class TransportServiceCategoryEnum(str, Enum):
+    bus = 'bus'
+    taxi = 'taxi'
+    bike = 'bike'
+    minibus = 'minibus'
+    plane = 'plane'
+    helicopter = 'helicopter'
+    other = 'other'
 
 
 class TransportServiceCreate(BaseModel):

@@ -8,7 +8,7 @@ from app.modules.activities.schema import ActivityCreateInternal
 from app.modules.place_activities.repository import PlaceActivityRepository
 from app.modules.place_activities.schema import PlaceActivityCreateInternal, PlaceActivityUpdateInternal
 from app.modules.places.repository import PlaceRepository
-from app.modules.places.schema import CreatePlace, CreatePlaceInternal, ReadPlace, UpdatePlace, UpdatePlaceInternal
+from app.modules.places.schema import CreatePlace, CreatePlaceInternal, PlaceRead, UpdatePlace, UpdatePlaceInternal
 from app.utils.helper import slugify
 from app.utils.image_utils import validate_and_process_image
 
@@ -40,11 +40,11 @@ class PlaceController():
         place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image", "municipality"])
         if not place:
             raise HTTPException(status_code=404, detail="Place not found")
-        return BaseResponse(message="Place fetched successfully", data=ReadPlace.from_model(place))
+        return BaseResponse(message="Place fetched successfully", data=PlaceRead.from_model(place))
     
     async def get_all(self):
         res = await self.repository.get_all(load_relations=["images", "place_activities.activity.image", "municipality"])
-        return BaseResponse(message="Places fetched successfully", data=[ReadPlace.from_model(p) for p in res])
+        return BaseResponse(message="Places fetched successfully", data=[PlaceRead.from_model(p) for p in res])
 
     async def delete(self, place_id: int):
         delete = await self.repository.delete(place_id)

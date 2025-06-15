@@ -18,7 +18,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Enum type for image category
-    image_category_enum = sa.Enum('PLACE', 'ACTIVITY', 'SERVICES', 'USER_PROFILE', 'OTHER', name='imagecategoryenum')
+    image_category_enum = sa.Enum(
+        'place', 'activity', 'services', 'user_profile', 'other',
+        name='imagecategoryenum'
+    )
+
 
     op.create_table(
         'images',

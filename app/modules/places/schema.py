@@ -8,18 +8,16 @@ from app.modules.place_activities.schema import PlaceActivityCreate, PlaceActivi
 from app.modules.places.models import Place
 from app.modules.storage.schema import ImageRead
 
-
-class PlaceCategoryEnum(Enum):
-    NATURAL = "natural"
-    CULTURAL = "cultural"
-    HISTORICAL = "historical"
-    RELIGIOUS = "religious"
-    ADVENTURE = "adventure"
-    WILDLIFE = "wildlife"
-    EDUCATIONAL = "educational"
-    ARCHITECTURAL = "architectural"
-    OTHER = "other"
-
+class PlaceCategoryEnum(str, Enum):
+    natural = "natural"
+    cultural = "cultural"
+    historical = "historical"
+    religious = "religious"
+    adventure = "adventure"
+    wildlife = "wildlife"
+    educational = "educational"
+    architectural = "architectural"
+    other = "other"
 
 class CreatePlace(BaseModel):
     name: str
@@ -64,7 +62,14 @@ class UpdatePlaceInternal(BaseModel):
     description: Optional[str] = None
     municipality_id: Optional[int] = None
 
-class ReadPlace(BaseModel):
+class PlaceReadBasic(BaseModel):
+    id: int
+    name: str
+    longitude: float
+    latitude: float
+    categories: List[PlaceCategoryEnum]
+
+class PlaceRead(BaseModel):
     id: int
     name: str
     longitude: float

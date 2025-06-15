@@ -2,9 +2,9 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-class ServiceProviderCategoryEnum(Enum):
-    ACCOMMODATION = 'accommodation'
-    TRANSPORT = 'transport'
+class ServiceProviderCategoryEnum(str, Enum):
+    accommodation = 'accommodation'
+    transport = 'transport'
 
 class ServiceProviderRegister(BaseModel):
     name: str

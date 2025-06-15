@@ -21,9 +21,10 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # Create enum type
     accomodation_category_enum = sa.Enum(
-        'HOTEL', 'MOTEL', 'RESORT', 'HOSTEL', 'HOMESTAY', 'OTHER',
+        'hotel', 'motel', 'resort', 'hostel', 'homestay', 'other',
         name='accomodationcategoryenum'
     )
+
     op.create_table(
         'accomodation_services',
         sa.Column('id', sa.Integer(), primary_key=True),

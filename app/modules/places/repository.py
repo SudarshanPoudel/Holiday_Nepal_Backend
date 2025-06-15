@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from app.core.repository import BaseRepository
 from app.modules.places.models import Place, place_images
-from app.modules.places.schema import ReadPlace
+from app.modules.places.schema import PlaceRead
 
 
-class PlaceRepository(BaseRepository[Place, ReadPlace]):
+class PlaceRepository(BaseRepository[Place, PlaceRead]):
     def __init__(self, db: AsyncSession):
         super().__init__(Place, db)
 
