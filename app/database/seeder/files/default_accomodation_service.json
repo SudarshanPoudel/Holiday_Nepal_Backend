@@ -1,0 +1,36 @@
+[
+    {
+      "username": "hotelwala2",
+      "description": "A modern hotel with great lake view.",
+      "full_location": "Lakeside, Pokhara",
+      "municipality": "Pokhara Metropolitan City",
+      "accomodation_category": "hotel",
+      "longitude": 83.9810,
+      "latitude": 28.2095,
+      "cost_per_night": 3500,
+      "images": ["1.jpg", "2.jpg"]
+    },
+    {
+      "username": "hotelwala3",
+      "description": "Quiet motel in Bandipur hills.",
+      "full_location": "Tundikhel, Bandipur",
+      "municipality": "Bandipur Rural Municipality",
+      "accomodation_category": "motel",
+      "longitude": 84.4095,
+      "latitude": 27.9350,
+      "cost_per_night": 1800,
+      "images": ["3.jpg"]
+    },
+    {
+      "username": "hotelwala4",
+      "description": "Luxurious resort surrounded by nature.",
+      "full_location": "Bharatpur Heights",
+      "municipality": "Bharatpur Metropolitan City",
+      "accomodation_category": "resort",
+      "longitude": 84.4371,
+      "latitude": 27.6667,
+      "cost_per_night": 6500,
+      "images": ["4.jpg", "5.jpg"]
+    }
+  ]
+  

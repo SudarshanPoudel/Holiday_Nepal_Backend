@@ -29,7 +29,7 @@ def upgrade() -> None:
         'accomodation_services',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('description', sa.String(), nullable=True),
-        sa.Column('service_provider_id', sa.Integer(), sa.ForeignKey('service_providers.id'), nullable=False),
+        sa.Column('service_provider_id', sa.Integer(), sa.ForeignKey('service_providers.id'), nullable=True),
         sa.Column('municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
         sa.Column('full_location', sa.String(), nullable=False),
         sa.Column('accomodation_category', accomodation_category_enum, nullable=False),

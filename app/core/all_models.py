@@ -10,4 +10,4 @@ from app.modules.service_provider.models import ServiceProvider
 from app.modules.storage.models import Image
 from app.modules.users.models import User
 from app.modules.transport_route.models import TransportRoute
-from app.modules.transport_service.models import TransportService
+from app.modules.transport_service.models import TransportService, TransportServiceRouteSegment

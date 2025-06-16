@@ -1,0 +1,119 @@
+[
+    {
+      "name": "Chitwan National Park",
+      "municipality": "Bharatpur Metropolitan City",
+      "categories": ["nature", "wildlife"],
+      "latitude": 27.5347,
+      "longitude": 84.4531,
+      "description": "A UNESCO World Heritage site famous for its wildlife safaris.",
+      "images": [
+        "app/seeders/files/images/places/chitwan1.jpeg",
+        "app/seeders/files/images/places/chitwan2.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Elephant Ride",
+          "description": "Ride through the forest on an elephant."
+        },
+        {
+          "name": "Boating",
+          "description": "Row along the Rapti River."
+        }
+      ]
+    },
+    {
+      "name": "Bandipur View Tower",
+      "municipality": "Bandipur Rural Municipality",
+      "categories": ["viewpoint", "culture"],
+      "latitude": 27.9431,
+      "longitude": 84.4132,
+      "description": "Panoramic hilltop view over mountains and villages.",
+      "images": [
+        "app/seeders/files/images/places/bandipur1.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Hiking",
+          "description": "Trail hike up to the tower."
+        },
+        {
+          "name": "Cultural Tours",
+          "description": "Explore Newari heritage."
+        }
+      ]
+    },
+    {
+      "name": "Gorkha Durbar",
+      "municipality": "Gorkha Municipality",
+      "categories": ["heritage", "history"],
+      "latitude": 28.1344,
+      "longitude": 84.6291,
+      "description": "Historic palace of the Shah kings with panoramic views.",
+      "images": [
+        "app/seeders/files/images/places/gorkha1.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Cultural Tours",
+          "description": "Guided tour of the palace."
+        }
+      ]
+    },
+    {
+      "name": "Phewa Lake",
+      "municipality": "Pokhara Metropolitan City",
+      "categories": ["lake", "scenic"],
+      "latitude": 28.2096,
+      "longitude": 83.9826,
+      "description": "Second largest lake in Nepal; boating hotspot.",
+      "images": [
+        "app/seeders/files/images/places/phewa1.jpeg",
+        "app/seeders/files/images/places/phewa2.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Boating",
+          "description": "Row or paddle across the lake."
+        }
+      ]
+    },
+    {
+      "name": "Sarangkot Viewpoint",
+      "municipality": "Pokhara Metropolitan City",
+      "categories": ["viewpoint", "sunrise"],
+      "latitude": 28.2156,
+      "longitude": 83.8943,
+      "description": "Famous for paragliding launches and sunrise views.",
+      "images": [
+        "app/seeders/files/images/places/sarangkot1.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Paragliding",
+          "description": "Take off from Sarangkot ridge."
+        },
+        {
+          "name": "Hiking",
+          "description": "Trail from Pokhara city."
+        }
+      ]
+    },
+    {
+      "name": "Gupteshwor Cave",
+      "municipality": "Pokhara Metropolitan City",
+      "categories": ["cave", "religious"],
+      "latitude": 28.2102,
+      "longitude": 83.9856,
+      "description": "Limestone cave with a sacred waterfall inside.",
+      "images": [
+        "app/seeders/files/images/places/gupteshwor1.jpeg"
+      ],
+      "activities": [
+        {
+          "name": "Cultural Tours",
+          "description": "Explore sacred cave temple."
+        }
+      ]
+    }
+  ]
+  

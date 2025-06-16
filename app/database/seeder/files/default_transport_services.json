@@ -1,0 +1,93 @@
+[
+    {
+      "username": "yatayat1",
+      "description": "Fast and reliable road travel from Gaindakot to Bandipur",
+      "transport_category": "bus",
+      "route_category": "road",
+      "segments": [
+        {
+          "start": "Gaindakot Municipality",
+          "end": "Bharatpur Metropolitan City"
+        },
+        {
+          "start": "Bharatpur Metropolitan City",
+          "end": "Bandipur Rural Municipality"
+        }
+      ],
+      "image_paths": [
+        "app/seeders/files/images/transport/1.jpeg"
+      ]
+    },
+    {
+      "username": "yatayat2",
+      "description": "Smooth ride through Bandipur to Pokhara",
+      "transport_category": "jeep",
+      "route_category": "road",
+      "segments": [
+        {
+          "start": "Bandipur Rural Municipality",
+          "end": "Byas Municipality"
+        },
+        {
+          "start": "Byas Municipality",
+          "end": "Pokhara Metropolitan City"
+        }
+      ],
+      "image_paths": [
+        "app/seeders/files/images/transport/2.jpeg"
+      ]
+    },
+    {
+      "username": "yatayat3",
+      "description": "Bandipur to Gorkha scenic route",
+      "transport_category": "van",
+      "route_category": "road",
+      "segments": [
+        {
+          "start": "Bandipur Rural Municipality",
+          "end": "Gorkha Municipality"
+        }
+      ],
+      "image_paths": [
+        "app/seeders/files/images/transport/3.jpeg"
+      ]
+    },
+    {
+      "username": "yatayat4",
+      "description": "Fast air travel between Pokhara and Bharatpur",
+      "transport_category": "plane",
+      "route_category": "air",
+      "segments": [
+        {
+          "start": "Pokhara Metropolitan City",
+          "end": "Bharatpur Metropolitan City"
+        }
+      ],
+      "image_paths": [
+        "app/seeders/files/images/transport/4.jpeg"
+      ]
+    },
+    {
+        "username": "yatayat1",
+        "description": "Convenient bus service from Bharatpur to Pokhara via Bandipur and Byas",
+        "transport_category": "bus",
+        "route_category": "road",
+        "segments": [
+          {
+            "start": "Bharatpur Metropolitan City",
+            "end": "Bandipur Rural Municipality"
+          },
+          {
+            "start": "Bandipur Rural Municipality",
+            "end": "Byas Municipality"
+          },
+          {
+            "start": "Byas Municipality",
+            "end": "Pokhara Metropolitan City"
+          }
+        ],
+        "image_paths": [
+          "app/seeders/files/images/transport/5.jpeg"
+        ]
+      }      
+  ]

@@ -18,7 +18,7 @@ class AccomodationService(Base):
 
     id = Column(Integer, primary_key=True)
     description = Column(String, nullable=True)
-    service_provider_id = Column(Integer, ForeignKey('service_providers.id'), nullable=False)
+    service_provider_id = Column(Integer, ForeignKey('service_providers.id'), nullable=True)
     municipality_id = Column(Integer, ForeignKey('municipalities.id'), nullable=False)
     full_location = Column(String, nullable=False)
     accomodation_category = Column(Enum(AccomodationCategoryEnum, name="accomodationcategoryenum"), nullable=False)

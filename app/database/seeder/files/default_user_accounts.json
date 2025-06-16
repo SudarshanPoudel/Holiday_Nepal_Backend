@@ -1,0 +1,62 @@
+[
+    {
+        "email": "contactholidaynepal@gmail.com",
+        "username": "admin",
+        "password": "admin",
+        "muicipality": "Gaindakot Municipality"
+    },
+    {
+        "email": "hotelwala1@gmail.com",
+        "username": "hotelwala1",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "hotelwala2@gmail.com",
+        "username": "hotelwala2",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "hotelwala3@gmail.com",
+        "username": "hotelwala3",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "hotelwala4@gmail.com",
+        "username": "hotelwala4",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "hotelwala5@gmail.com",
+        "username": "hotelwala5",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "yatayat1@gmail.com",
+        "username": "yatayat1",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "yatayat2@gmail.com",
+        "username": "yatayat2",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "yatayat3@gmail.com",
+        "username": "yatayat3",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    },
+    {
+        "email": "yatayat4@gmail.com",
+        "username": "yatayat4",
+        "password": "1234",
+        "muicipality": "Pokhara Metropolitan City"
+    }
+]

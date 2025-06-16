@@ -1,0 +1,28 @@
+[
+    {
+      "name": "Bungee Jumping",
+      "description": "Experience the thrill of jumping from extreme heights with safety gear.",
+      "image_path": "app/seeders/files/images/activities/bungee.webp"
+    },
+    {
+      "name": "Paragliding",
+      "description": "Soar through the skies and enjoy breathtaking aerial views.",
+      "image_path": "app/seeders/files/images/activities/paragliding.webp"
+    },
+    {
+      "name": "Boating",
+      "description": "Relax with a boat ride on calm lakes or thrilling river waters.",
+      "image_path": "app/seeders/files/images/activities/boating.webp"
+    },
+    {
+      "name": "White Water Rafting",
+      "description": "Navigate Nepal’s exciting river rapids for an adrenaline-pumping adventure.",
+      "image_path": "app/seeders/files/images/activities/rafting.webp"
+    },
+    {
+      "name": "Elephant Ride",
+      "description": "Ride atop gentle giants through forests and grasslands in Chitwan.",
+      "image_path": "app/seeders/files/images/activities/elephant_ride.webp"
+    }
+  ]
+  

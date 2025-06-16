@@ -1,0 +1,82 @@
+[
+  {
+    "username": "hotelwala2",
+    "name": "Hotel Pokhara View",
+    "description": "A scenic hotel near Phewa Lake.",
+    "contact_no": "9801234567",
+    "address": "Lakeside, Pokhara",
+    "longitude": 83.9822,
+    "latitude": 28.2096,
+    "category": "accomodation"
+  },
+  {
+    "username": "hotelwala3",
+    "name": "Mountain Inn",
+    "description": "Comfortable rooms with mountain views.",
+    "contact_no": "9802345678",
+    "address": "Sedi, Pokhara",
+    "longitude": 83.9946,
+    "latitude": 28.2430,
+    "category": "accomodation"
+  },
+  {
+    "username": "hotelwala4",
+    "name": "Lodge Paradise",
+    "description": "Affordable stay with great hospitality.",
+    "contact_no": "9803456789",
+    "address": "Damside, Pokhara",
+    "longitude": 83.9739,
+    "latitude": 28.2088,
+    "category": "accomodation"
+  },
+  {
+    "username": "hotelwala5",
+    "name": "Green Valley Hotel",
+    "description": "Eco-friendly hotel with garden views.",
+    "contact_no": "9804567890",
+    "address": "Khahare, Pokhara",
+    "longitude": 83.9671,
+    "latitude": 28.2170,
+    "category": "accomodation"
+  },
+  {
+    "username": "yatayat1",
+    "name": "Pokhara Bus Service",
+    "description": "Local and intercity transport provider.",
+    "contact_no": "9805678901",
+    "address": "New Road, Pokhara",
+    "longitude": 83.9812,
+    "latitude": 28.2131,
+    "category": "transport"
+  },
+  {
+    "username": "yatayat2",
+    "name": "Lake City Travel",
+    "description": "Tourist transport with deluxe buses.",
+    "contact_no": "9806789012",
+    "address": "Prithvi Chowk, Pokhara",
+    "longitude": 83.9840,
+    "latitude": 28.2025,
+    "category": "transport"
+  },
+  {
+    "username": "yatayat3",
+    "name": "Nepal Express",
+    "description": "Express bus service to major cities.",
+    "contact_no": "9807890123",
+    "address": "Bagar, Pokhara",
+    "longitude": 83.9705,
+    "latitude": 28.2242,
+    "category": "transport"
+  },
+  {
+    "username": "yatayat4",
+    "name": "Mountain Movers",
+    "description": "Reliable goods and people transport.",
+    "contact_no": "9808901234",
+    "address": "Chipledhunga, Pokhara",
+    "longitude": 83.9952,
+    "latitude": 28.2299,
+    "category": "transport"
+  }
+]
