@@ -37,3 +37,7 @@ class ServiceProviderRead(BaseModel):
     contact_no: str
     address: str
     description: Optional[str]
+
+class ServiceProviderFilters(BaseModel):
+    category: Optional[ServiceProviderCategoryEnum]
+    is_verified: Optional[bool]

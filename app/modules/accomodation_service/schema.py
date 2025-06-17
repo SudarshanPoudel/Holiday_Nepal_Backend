@@ -66,3 +66,7 @@ class AccomodationServiceRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AccomodationServiceFilter(BaseModel):
+    municipality_id: Optional[int] = None
+    accomodation_category: Optional[AccomodationCategoryEnum] = None

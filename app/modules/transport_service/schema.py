@@ -67,3 +67,11 @@ class TransportServiceUpdate(BaseModel):
     transport_category: Optional[TransportServiceCategoryEnum]
     average_time: Optional[int]
     image_ids: Optional[List[int]] = None  
+
+
+class TransportServiceFilters(BaseModel):
+    service_provider_id: Optional[int] = None
+    start_municipality_id: Optional[int] = None
+    end_municipality_id: Optional[int] = None
+    route_category: Optional[RouteCategoryEnum] = None
+    transport_category: Optional[TransportServiceCategoryEnum] = None

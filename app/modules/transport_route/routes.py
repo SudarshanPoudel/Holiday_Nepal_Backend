@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi_pagination import Params
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,11 +10,32 @@ from app.modules.transport_route.schema import TransportRouteCreate, TransportRo
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("/all")
 async def get_all_transport_routes(db: AsyncSession = Depends(get_db)):
     try:
         controller = TransportRouteController(db)
         return await controller.get_all()
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/")
+async def index_transport_route(
+    request: Request,
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    params: Params = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        user_id = request.state.user_id
+        controller = TransportRouteController(db, user_id)
+        return await controller.index(
+            params=params,
+            sort_by=sort_by,
+            order=order,
+        )
     except HTTPException as e:
         raise e
     except Exception as e:

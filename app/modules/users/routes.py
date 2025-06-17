@@ -4,6 +4,6 @@ from app.database.database import get_db
 
 router = APIRouter()
 
-router.get("/")
+@router.get("/")
 async def get_profile(request: Request, db: AsyncSession = Depends(get_db)):
     return {"message": "Hello, Users!"}

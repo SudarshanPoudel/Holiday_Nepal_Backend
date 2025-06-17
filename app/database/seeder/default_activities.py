@@ -1,35 +1,28 @@
 import json
 from pathlib import Path
-from slugify import slugify
+from app.database.seeder.utils import get_file_path, load_data
+from app.utils.helper import slugify
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.activities.models import Activity
 from app.modules.storage.models import Image, ImageCategoryEnum
 from app.modules.storage.service import StorageService  # Use your actual S3 service import
-
-ACTIVITY_JSON_PATH = "app/seeders/data/default_activities.json"
+from app.utils.image_utils import validate_and_process_image
 
 async def seed_default_activities(db: AsyncSession):
-    with open(ACTIVITY_JSON_PATH, "r") as f:
-        activities = json.load(f)
-
+    activities = load_data("files/default_activities.json")
     for activity in activities:
         name = activity["name"]
         slug = slugify(name)
         description = activity.get("description")
-        image_path = Path(activity["image_path"])
-
+        image_path = get_file_path(f"files/images/activities/{activity['image_path']}")
         result = await db.execute(select(Activity).filter_by(name_slug=slug))
         if result.scalar():
             continue
 
-        if not image_path.exists():
-            print(f"Image not found: {image_path}")
-            continue
-
         with open(image_path, "rb") as f:
-            content = f.read()
+            content = validate_and_process_image(f.read(), resize_to=(1080, 720))
 
         s3_key = f"activities/{slug}.webp"
         s3_service = StorageService()

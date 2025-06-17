@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class DistrictBase(BaseModel):
     id: Optional[int] = None
     name: str
-    headquarter: str
+    # headquarter: str
 
     class Config:
         from_attributes = True

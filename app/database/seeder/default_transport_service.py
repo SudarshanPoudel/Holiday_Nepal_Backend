@@ -1,24 +1,21 @@
 import json
 from pathlib import Path
-from sqlalchemy import select
+from sqlalchemy import insert, select
 from app.core.all_models import TransportService, TransportServiceRouteSegment, Municipality, TransportRoute, ServiceProvider, Image
+from app.modules.transport_service.models import transport_service_images
+from app.database.seeder.utils import get_file_path, load_data
 from app.modules.transport_service.schema import TransportServiceCategoryEnum
 from app.modules.transport_route.schema import RouteCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
 from fastapi.concurrency import run_in_threadpool
 from fastapi import HTTPException
-from app.modules.storage.service import StorageService 
+from app.modules.storage.service import StorageService
+from app.utils.image_utils import validate_and_process_image 
 
 
 async def seed_default_transport_services(db):
-    json_path = Path("app/seeders/files/data/default_transport_services.json")
-    if not json_path.exists():
-        raise FileNotFoundError(f"JSON file not found: {json_path}")
-
-    with open(json_path) as f:
-        transport_services = json.load(f)
-
+    transport_services = load_data("files/default_transport_services.json")
     for entry in transport_services:
         provider = await db.scalar(select(ServiceProvider).join(ServiceProvider.user).where(ServiceProvider.user.has(username=entry["username"])))
         if not provider:
@@ -43,8 +40,12 @@ async def seed_default_transport_services(db):
             ))
 
             if not route:
-                print(f"No matching route found for {segment}")
-                continue
+                route = await db.scalar(select(TransportRoute).where(
+                    TransportRoute.start_municipality_id == end.id,
+                    TransportRoute.end_municipality_id == start.id
+                ))
+                if not route:
+                    continue
 
             route_ids.append(route.id)
             total_distance += route.distance
@@ -73,13 +74,18 @@ async def seed_default_transport_services(db):
                 sequence=idx
             ))
 
+        transport_images = []
         for path in entry.get("image_paths", []):
-            file_path = Path(path)
-            if not file_path.exists():
-                print(f"Image not found: {file_path}")
+            file_path = get_file_path(f"files/images/transport/{path}")
+            key = f"services/{StorageService.generate_unique_key('.webp')}"
+            existing = await db.scalar(select(Image).where(Image.key == key))
+            if existing:
+                transport_images.append(existing)
                 continue
-            key = f"services/{file_path.stem}.webp"
-            content = file_path.read_bytes()
+
+            with open(file_path, "rb") as f:
+                content = f.read()
+            content = validate_and_process_image(content, resize_to=(1080, 720))
             s3_service = StorageService()
             await s3_service.upload_file(key, content, "image/webp")
             url = s3_service.get_file_url(key)
@@ -87,7 +93,18 @@ async def seed_default_transport_services(db):
             image = Image(key=key, url=url, category=ImageCategoryEnum.services)
             db.add(image)
             await db.flush()
-            new_service.images.append(image)
+            transport_images.append(image)
+
+        for image in transport_images:
+            existing = await db.scalar(
+                select(transport_service_images).where(
+                    transport_service_images.c.transport_service_id == new_service.id, transport_service_images.c.image_id == image.id
+                )
+            )
+            if existing:
+                continue
+            await db.execute(insert(transport_service_images).values(transport_service_id=new_service.id, image_id=image.id))
+        
 
     await db.commit()
     print("Transport services seeded.")

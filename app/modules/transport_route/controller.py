@@ -1,4 +1,6 @@
+from typing import Optional
 from fastapi import HTTPException
+from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
@@ -47,3 +49,16 @@ class TransportRouteController():
             raise HTTPException(status_code=404, detail="Transport route not found")
         return BaseResponse(message="Transport route deleted successfully")
     
+    async def index(
+        self,
+        params: Params,
+        sort_by: Optional[str],
+        order: Optional[str],
+    ):
+        data = await self.repository.index(
+            params=params,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["start_municipality", "end_municipality"]
+        )
+        return BaseResponse(message="Transport routes fetched successfully", data=[TransportRouteRead.model_validate(tr, from_attributes=True) for tr in data.items])

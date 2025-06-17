@@ -1,5 +1,6 @@
-import time
-from fastapi import HTTPException, UploadFile
+from typing import Dict, Optional
+from fastapi import HTTPException
+from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
@@ -53,4 +54,21 @@ class ActivityController():
         if not delete:
             raise HTTPException(status_code=404, detail="Activity not found")
         return BaseResponse(message="Activity deleted successfully")
-    
+
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+    ):
+        data = await self.repository.index(
+            params=params,
+            search_fields=["name"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["images"]
+        )
+        return BaseResponse(message="Transport services fetched successfully", data=[ActivityRead.model_validate(ts, from_attributes=True) for ts in data.items])
+

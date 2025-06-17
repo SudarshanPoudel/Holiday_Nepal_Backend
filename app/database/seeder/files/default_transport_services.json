@@ -1,93 +1,97 @@
 [
-    {
-      "username": "yatayat1",
-      "description": "Fast and reliable road travel from Gaindakot to Bandipur",
-      "transport_category": "bus",
-      "route_category": "road",
-      "segments": [
-        {
-          "start": "Gaindakot Municipality",
-          "end": "Bharatpur Metropolitan City"
-        },
-        {
-          "start": "Bharatpur Metropolitan City",
-          "end": "Bandipur Rural Municipality"
-        }
-      ],
-      "image_paths": [
-        "app/seeders/files/images/transport/1.jpeg"
-      ]
-    },
-    {
-      "username": "yatayat2",
-      "description": "Smooth ride through Bandipur to Pokhara",
-      "transport_category": "jeep",
-      "route_category": "road",
-      "segments": [
-        {
-          "start": "Bandipur Rural Municipality",
-          "end": "Byas Municipality"
-        },
-        {
-          "start": "Byas Municipality",
-          "end": "Pokhara Metropolitan City"
-        }
-      ],
-      "image_paths": [
-        "app/seeders/files/images/transport/2.jpeg"
-      ]
-    },
-    {
-      "username": "yatayat3",
-      "description": "Bandipur to Gorkha scenic route",
-      "transport_category": "van",
-      "route_category": "road",
-      "segments": [
-        {
-          "start": "Bandipur Rural Municipality",
-          "end": "Gorkha Municipality"
-        }
-      ],
-      "image_paths": [
-        "app/seeders/files/images/transport/3.jpeg"
-      ]
-    },
-    {
-      "username": "yatayat4",
-      "description": "Fast air travel between Pokhara and Bharatpur",
-      "transport_category": "plane",
-      "route_category": "air",
-      "segments": [
-        {
-          "start": "Pokhara Metropolitan City",
-          "end": "Bharatpur Metropolitan City"
-        }
-      ],
-      "image_paths": [
-        "app/seeders/files/images/transport/4.jpeg"
-      ]
-    },
-    {
-        "username": "yatayat1",
-        "description": "Convenient bus service from Bharatpur to Pokhara via Bandipur and Byas",
-        "transport_category": "bus",
-        "route_category": "road",
-        "segments": [
-          {
-            "start": "Bharatpur Metropolitan City",
-            "end": "Bandipur Rural Municipality"
-          },
-          {
-            "start": "Bandipur Rural Municipality",
-            "end": "Byas Municipality"
-          },
-          {
-            "start": "Byas Municipality",
-            "end": "Pokhara Metropolitan City"
-          }
-        ],
-        "image_paths": [
-          "app/seeders/files/images/transport/5.jpeg"
-        ]
-      }      
-  ]
+  {
+    "username": "yatayat1",
+    "description": "This bus service offers a dependable and comfortable road journey from Gaindakot to Bandipur, passing through the bustling city of Bharatpur. Travelers can enjoy smooth roads and frequent rest stops, making it ideal for families and groups. The scenic drive transitions from plains to hills, offering panoramic views and a taste of the countryside. Buses are modern and well-maintained, equipped with air conditioning and ample seating. The route is favored for its timely schedule and courteous staff, ensuring a pleasant experience throughout.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "segments": [
+      {
+        "start": "Gaindakot Municipality",
+        "end": "Bharatpur Metropolitan City"
+      },
+      {
+        "start": "Bharatpur Metropolitan City",
+        "end": "Bandipur Rural Municipality"
+      }
+    ],
+    "image_paths": [
+      "1.jpeg",
+      "2.jpg"
+    ]
+  },
+  {
+    "username": "yatayat2",
+    "description": "This minibus route from Bandipur to Pokhara via Byas Municipality is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
+    "transport_category": "minibus",
+    "route_category": "road",
+    "segments": [
+      {
+        "start": "Bandipur Rural Municipality",
+        "end": "Byas Municipality"
+      },
+      {
+        "start": "Byas Municipality",
+        "end": "Pokhara Metropolitan City"
+      }
+    ],
+    "image_paths": [
+      "1.jpeg",
+      "2.jpg"
+    ]
+  },
+  {
+    "username": "yatayat3",
+    "description": "This taxi service connects the historic hill town of Bandipur to the culturally rich city of Gorkha. Ideal for travelers seeking privacy, speed, and scenic stops, the ride traverses winding roads with breathtaking views of terraced fields and lush hillsides. Taxis are typically compact sedans or SUVs with professional drivers who are familiar with the terrain. The journey allows for spontaneous stops, ideal for photography or quick detours to local eateries. It’s a highly personalized and efficient option for small groups or solo travelers.",
+    "transport_category": "taxi",
+    "route_category": "road",
+    "segments": [
+      {
+        "start": "Bandipur Rural Municipality",
+        "end": "Gorkha Municipality"
+      }
+    ],
+    "image_paths": [
+      "1.jpeg",
+      "2.jpg"
+    ]
+  },
+  {
+    "username": "yatayat4",
+    "description": "This short-haul flight offers a fast and scenic journey between Pokhara and Bharatpur. Ideal for time-sensitive travelers or those avoiding long road trips, this air route covers the distance in under 30 minutes. The flight provides panoramic views of the Himalayas and mid-hill landscapes, making it a visually rewarding experience. Modern aircraft ensure a smooth journey with minimal turbulence and efficient boarding. It’s especially popular among business travelers, tourists with tight itineraries, and older passengers seeking comfort.",
+    "transport_category": "plane",
+    "route_category": "air",
+    "segments": [
+      {
+        "start": "Pokhara Metropolitan City",
+        "end": "Bharatpur Metropolitan City"
+      }
+    ],
+    "image_paths": [
+      "3.jpg"
+    ]
+  },
+  {
+    "username": "yatayat1",
+    "description": "This extended bus service connects Bharatpur to Pokhara, weaving through the picturesque towns of Bandipur and Byas. It’s a favorite for travelers seeking a laid-back journey through cultural and natural landmarks. Each leg of the trip offers a different landscape—from cityscapes in Bharatpur to hilltop charm in Bandipur and riverside tranquility in Byas. Buses are semi-deluxe with reclining seats, onboard music, and storage for luggage. The complete route is well-paced, making it suitable for both tourists and locals looking for a reliable, scenic commute.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "segments": [
+      {
+        "start": "Bharatpur Metropolitan City",
+        "end": "Bandipur Rural Municipality"
+      },
+      {
+        "start": "Bandipur Rural Municipality",
+        "end": "Byas Municipality"
+      },
+      {
+        "start": "Byas Municipality",
+        "end": "Pokhara Metropolitan City"
+      }
+    ],
+    "image_paths": [
+      "1.jpeg",
+      "2.jpg"
+    ]
+  }
+]

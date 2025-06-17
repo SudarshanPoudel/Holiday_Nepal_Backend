@@ -3,16 +3,11 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.all_models import Municipality, TransportRoute  # adjust import paths
+from app.database.seeder.utils import load_data
 from app.modules.transport_route.schema import RouteCategoryEnum
 
 async def seed_default_transport_routes(db: AsyncSession):
-    file_path = Path("app/seeder/files/default_transport_routes.json")
-    if not file_path.exists():
-        print("default_transport_routes.json not found.")
-        return
-
-    with file_path.open("r", encoding="utf-8") as f:
-        routes_data = json.load(f)
+    routes_data = load_data("files/default_transport_routes.json")
 
     for route in routes_data:
         start_name = route["start_municipality"]
@@ -39,7 +34,15 @@ async def seed_default_transport_routes(db: AsyncSession):
         )
         if existing.scalar():
             continue
-
+        existing_opposite = await db.execute(
+            select(TransportRoute).where(
+                TransportRoute.start_municipality_id == end.id,
+                TransportRoute.end_municipality_id == start.id,
+                TransportRoute.route_category == RouteCategoryEnum(route["route_category"])
+            )
+        )
+        if existing_opposite.scalar():
+            continue
         new_route = TransportRoute(
             id=route["id"],
             start_municipality_id=start.id,

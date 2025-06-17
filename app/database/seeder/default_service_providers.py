@@ -3,16 +3,11 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.all_models import User, ServiceProvider
+from app.database.seeder.utils import load_data
 from app.modules.service_provider.schema import ServiceProviderCategoryEnum  # adjust import
 
 async def seed_default_service_providers(db: AsyncSession):
-    file_path = Path("app/seeder/files/default_service_providers.json")
-    if not file_path.exists():
-        print("default_service_providers.json not found.")
-        return
-
-    with file_path.open("r", encoding="utf-8") as f:
-        providers_data = json.load(f)
+    providers_data = load_data("files/default_service_providers.json")
 
     for provider in providers_data:
         username = provider["username"]

@@ -1,28 +1,42 @@
 [
-    {
-      "name": "Bungee Jumping",
-      "description": "Experience the thrill of jumping from extreme heights with safety gear.",
-      "image_path": "app/seeders/files/images/activities/bungee.webp"
-    },
-    {
-      "name": "Paragliding",
-      "description": "Soar through the skies and enjoy breathtaking aerial views.",
-      "image_path": "app/seeders/files/images/activities/paragliding.webp"
-    },
-    {
-      "name": "Boating",
-      "description": "Relax with a boat ride on calm lakes or thrilling river waters.",
-      "image_path": "app/seeders/files/images/activities/boating.webp"
-    },
-    {
-      "name": "White Water Rafting",
-      "description": "Navigate Nepal’s exciting river rapids for an adrenaline-pumping adventure.",
-      "image_path": "app/seeders/files/images/activities/rafting.webp"
-    },
-    {
-      "name": "Elephant Ride",
-      "description": "Ride atop gentle giants through forests and grasslands in Chitwan.",
-      "image_path": "app/seeders/files/images/activities/elephant_ride.webp"
-    }
-  ]
-  
+  {
+    "name": "Bungee Jumping",
+    "description": "Bungee jumping in Nepal is a heart-pounding experience set against dramatic natural backdrops. Whether you're leaping from a suspension bridge over the roaring Bhote Koshi River or from a high cliff near Pokhara, the thrill is unmatched. As you free-fall with only a secure harness and elastic cord, the sensation of defying gravity offers a rush of pure adrenaline.\n\nThis activity is supervised by trained professionals who prioritize safety while making the experience unforgettable. Suitable for both seasoned thrill-seekers and first-timers, Nepal’s bungee sites combine extreme adventure with awe-inspiring scenery. The jump often ends with a gentle rebound and a sense of accomplishment that stays with you for life.",
+    "image_path": "1.jpg"
+  },
+  {
+    "name": "Paragliding",
+    "description": "Paragliding in Nepal offers a bird’s-eye view of the country’s stunning landscapes, from the sparkling waters of Phewa Lake to the snowy peaks of the Annapurna range. Taking off from Sarangkot in Pokhara, you glide effortlessly through the skies, guided by expert pilots who ensure a safe and smooth journey. The air currents carry you across valleys, forests, and villages, giving you a new perspective on Nepal’s natural beauty.\n\nWhether you’re chasing sunrise over the mountains or a golden sunset in the distance, paragliding is both serene and exhilarating. Tandem flights make the activity accessible to almost anyone, and the gentle descent allows time to soak in the silence of the sky. It’s more than a thrill—it's a peaceful float through some of the world’s most majestic views.",
+    "image_path": "2.jpg"
+  },
+  {
+    "name": "Boating",
+    "description": "Boating in Nepal is a serene and scenic way to explore its many lakes and rivers. In Pokhara, traditional wooden boats glide across the crystal-clear Phewa Lake, where reflections of the Annapurna mountains shimmer on the surface. The gentle paddling of oars and the distant sound of temple bells create a peaceful atmosphere ideal for couples, families, or solo travelers seeking relaxation.\n\nFor a slightly more adventurous option, canoe rides on rivers like the Rapti in Chitwan bring you closer to wildlife and lush forests. Whether it's a sunset ride with golden hues dancing on the water or an early morning cruise through soft mist, boating offers a timeless experience. It's a gentle yet memorable way to connect with Nepal's water landscapes.",
+    "image_path": "3.jpg"
+  },
+  {
+    "name": "Rafting",
+    "description": "Rafting in Nepal is an adrenaline-charged activity that plunges you into the heart of its wild and scenic rivers. With a variety of rivers such as Trishuli, Seti, and Bhote Koshi, each offering different grades of rapids, rafting is suitable for everyone—from beginners to seasoned adventurers. The experience combines the thrill of crashing through waves with moments of calm, as you float past jungle-covered hills, remote villages, and cascading waterfalls.\n\nTeams work together to navigate the flow, guided by certified instructors who ensure both fun and safety. Some routes include overnight stays on riverbanks under starry skies, adding to the immersive outdoor adventure. It’s an unforgettable way to explore Nepal’s natural beauty from a thrilling new perspective.",
+    "image_path": "4.jpg"
+  },
+  {
+    "name": "Elephant Ride",
+    "description": "Elephant rides in Chitwan provide a unique and traditional way to explore the rich biodiversity of Nepal’s southern plains. From the back of a majestic elephant, you can journey through dense sal forests, tall grasslands, and muddy riverbanks in Chitwan National Park. This vantage point allows close observation of rhinos, deer, crocodiles, and various bird species—all while maintaining a respectful distance.\n\nThe ride is led by experienced mahouts who share insights about the animals and ecosystems of the park. Although conservation concerns are changing how these rides are offered, many places are now incorporating ethical tourism and care for elephants. The experience is both immersive and educational, connecting visitors with Nepal’s remarkable wildlife heritage.",
+    "image_path": "5.jpg"
+  },
+  {
+    "name": "Ziplining",
+    "description": "Ziplining in Nepal is a thrilling way to soar over vast valleys, roaring rivers, and dense forests. In Pokhara, one of the world's most extreme ziplines lets you descend over 600 meters at speeds exceeding 100 km/h. As you race toward the finish, panoramic views of the Annapurna and Machhapuchhre peaks unfold around you.\n\nThe setup is designed with top-tier safety standards, ensuring a secure yet exhilarating ride. Even the initial leap from the launch platform is a moment of heart-racing excitement. Ziplining is perfect for those seeking high-speed adventure with a side of jaw-dropping scenery.",
+    "image_path": "1.jpg"
+  },
+  {
+    "name": "Canoeing",
+    "description": "Canoeing through Nepal’s rivers offers a peaceful, close-to-nature experience. Gliding on narrow wooden canoes, especially in Chitwan, brings travelers into intimate contact with the water’s edge. You can spot gharials basking on sandbanks, kingfishers diving for prey, and maybe even a wild elephant drinking nearby.\n\nThe slow pace lets you truly absorb the beauty and stillness of the jungle surroundings. Local guides paddle while sharing stories and knowledge about the river ecosystem. It’s a calming, educational experience that contrasts beautifully with the country’s more adrenaline-heavy adventures.",
+    "image_path": "3.jpg"
+  },
+  {
+    "name": "Jungle Safari",
+    "description": "Nepal’s jungle safaris, particularly in Chitwan and Bardia National Parks, are a window into its vibrant and diverse wildlife. Guests ride in open-top jeeps through grasslands and forest trails, guided by expert naturalists. It's one of the few places in the world where you might spot the endangered one-horned rhinoceros, Bengal tiger, and Asian elephant in a single outing.\n\nEach safari is a thrilling combination of tracking animal signs, listening for distant calls, and witnessing wildlife in their natural habitat. Morning and evening drives offer different experiences, from quiet misty paths to golden-lit clearings full of life. This is a must-do activity for wildlife enthusiasts and photographers alike.",
+    "image_path": "5.jpg"
+  }
+]

@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from starlette.concurrency import run_in_threadpool
 
 from app.core.all_models import User, Municipality, AccomodationService, ServiceProvider, Image
+from app.database.seeder.utils import get_file_path, load_data
 from app.modules.accomodation_service.schema import AccomodationCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
@@ -13,14 +14,7 @@ from app.modules.storage.service import StorageService
 from app.utils.image_utils import validate_and_process_image
 
 async def seed_default_accomodation_services(db: AsyncSession):
-    file_path = Path("app/seeder/files/default_accomodation_service.json")
-    if not file_path.exists():
-        print("default_accomodation_service.json not found.")
-        return
-
-    with file_path.open("r", encoding="utf-8") as f:
-        service_data = json.load(f)
-
+    service_data = load_data("files/default_accommodation_services.json")
     for data in service_data:
         # Lookup user
         user = await db.scalar(select(User).where(User.username == data["username"]))
@@ -43,7 +37,7 @@ async def seed_default_accomodation_services(db: AsyncSession):
         # Upload images and create image records
         images = []
         for image_name in data["images"]:
-            local_path = Path(f"app/seeders/files/images/accomodation/{image_name}")
+            local_path = Path(get_file_path("files/images/accomodation/" + image_name))
             if not local_path.exists():
                 print(f"Image {image_name} not found. Skipping.")
                 continue

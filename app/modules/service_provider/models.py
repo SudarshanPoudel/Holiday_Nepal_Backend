@@ -30,3 +30,4 @@ class ServiceProvider(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
     
     documents = relationship("VerificationDocuments", back_populates="service_provider")
+    user = relationship("User")

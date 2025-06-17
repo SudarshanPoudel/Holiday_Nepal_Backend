@@ -1,4 +1,6 @@
+from typing import Dict, Optional
 from fastapi import HTTPException
+from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
@@ -45,3 +47,22 @@ class AccomodationServiceController():
     async def get_all(self):
         res = await self.repository.get_all(load_relations=["images"])
         return BaseResponse(message="Accomodation services fetched successfully", data=[AccomodationServiceRead.model_validate(as_, from_attributes=True) for as_ in res])
+    
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        filters: Optional[Dict[str, str]] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+    ):
+        data = await self.repository.index(
+            params=params,
+            filters=filters,
+            search_fields=["name"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["images"]
+        )
+        return BaseResponse(message="Transport services fetched successfully", data=[AccomodationServiceRead.model_validate(ts, from_attributes=True) for ts in data.items])

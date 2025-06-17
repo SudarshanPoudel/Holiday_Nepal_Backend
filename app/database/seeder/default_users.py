@@ -4,19 +4,13 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.all_models import User, Municipality  
+from app.core.all_models import User, Municipality
+from app.database.seeder.utils import get_file_path, load_data  
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def seed_default_users(db: AsyncSession):
-    file_path = Path("app/seeders/files/default_users.json")
-    if not file_path.exists():
-        print("default_users.json not found.")
-        return
-
-    with file_path.open("r", encoding="utf-8") as f:
-        users_data = json.load(f)
-
+    users_data = load_data("files/default_users.json")
     for user_data in users_data:
         email = user_data["email"]
         username = user_data["username"]

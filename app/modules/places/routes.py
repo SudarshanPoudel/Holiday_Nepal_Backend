@@ -1,10 +1,11 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi_pagination import Params
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.places.controller import PlaceController
-from app.modules.places.schema import CreatePlace, UpdatePlace
+from app.modules.places.schema import CreatePlace, PlaceFilters, UpdatePlace
 
 
 router = APIRouter()
@@ -21,6 +22,31 @@ async def create_place(place: CreatePlace, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/")
+async def index_places(
+    request: Request,
+    search: Optional[str] = Query(None, description="Search query for service provider name"),
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    params: Params = Depends(),
+    filters: Optional[PlaceFilters] = Depends(PlaceFilters),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        controller = PlaceController(db)
+        return await controller.index(
+            params=params,
+            search=search,
+            filters=filters,
+            sort_by=sort_by,
+            order=order,
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.get("/all")
 async def get_all_places(db: AsyncSession = Depends(get_db)):
     try:
         controller = PlaceController(db)

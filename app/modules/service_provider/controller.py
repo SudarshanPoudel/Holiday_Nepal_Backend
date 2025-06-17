@@ -1,4 +1,6 @@
+from typing import Dict, Optional
 from fastapi import HTTPException, Request
+from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
@@ -51,4 +53,26 @@ class ServiceProviderController():
         await self.repository.delete(provider_id)
         return BaseResponse(message="Service provider deleted successfully")
     
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        filters: Optional[Dict[str, str]] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+    ):
+        data = await self.repository.index(
+            params=params,
+            filters=filters,
+            search_fields=["name"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+        )
+        return BaseResponse(message="Transport services fetched successfully", data=[ServiceProviderRead.model_validate(ts, from_attributes=True) for ts in data.items])
 
+    async def _add_route_segments(self, transport_service_id: int, route_ids: list[int]):
+        for route_id in route_ids:
+            await self.repository.add_route_segment(transport_service_id, route_id)
+
+    

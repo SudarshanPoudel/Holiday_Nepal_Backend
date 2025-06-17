@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi_pagination import Params
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +21,27 @@ async def create_activity(activity: ActivityCreate, db: AsyncSession = Depends(g
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/")
+async def index_activities(
+    search: Optional[str] = Query(None, description="Search query for service provider name"),
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    params: Params = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        controller = ActivityController(db)
+        return await controller.index(
+            params=params,
+            search=search,
+            sort_by=sort_by,
+            order=order,
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/all")
 async def get_all_activities(db: AsyncSession = Depends(get_db)):
     try:
         controller = ActivityController(db)

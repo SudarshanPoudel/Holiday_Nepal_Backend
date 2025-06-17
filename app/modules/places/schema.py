@@ -97,3 +97,6 @@ class PlaceRead(BaseModel):
             municipality=MunicipalityBase.model_validate(place.municipality, from_attributes=True)
         )
 
+
+class PlaceFilters(BaseModel):
+    municipality_id: Optional[int] = None

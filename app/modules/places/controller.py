@@ -1,5 +1,6 @@
-import time
-from fastapi import HTTPException, UploadFile
+from typing import Dict, Optional
+from fastapi import HTTPException
+from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
@@ -68,3 +69,22 @@ class PlaceController():
             except:
                 raise HTTPException(status_code=404, detail="Activity not found")
         return BaseResponse(message="Place updated successfully", data={"id": place_db.id})
+    
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        filters: Optional[Dict[str, str]] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+    ):
+        data = await self.repository.index(
+            params=params,
+            filters=filters,
+            search_fields=["name"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["images", "place_activities.activity.image", "municipality"]
+        )
+        return BaseResponse(message="Transport services fetched successfully", data=[PlaceRead.model_validate(ts, from_attributes=True) for ts in data.items])
