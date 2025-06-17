@@ -15,8 +15,8 @@ services:
       - celery
     command: >
       sh -c "
-        # alembic upgrade head &&
-        # python -m app.database.seeder.run_seeder &&
+        alembic upgrade head &&
+        python -m app.database.seeder.run_seeder &&
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
 
