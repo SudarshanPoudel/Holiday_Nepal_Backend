@@ -1,12 +1,9 @@
+import os
+from dotenv import load_dotenv
 from fastapi import Request, HTTPException, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.modules.auth.service import AuthService
-from app.database.database import get_db
-from app.core.config import settings
-from app.modules.auth.models import RefreshToken
 from passlib.context import CryptContext
-from sqlalchemy import update
-from datetime import datetime, timedelta, timezone
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -19,10 +16,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/docs", "/redoc", "/openapi.json"
         ]:
             return await call_next(request)
-
-        token = request.headers.get("Authorization")
+        load_dotenv()
+        token = os.getenv("DEV_TOKEN")
+        token = request.headers.get("Authorization") if not token else token
         if not token:
-            response = {"detail": "No token provided"}
+            response = HTTPException(status_code=401, detail="Token not found")
             return Response(content=str(response), status_code=401)
 
         try:
@@ -32,14 +30,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             if user:
                 request.state.user_id = user.get("user_id")  # User ID from token
             else:
-                response = {"detail": "Invalid token"}
-                return Response(content=str(response), status_code=401)
+                raise ValueError("Invalid token")
 
         except ValueError:
-            response = {"detail": "Invalid token format"}
-            return Response(content=str(response), status_code=401)
+            raise HTTPException(status_code=401, detail="Invalid token")
         except Exception as e:
-            response = {"detail": str(e)}
-            return Response(content=str(response), status_code=401)
-
+            raise HTTPException(status_code=401, detail=str(e))
         return await call_next(request)
