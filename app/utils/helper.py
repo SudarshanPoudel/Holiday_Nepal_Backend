@@ -9,3 +9,7 @@ def slugify(text: str) -> str:
     text = re.sub(r"[^a-z0-9]+", "-", text)
     text = text.strip("-")
     return text
+
+def symmetric_pair(a: int, b: int) -> int:
+    a, b = sorted((a, b))
+    return (a + b) * (a + b + 1) // 2 + b

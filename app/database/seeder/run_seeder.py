@@ -1,3 +1,4 @@
+from app.database.graph_database import get_graph_db
 from app.database.seeder.default_accomodation_service import seed_default_accomodation_services
 from app.database.seeder.default_activities import seed_default_activities
 from app.database.seeder.default_address import seed_default_address
@@ -15,15 +16,16 @@ async def run_seeder():
 
     create_bucket_if_not_exists()
     async for db in get_db():
-        await seed_default_address(db)
-        await seed_default_users(db)
-        await seed_default_activities(db)
-        await seed_default_places(db)
-        await seed_default_transport_routes(db)
-        await seed_default_service_providers(db)
-        await seed_default_transport_services(db)
-        await seed_default_accomodation_services(db)
-        
+        async for graph_db in get_graph_db():
+            await seed_default_address(db, graph_db)
+            await seed_default_users(db)
+            await seed_default_activities(db, graph_db)
+            await seed_default_places(db, graph_db)
+            await seed_default_transport_routes(db, graph_db)
+            await seed_default_service_providers(db)
+            await seed_default_transport_services(db)
+            await seed_default_accomodation_services(db)
+            
     print("Seeder: Seeding completed.")
 
 if __name__ == "__main__":

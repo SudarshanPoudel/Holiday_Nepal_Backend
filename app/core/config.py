@@ -32,6 +32,13 @@ class Settings(BaseSettings):
     FRONTEND_GOOGLE_AUTH_REDIRECT_URL: str = "http://localhost:3000"
     FRONTEND_FORGET_PASSWORD_URL:str = "http://localhost:3000/forget_password"
     DOMAIN: str = "http://127.0.0.1:8000"
+
+    NEO4J_URI: str = "bolt://neo4j:7687"
+    NEO4J_USER: str = "neo4j"
+    NEO4J_PASSWORD: str = "password"
+    NEO4J_DATABASE: str = "neo4j"
+
+    DEV_TOKEN: str = None
     class Config:
         env_file = ".env" if os.getenv("DOCKERIZED") != "1" else None
 
