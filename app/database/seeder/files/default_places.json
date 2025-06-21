@@ -2,7 +2,7 @@
   {
     "name": "Chitwan National Park",
     "municipality": "Bharatpur Metropolitan City",
-    "categories": ["wildlife", "natural"],
+    "category": "wildlife",
     "latitude": 27.5347,
     "longitude": 84.4531,
     "description": "Chitwan National Park is Nepal’s first national park and a UNESCO World Heritage Site, renowned for its incredible biodiversity and lush subtropical jungle. It’s one of the few places in the world where you can observe endangered species like the one-horned rhinoceros and Bengal tiger in their natural habitat. The park’s dense forests, expansive grasslands, and meandering rivers provide the perfect environment for wildlife to thrive.\n\nVisitors to Chitwan can immerse themselves in nature through safaris, boat rides, jungle walks, and cultural experiences with the local Tharu community. The serene landscape is complemented by the presence of exotic birds, gharials, elephants, and wild boars. Whether you’re a nature enthusiast or a curious traveler, Chitwan offers a deeply engaging eco-tourism experience.",
@@ -25,7 +25,7 @@
   {
     "name": "Bandipur",
     "municipality": "Bandipur Rural Municipality",
-    "categories": ["cultural", "architectural"],
+    "category": "cultural",
     "latitude": 27.9431,
     "longitude": 84.4132,
     "description": "Bandipur is a picturesque hilltop town that perfectly preserves its rich Newari heritage amidst sweeping Himalayan views. The town’s stone-paved streets, traditional homes, and centuries-old temples reflect its cultural charm. Perched high above the Marsyangdi Valley, Bandipur is a peaceful retreat that feels untouched by time.\n\nVisitors can enjoy panoramic views of the Annapurna and Langtang ranges while exploring its unique architectural beauty. The absence of traffic in the town center enhances its tranquil and authentic vibe. Whether you’re sipping tea at a local café or watching the clouds roll in from Tundikhel, Bandipur offers a calm yet enriching cultural escape.",
@@ -35,7 +35,7 @@
   {
     "name": "Gorkha Durbar",
     "municipality": "Gorkha Municipality",
-    "categories": ["historical", "architectural"],
+    "category": "historic",
     "latitude": 28.1344,
     "longitude": 84.6291,
     "description": "Gorkha Durbar is a historic hilltop palace that once served as the ancestral seat of Nepal’s Shah kings. The architectural masterpiece combines fort, temple, and palace features, offering insight into Nepal’s unification era. From its elevated perch, it overlooks deep valleys and snow-capped mountains, symbolizing the power and legacy of its former rulers.\n\nReaching the palace involves a steep climb, but the breathtaking views from the top make it worth every step. Inside, you’ll find intricate wood carvings, sacred shrines, and panoramic terraces. It's a must-visit destination for history lovers and those interested in Nepal’s monarchical past.",
@@ -45,7 +45,7 @@
   {
     "name": "Phewa Lake",
     "municipality": "Pokhara Metropolitan City",
-    "categories": ["natural"],
+    "category": "natural",
     "latitude": 28.2096,
     "longitude": 83.9826,
     "description": "Phewa Lake is the shimmering heart of Pokhara, famous for its calm waters and stunning reflections of the Annapurna range. Boats dot the lake throughout the day, offering travelers a peaceful way to explore its vast surface. The iconic Tal Barahi Temple, situated on a small island in the middle of the lake, adds cultural and spiritual depth to the scenery.\n\nSurrounding the lake are cafés, walking trails, and viewpoints that capture the lake’s changing colors from dawn to dusk. Whether you're watching paragliders descend from Sarangkot or just enjoying the tranquility, Phewa Lake invites you to slow down and connect with nature. It’s a place that balances leisure and beauty in perfect harmony.",
@@ -62,7 +62,7 @@
   {
     "name": "Sarangkot Viewpoint",
     "municipality": "Pokhara Metropolitan City",
-    "categories": ["adventure", "natural"],
+    "category": "adventure",
     "latitude": 28.2156,
     "longitude": 83.8943,
     "description": "Sarangkot Viewpoint is a popular destination in Pokhara, known for its mesmerizing sunrise views over the Annapurna and Dhaulagiri ranges. In the early morning, travelers gather to watch the first rays of sunlight illuminate the mountains in a golden glow. The hilltop also offers sweeping views of Pokhara Valley and Phewa Lake.\n\nAs the day progresses, Sarangkot becomes a hub for thrill-seekers looking to paraglide from its ridges. The combination of natural beauty and adventure opportunities makes it an iconic part of the Pokhara experience. It’s a place where serenity and adrenaline coexist, making it ideal for all kinds of travelers.",
@@ -79,7 +79,7 @@
   {
     "name": "Gupteshwor Cave",
     "municipality": "Pokhara Metropolitan City",
-    "categories": ["religious", "natural"],
+    "category": "religious",
     "latitude": 28.2102,
     "longitude": 83.9856,
     "description": "Gupteshwor Cave is one of the most sacred natural landmarks in Pokhara, located right across from Davis Falls. The cave stretches deep into the earth and houses a revered Shiva lingam, making it a popular pilgrimage site. Its winding, dimly-lit tunnels lead visitors through stalactites and limestone formations, creating a mystical and cool underground atmosphere.\n\nAs you go deeper, you’ll hear the roar of the waterfall above, which cascades into the cave's depths. The fusion of religious significance and natural wonder makes this site unique. It’s a fascinating destination for both spiritual seekers and geological enthusiasts.",

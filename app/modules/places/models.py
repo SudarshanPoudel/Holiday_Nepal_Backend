@@ -1,7 +1,7 @@
-from typing import List
-from sqlalchemy import JSON, Column, Integer, String, ForeignKey, Float, Table
+from sqlalchemy import Column, Enum, Integer, String, ForeignKey, Float, Table
 from sqlalchemy.orm import relationship
 from app.database.database import Base
+from app.modules.places.schema import PlaceCategoryEnum
 
 place_images = Table(
     "place_images",
@@ -15,7 +15,7 @@ class Place(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
-    categories = Column(JSON, nullable=True)
+    category= Column(Enum(PlaceCategoryEnum, name="placecategoryenum"), nullable=False)
     longitude = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     description = Column(String, nullable=True)

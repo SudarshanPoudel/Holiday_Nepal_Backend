@@ -17,8 +17,13 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+
 def upgrade() -> None:
-    # Create activities table with FK to images
+    place_category_enum = sa.Enum(
+        'natural', 'cultural', 'historic', 'religious', 'adventure', 'wildlife', 'educational', 'architectural', 'other',
+        name='placecategoryenum'
+    )
+
     op.create_table(
         'activities',
         sa.Column('id', sa.Integer, primary_key=True),
@@ -33,7 +38,7 @@ def upgrade() -> None:
         'places',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('name', sa.String, index=True, nullable=False),
-        sa.Column('categories', sa.JSON, nullable=True),
+        sa.Column('category', place_category_enum, nullable=True),
         sa.Column('longitude', sa.Float, nullable=False),
         sa.Column('latitude', sa.Float, nullable=False),
         sa.Column('description', sa.String, nullable=True),
@@ -64,3 +69,4 @@ def downgrade() -> None:
     op.drop_table('place_activities')
     op.drop_table('places')
     op.drop_table('activities')
+    op.execute('DROP TYPE placecategoryenum')
