@@ -8,14 +8,20 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.rstrip('/') in [
+        skip_prefixes = [
             "/auth/login", "/auth/register", "/auth/google_login",
             "/auth/google_callback", "/auth/refresh_token",
             "/auth/verify_email", "/auth/resend_otp",
             "/auth/forget_password", "/auth/change_password_with_token",
-            "/docs", "/redoc", "/openapi.json"
-        ]:
+            "/docs", "/redoc", "/openapi.json",
+            "/address"
+        ]
+
+        path = request.url.path.rstrip("/")
+
+        if any(path == prefix or path.startswith(prefix) for prefix in skip_prefixes):
             return await call_next(request)
+
         load_dotenv()
         token = os.getenv("DEV_TOKEN")
         token = request.headers.get("Authorization") if not token else token
