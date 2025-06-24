@@ -1,11 +1,12 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from app.database.graph_database import get_graph_db
 from fastapi_pagination import Params
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.transport_route.controller import TransportRouteController
-from app.modules.transport_route.schema import TransportRouteCreate, TransportRouteUpdate
+from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteCreate, TransportRouteUpdate
 
 
 router = APIRouter()
@@ -52,10 +53,10 @@ async def create_transport_route(transport_route: TransportRouteCreate, db: Asyn
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/municipality/{municipality_id}")
-async def get_transport_routes_by_municipality(municipality_id: int, db: AsyncSession = Depends(get_db)):
+async def get_transport_routes_by_municipality(municipality_id: int, route_category:Optional[RouteCategoryEnum] = None, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db)):
     try:
         controller = TransportRouteController(db)
-        return await controller.get_from_municipality(municipality_id)
+        return await controller.get_from_municipality(graph_db, municipality_id, route_category)
     except HTTPException as e:
         raise e
     except Exception as e:

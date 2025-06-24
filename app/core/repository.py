@@ -1,4 +1,4 @@
-from typing import Generic, Type, TypeVar, Optional , Dict, Any
+from typing import Generic, List, Type, TypeVar, Optional , Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import DeclarativeMeta , selectinload , joinedload
@@ -45,6 +45,31 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         record = result.unique().scalar_one_or_none()
 
         return record
+    
+    async def get_multiple(self, record_ids: List[int], load_relations: list[str] = None) -> List[ModelType]:
+        """Get multiple records by a list of IDs."""
+        if not record_ids:
+            return []
+
+        query = select(self.model).filter(self.model.id.in_(record_ids))
+
+        if load_relations:
+            for relation in load_relations:
+                if '.' in relation:
+                    parts = relation.split('.')
+                    current_model = self.model
+                    option = None
+                    for part in parts:
+                        attr = getattr(current_model, part)
+                        current_model = attr.property.mapper.class_
+                        option = joinedload(attr) if option is None else option.joinedload(attr)
+                    query = query.options(option)
+                else:
+                    query = query.options(selectinload(getattr(self.model, relation)))
+
+        result = await self.db.execute(query)
+        records = result.unique().scalars().all()
+        return records
 
     async def get_by_fields(self, filters: dict, load_relations: list[str] = None) -> Optional[ModelType]:
         """Get a record by arbitrary field(s)."""
