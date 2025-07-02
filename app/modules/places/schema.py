@@ -75,26 +75,11 @@ class PlaceRead(BaseModel):
     category: PlaceCategoryEnum
     description: Optional[str]
     images: Optional[list[ImageRead]]
-    activities: Optional[List[PlaceActivityRead]]
+    place_activities: Optional[List[PlaceActivityRead]]
     municipality: Optional[MunicipalityBase]
-
-    @classmethod
-    def from_model(cls, place):
-        return cls(
-            id=place.id,
-            name=place.name,
-            latitude=place.latitude,
-            longitude=place.longitude,
-            description=place.description,
-            category=place.category,
-            images=[ImageRead.model_validate(img, from_attributes=True) for img in place.images],
-            activities=[
-                PlaceActivityRead.model_validate(pa, from_attributes=True)
-                for pa in place.place_activities
-            ],
-            municipality=MunicipalityBase.model_validate(place.municipality, from_attributes=True)
-        )
-
+    
+    class Config:
+        from_attributes = True
 
 class PlaceFilters(BaseModel):
     municipality_id: Optional[int] = None

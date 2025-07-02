@@ -11,16 +11,6 @@ from app.modules.transport_route.schema import RouteCategoryEnum, TransportRoute
 
 router = APIRouter()
 
-@router.get("/all")
-async def get_all_transport_routes(db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db)):
-    try:
-        controller = TransportRouteController(db, graph_db)
-        return await controller.get_all()
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
 @router.get("/")
 async def index_transport_route(
     request: Request,

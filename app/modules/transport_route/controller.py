@@ -33,10 +33,6 @@ class TransportRouteController():
         ))
         return BaseResponse(message="Transport route created successfully", data={"id": res.id})
     
-    async def get_all(self):
-        res = await self.repository.get_all(load_relations=["start_municipality", "end_municipality"])
-        return BaseResponse(message="Transport routes fetched successfully", data=[TransportRouteRead.model_validate(tr, from_attributes=True) for tr in res])
-    
     async def get(self, transport_route_id: int):
         res = await self.repository.get(transport_route_id, load_relations=["start_municipality", "end_municipality"])
         if not res:

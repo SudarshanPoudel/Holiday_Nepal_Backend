@@ -32,10 +32,6 @@ class ActivityController():
         await self.graph_repository.create(ActivityNode(id=activity_db.id, name=activity.name))
         return BaseResponse(message="Activity created successfully", data={"id": activity_db.id})   
     
-    async def get_all(self):
-        res = await self.repository.get_all(load_relations=["image"])
-        return BaseResponse(message="Activities fetched successfully", data=[ActivityRead.model_validate(a, from_attributes=True) for a in res])
-
     async def get(self, activity_id: int):
         activity = await self.repository.get(activity_id, load_relations=["image"])
         if not activity:

@@ -21,10 +21,6 @@ class Place(Base):
     description = Column(String, nullable=True)
     municipality_id = Column(Integer, ForeignKey("municipalities.id"), nullable=False)
 
-    place_activities = relationship("PlaceActivity", back_populates="place", cascade="all, delete-orphan")
-    images = relationship("Image", secondary=place_images)
+    place_activities = relationship("PlaceActivity", back_populates="place", cascade="all, delete-orphan", uselist=True)
+    images = relationship("Image", secondary=place_images, uselist=True)
     municipality = relationship("Municipality", foreign_keys=[municipality_id])
-
-    @property
-    def activities(self):
-        return [pa.activity for pa in self.place_activities]

@@ -49,10 +49,6 @@ class PlaceController():
             raise HTTPException(status_code=404, detail="Place not found")
         return BaseResponse(message="Place fetched successfully", data=PlaceRead.from_model(place))
     
-    async def get_all(self):
-        res = await self.repository.get_all(load_relations=["images", "place_activities.activity.image", "municipality"])
-        return BaseResponse(message="Places fetched successfully", data=[PlaceRead.from_model(p) for p in res])
-
     async def delete(self, place_id: int):
         delete = await self.repository.delete(place_id)
         if not delete:
@@ -96,4 +92,4 @@ class PlaceController():
             sort_order=order,
             load_relations=["images", "place_activities.activity.image", "municipality"]
         )
-        return BaseResponse(message="Transport services fetched successfully", data=[PlaceRead.model_validate(ts, from_attributes=True) for ts in data.items])
+        return BaseResponse(message="Transport services fetched successfully", data=[PlaceRead.model_validate(ts) for ts in data.items])

@@ -44,18 +44,6 @@ async def index_accomodation_services(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/all")
-async def get_all_accomodation_services(request: Request, db: AsyncSession = Depends(get_db)):
-    try:
-        user_id = request.state.user_id
-        controller = AccomodationServiceController(db, user_id)
-        return await controller.get_all()
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
 @router.get("/{accomodation_service_id}")
 async def get_accomodation_service(accomodation_service_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     try:

@@ -48,17 +48,6 @@ async def index_places(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
-@router.get("/all")
-async def get_all_places(db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
-    try:
-        controller = PlaceController(db, graph_db)
-        return await controller.get_all()
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
 @router.get("/{place_id}")
 async def get_place(place_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
     try:

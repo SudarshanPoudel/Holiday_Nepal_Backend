@@ -44,16 +44,6 @@ async def index_activities(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/all")
-async def get_all_activities(db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
-    try:
-        controller = ActivityController(db, graph_db)
-        return await controller.get_all()
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
 @router.get("/{activity_id}")
 async def get_activity(activity_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
     try:

@@ -77,15 +77,6 @@ class TransportServiceController:
             data=TransportServiceRead.model_validate(res, from_attributes=True),
         )
 
-    async def get_all(self):
-        res = await self.repository.get_all(
-            load_relations=["images", "start_municipality", "end_municipality"]
-        )
-        return BaseResponse(
-            message="Transport services fetched successfully",
-            data=[TransportServiceReadAll.model_validate(ts, from_attributes=True) for ts in res],
-        )
-
     async def update(self, transport_service_id: int, transport_service: TransportServiceUpdate):
         existing = await self.repository.get(transport_service_id)
         if not existing:
