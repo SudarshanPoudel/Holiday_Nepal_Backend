@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import HTTPException
-from app.modules.transport_route.graph import TransportRouteGraphRepository
+from app.modules.transport_route.graph import TransportRouteEdge, TransportRouteGraphRepository
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
@@ -11,9 +11,11 @@ from app.modules.transport_route.schema import RouteCategoryEnum, TransportRoute
 
 
 class TransportRouteController():
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession, graph_db: Neo4jSession):
         self.db = db
+        self.graph_db = graph_db
         self.repository = TransportRouteRepository(db)
+        self.graph_repository = TransportRouteGraphRepository(graph_db)
 
     
     async def create(self, transport_route: TransportRouteCreate):
@@ -21,6 +23,14 @@ class TransportRouteController():
         if does_exist:
             raise HTTPException(status_code=400, detail="Transport route already exists")
         res = await self.repository.create(transport_route)
+        await self.graph_repository.create(TransportRouteEdge(
+            id=res.id,
+            start_id=transport_route.start_municipality_id,
+            end_id=transport_route.end_municipality_id,
+            average_time=transport_route.average_time,
+            distance=transport_route.distance,
+            route_category=transport_route.route_category
+        ))
         return BaseResponse(message="Transport route created successfully", data={"id": res.id})
     
     async def get_all(self):
@@ -33,8 +43,7 @@ class TransportRouteController():
             raise HTTPException(status_code=404, detail="Transport route not found")
         return BaseResponse(message="Transport route fetched successfully", data=TransportRouteRead.model_validate(res, from_attributes=True))
     
-    async def get_from_municipality(self, graph_db: Neo4jSession, municipality_id: int, category: Optional[RouteCategoryEnum] = None):
-        self.graph_repository = TransportRouteGraphRepository(graph_db)
+    async def get_from_municipality(self, municipality_id: int, category: Optional[RouteCategoryEnum] = None):
         res = await self.graph_repository.get_possible_routes_from_municipality(municipality_id, category)
         if not res:
             raise HTTPException(status_code=404, detail="Transport routes not found")
@@ -46,12 +55,23 @@ class TransportRouteController():
         res = await self.repository.update(transport_route_id, transport_route)
         if not res:
             raise HTTPException(status_code=404, detail="Transport route not found")
+        await self.graph_repository.update(
+            obj_id=transport_route_id,
+            update_data={
+                "start_id": transport_route.start_municipality_id,
+                "end_id": transport_route.end_municipality_id,
+                "average_time": transport_route.average_time,
+                "distance": transport_route.distance,
+                "route_category": transport_route.route_category
+            }
+        )
         return BaseResponse(message="Transport route updated successfully", data={"id": res.id})
     
     async def delete(self, transport_route_id: int):
         delete = await self.repository.delete(transport_route_id)
         if not delete:
             raise HTTPException(status_code=404, detail="Transport route not found")
+        await self.graph_repository.delete(transport_route_id)
         return BaseResponse(message="Transport route deleted successfully")
     
     async def index(

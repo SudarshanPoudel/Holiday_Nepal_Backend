@@ -11,7 +11,6 @@ class PlaceActivityCreateInternal(PlaceActivityCreate):
     place_id: int
 
 class PlaceActivityUpdate(BaseModel):
-    id: int
     activity_id: Optional[int] = None
     description: Optional[str] = None
     average_duration: Optional[int] = None

@@ -22,10 +22,10 @@ class CreatePlace(BaseModel):
     category: PlaceCategoryEnum
     longitude: float
     latitude: float
-    description: Optional[str] = None
-    activities: Optional[List[PlaceActivityCreate]] = None
-    image_ids: Optional[list[int]] = None
-    municipality_id: Optional[int] = None
+    description: Optional[str] 
+    activities: Optional[List[PlaceActivityCreate]] 
+    image_ids: Optional[list[int]] 
+    municipality_id: Optional[int] 
 
     class Config:
         use_enum_values = True
@@ -35,30 +35,30 @@ class CreatePlaceInternal(BaseModel):
     category: PlaceCategoryEnum
     longitude: float
     latitude: float
-    description: Optional[str] = None
-    municipality_id: Optional[int] = None
+    description: Optional[str] 
+    municipality_id: Optional[int] 
 
     class Config:
         use_enum_values = True
 
 class UpdatePlace(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] 
     category: Optional[PlaceCategoryEnum]
-    longitude: Optional[float] = None
-    latitude: Optional[float] = None
-    description: Optional[str] = None
-    municipality_id: Optional[int] = None
-    activities: Optional[List[PlaceActivityUpdate]] = None
-    image_ids: Optional[list[int]] = None
+    longitude: Optional[float] 
+    latitude: Optional[float] 
+    description: Optional[str] 
+    municipality_id: Optional[int] 
+    activities: Optional[List[PlaceActivityCreate]] 
+    image_ids: Optional[list[int]] 
 
 
 class UpdatePlaceInternal(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] 
     category: Optional[PlaceCategoryEnum]
-    longitude: Optional[float] = None
-    latitude: Optional[float] = None
-    description: Optional[str] = None
-    municipality_id: Optional[int] = None
+    longitude: Optional[float] 
+    latitude: Optional[float] 
+    description: Optional[str] 
+    municipality_id: Optional[int] 
 
 class PlaceReadBasic(BaseModel):
     id: int
@@ -73,10 +73,10 @@ class PlaceRead(BaseModel):
     longitude: float
     latitude: float
     category: PlaceCategoryEnum
-    description: Optional[str] = None
-    images: Optional[list[ImageRead]] = None
-    activities: Optional[List[PlaceActivityRead]] = None
-    municipality: Optional[MunicipalityBase] = None
+    description: Optional[str]
+    images: Optional[list[ImageRead]]
+    activities: Optional[List[PlaceActivityRead]]
+    municipality: Optional[MunicipalityBase]
 
     @classmethod
     def from_model(cls, place):
