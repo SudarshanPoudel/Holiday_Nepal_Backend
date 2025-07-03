@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBearer
 from fastapi.openapi.utils import get_openapi
 
@@ -6,6 +7,7 @@ from app.core.all_models import *
 from app.middlerware.auth import AuthMiddleware
 from app.middlerware.cors import add_cors_middleware
 
+from app.utils.homeage_router import router as homeage_router
 from app.modules.auth.routes import router as auth_router
 from app.modules.address.routes import router as address_router
 from app.modules.activities.routes import router as activities_router
@@ -23,6 +25,7 @@ security = HTTPBearer()
 app.add_middleware(AuthMiddleware)
 add_cors_middleware(app)
 
+app.include_router(homeage_router, tags=["Home"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(image_router, prefix="/image", tags=["Images"])
 app.include_router(plans_router, prefix="/plans", tags=["Plans"])

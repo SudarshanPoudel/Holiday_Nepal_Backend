@@ -39,4 +39,5 @@ class TransportRouteGraphRepository(BaseGraphRepository[TransportRouteEdge]):
 
         result = await self.session.run(base_query, **params)
         records = [record async for record in result]
+        print(records)
         return [TransportRouteEdgeRead(**record['r']) for record in records]

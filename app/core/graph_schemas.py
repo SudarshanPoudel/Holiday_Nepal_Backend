@@ -24,18 +24,19 @@ class BaseEdge(BaseModel):
     end_id: int
 
     label: ClassVar[str]
-    start_model: ClassVar[Type[BaseNode]]
-    end_model: ClassVar[Type[BaseNode]]
-    
+    start_model: ClassVar[Type["BaseNode"]]
+    end_model: ClassVar[Type["BaseNode"]]
+
     @model_validator(mode='before')
     @classmethod
     def infer_id(cls, values: dict) -> dict:
-        start = values.get("start_id")
-        end = values.get("end_id")
-        if start is not None and end is not None:
-            values["id"] = symmetric_pair(start, end)
+        if "id" not in values or values["id"] is None:
+            start = values.get("start_id")
+            end = values.get("end_id")
+            if start is not None and end is not None:
+                values["id"] = symmetric_pair(start, end)
         return values
-    
+
     @property
     def label(self) -> str:
         return self.__class__.label

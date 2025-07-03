@@ -10,9 +10,9 @@ from app.modules.service_provider.schema import ServiceProviderRead, ServiceProv
 
 
 class ServiceProviderController():
-    def __init__(self, db: AsyncSession, request: Request):
+    def __init__(self, db: AsyncSession, user_id: int):
         self.db = db
-        self.user_id = request.state.user_id
+        self.user_id = user_id
         self.repository = ServiceProviderRepository(db)
 
     async def register(self, provider: ServiceProviderRegister):

@@ -52,9 +52,5 @@ class StorageController:
         return BaseResponse(message="Image Replaced Successfully", data=ImageRead.model_validate(image, from_attributes=True))
     
     async def delete_image(self, id: int):  
-        image = await self.repository.get(id)
-        if not image:
-            raise HTTPException(detail="Image not found", status_code=404)
         await self.repository.delete(id)
-        await self.storage_service.delete_file(image.key)
         return BaseResponse(message="Image Deleted Successfully")

@@ -42,17 +42,12 @@ async def seed_default_accomodation_services(db: AsyncSession):
                 print(f"Image {image_name} not found. Skipping.")
                 continue
 
-            key = f"services/{StorageService.generate_unique_key('.webp')}"
+            key = f"services/{StorageService.generate_unique_key('webp')}"
             content = local_path.read_bytes()
             content = validate_and_process_image(content)
             # Upload to S3/localstack
             file_service = StorageService()
-            try:
-                await file_service.upload_file(key=key, file_content=content, content_type="image/webp")
-            except HTTPException:
-                print(f"Failed to upload {key}. Skipping.")
-                continue
-
+            await file_service.upload_file(key=key, file_content=content, content_type="image/webp")
             image = Image(
                 key=key,
                 url=file_service.get_file_url(key),

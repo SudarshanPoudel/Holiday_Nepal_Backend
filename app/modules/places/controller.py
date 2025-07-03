@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 from fastapi import HTTPException
 from app.modules.place_activities.graph import PlaceActivityEdge, PlaceActivityGraphRepository
-from app.modules.places.graph import PlaceGraphRepository, PlaceNode
+from app.modules.places.graph import MuncipalityPlaceEdge, MunicipalityPlaceGraphRepository, PlaceGraphRepository, PlaceNode
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +24,7 @@ class PlaceController():
         self.graph_repository = PlaceGraphRepository(graph_db)
         self.place_activity_repository = PlaceActivityRepository(db)
         self.place_activity_graph_repository = PlaceActivityGraphRepository(graph_db)
+        self.municipality_place_graph_repository = MunicipalityPlaceGraphRepository(graph_db)
 
     async def create(self, place: CreatePlace):
         slug = slugify(place.name)
@@ -31,6 +32,7 @@ class PlaceController():
         place_db = CreatePlaceInternal(**place.model_dump(exclude={"activities", "image_ids"}), name_slug=slug)
         place_db = await self.repository.create(place_db)
         await self.graph_repository.create(PlaceNode(id=place_db.id, name=place.name, category=place.category))
+        await self.municipality_place_graph_repository.create(MuncipalityPlaceEdge(start_id=place.municipality_id, end_id=place_db.id))
         await self.repository.add_images(place_db.id, place.image_ids)
         for activity in place.activities:
             try:
@@ -47,7 +49,7 @@ class PlaceController():
         place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image", "municipality"])
         if not place:
             raise HTTPException(status_code=404, detail="Place not found")
-        return BaseResponse(message="Place fetched successfully", data=PlaceRead.from_model(place))
+        return BaseResponse(message="Place fetched successfully", data=PlaceRead.model_validate(place))
     
     async def delete(self, place_id: int):
         delete = await self.repository.delete(place_id)
@@ -65,7 +67,9 @@ class PlaceController():
         await self.graph_repository.update(place_id, {"name": place.name, "category": place.category})
         await self.repository.update_images(place_id, place.image_ids)
         await self.place_activity_repository.clear_place_activities(place_id)
-        await self.place_activity_graph_repository.clear_edges(place_id, edge_type=PlaceActivityEdge)
+        await self.graph_repository.clear_edges(place_id, edge_type=PlaceActivityEdge)
+        await self.graph_repository.clear_edges(place_id, edge_type=MuncipalityPlaceEdge)
+        await self.municipality_place_graph_repository.create(MuncipalityPlaceEdge(start_id=place.municipality_id, end_id=place_id))
         for activity in place.activities:
             try:
                 place_acitivity = PlaceActivityUpdateInternal(place_id=place.id, **activity.model_dump())

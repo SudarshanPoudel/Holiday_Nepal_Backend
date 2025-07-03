@@ -39,5 +39,5 @@ class ServiceProviderRead(BaseModel):
     description: Optional[str]
 
 class ServiceProviderFilters(BaseModel):
-    category: Optional[ServiceProviderCategoryEnum]
-    is_verified: Optional[bool]
+    category: Optional[ServiceProviderCategoryEnum] = None
+    is_verified: Optional[bool] = None

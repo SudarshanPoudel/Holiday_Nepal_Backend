@@ -9,6 +9,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path.rstrip('/') in [
+            "/",
             "/auth/login", "/auth/register", "/auth/google_login",
             "/auth/google_callback", "/auth/refresh_token",
             "/auth/verify_email", "/auth/resend_otp",
