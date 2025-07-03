@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD: str = "password"
     NEO4J_DATABASE: str = "neo4j"
 
-    DEV_TOKEN: str = None
+    DEV_TOKEN: str = ''
     class Config:
         env_file = ".env" if os.getenv("DOCKERIZED") != "1" else None
 
