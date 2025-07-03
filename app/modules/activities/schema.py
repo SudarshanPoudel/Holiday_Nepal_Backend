@@ -13,7 +13,6 @@ class ActivityCreateInternal(ActivityCreate):
     name_slug: str
 
 class ActivityUpdate(BaseModel):
-    id: int
     name: Optional[str] = None
     description: Optional[str] = None
 

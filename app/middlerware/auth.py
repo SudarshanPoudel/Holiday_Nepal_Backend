@@ -8,19 +8,26 @@ from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        skip_prefixes = [
+        allowed_paths = [
+            "",
             "/auth/login", "/auth/register", "/auth/google_login",
             "/auth/google_callback", "/auth/refresh_token",
             "/auth/verify_email", "/auth/resend_otp",
             "/auth/forget_password", "/auth/change_password_with_token",
-            "/docs", "/redoc", "/openapi.json",
-            "/address"
+            "/docs", "/redoc", "/openapi.json", 
+            "/address/district", "/address/municipality",
         ]
 
-        path = request.url.path.rstrip("/")
+        # Add regex patterns for dynamic paths
+        allowed_path_patterns = [
+            r"^/address/municipality/\d+$",  # matches /address/10, /address/20, etc.
+        ]
 
-        if any(path == prefix or path.startswith(prefix) for prefix in skip_prefixes):
+        path = request.url.path.rstrip('/')
+
+        if path in allowed_paths or any(re.fullmatch(pattern, path) for pattern in allowed_path_patterns):
             return await call_next(request)
+        
 
         load_dotenv()
         token = os.getenv("DEV_TOKEN")

@@ -125,6 +125,6 @@ class StorageService:
             return None
 
     @staticmethod
-    def generate_unique_key(file_extension: str = ".bin") -> str:
+    def generate_unique_key(file_extension: str = "bin") -> str:
         unique_id = f"{uuid.uuid4()}_{int(time.time() * 1000)}"
         return f"{unique_id}.{file_extension}"

@@ -14,6 +14,7 @@ class Activity(Base):
 
     place_activities = relationship("PlaceActivity", back_populates="activity", cascade="all, delete-orphan")
     image = relationship("Image")
+
     @property
     def places(self):
         return [pa.place for pa in self.place_activities]

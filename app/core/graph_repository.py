@@ -130,3 +130,41 @@ class BaseGraphRepository(Generic[GraphSchemaType]):
             """
         await self.session.run(query, obj_id=obj_id)
         return True
+
+    async def clear_edges(
+        self,
+        node_id: int,
+        edge_type: Optional[Type[BaseEdge]] = None,
+        condition: str = "both"
+    ) -> None:
+        if self.schema_type != "node":
+            raise TypeError("clear_edges can only be called on node repositories")
+
+        if condition not in {"start", "end", "both"}:
+            raise ValueError("condition must be one of 'start', 'end', or 'both'")
+
+        edge_label = edge_type.label if edge_type else ""
+
+        # Construct the relationship pattern
+        if edge_type:
+            rel_pattern = f"[r:{edge_label}]"
+        else:
+            rel_pattern = "[r]"
+
+        if condition == "start":
+            query = f"""
+            MATCH (n:{self.label} {{id: $node_id}})-{rel_pattern}->()
+            DELETE r
+            """
+        elif condition == "end":
+            query = f"""
+            MATCH ()-{rel_pattern}->(n:{self.label} {{id: $node_id}})
+            DELETE r
+            """
+        else:  # both
+            query = f"""
+            MATCH (n:{self.label} {{id: $node_id}})-{rel_pattern}-()
+            DELETE r
+            """
+
+        await self.session.run(query, node_id=node_id)

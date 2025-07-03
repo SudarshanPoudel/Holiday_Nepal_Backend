@@ -46,16 +46,6 @@ async def index_service_providers(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/all")
-async def get_all_service_providers(request: Request, db: AsyncSession = Depends(get_db)):
-    try:
-        controller = ServiceProviderController(db, request)
-        return await controller.get_all()
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
 @router.get("/{provider_id}")
 async def get_service_provider(provider_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     try:

@@ -44,10 +44,6 @@ class AccomodationServiceController():
             raise HTTPException(status_code=404, detail="Accomodation service not found")
         return BaseResponse(message="Accomodation service fetched successfully", data=AccomodationServiceRead.model_validate(res, from_attributes=True))
     
-    async def get_all(self):
-        res = await self.repository.get_all(load_relations=["images"])
-        return BaseResponse(message="Accomodation services fetched successfully", data=[AccomodationServiceRead.model_validate(as_, from_attributes=True) for as_ in res])
-    
     async def index(
         self,
         params: Params,

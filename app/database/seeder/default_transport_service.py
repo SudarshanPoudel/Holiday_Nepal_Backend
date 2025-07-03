@@ -77,7 +77,7 @@ async def seed_default_transport_services(db):
         transport_images = []
         for path in entry.get("image_paths", []):
             file_path = get_file_path(f"files/images/transport/{path}")
-            key = f"services/{StorageService.generate_unique_key('.webp')}"
+            key = f"services/{StorageService.generate_unique_key('webp')}"
             existing = await db.scalar(select(Image).where(Image.key == key))
             if existing:
                 transport_images.append(existing)
