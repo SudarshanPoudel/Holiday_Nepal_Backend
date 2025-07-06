@@ -381,88 +381,75 @@ class BaseGraphRepository(Generic[NodeType]):
         edge_type: Type[BaseEdge], 
         weight_property: str,
         directed: bool = False,
-        # edge_filters: Optional[dict] = None,
-        # node_filters: Optional[dict] = None,
     ) -> List[tuple[int, int]]:
         """
-        Find the shortest path between two nodes of the same type using standard Cypher.
-        Args:
-            start_node_id: ID of the starting node
-            end_node_id: ID of the ending node
-            edge_type: The edge type to traverse
-            weight_property: Property name on the edge to use as weight (must be numeric)
-            directed: If True, follows edge direction; if False, ignores direction
-            edge_filters: Dictionary of edge property filters (optional)
-            node_filters: Dictionary of node property filters (optional)
-        Returns:
-            List of tuples (edge_id, next_node_id) representing the path.
-            Empty list if no path exists.
+        Find the weighted shortest path using GDS Dijkstra between two nodes.
+        Returns list of (edge_id, next_node_id) for each hop along the path.
         """
         edge_label = edge_type.label
-        
-        # # Build edge filter string
-        # edge_where = ""
-        # if edge_filters:
-        #     edge_conditions = []
-        #     for k, v in edge_filters.items():
-        #         val = f"'{v}'" if isinstance(v, str) else v
-        #         edge_conditions.append(f"e.{k} = {val}")
-        #     edge_where = f"AND {' AND '.join(edge_conditions)}"
-        
-        # # Build node filter string  
-        # node_where = ""
-        # if node_filters:
-        #     node_conditions = []
-        #     for k, v in node_filters.items():
-        #         val = f"'{v}'" if isinstance(v, str) else v
-        #         node_conditions.append(f"n.{k} = {val}")
-        #     node_where = f"AND {' AND '.join(node_conditions)}"
-        
-        # arrow = ">" if directed else ""
+        orientation = "NATURAL" if directed else "UNDIRECTED"
+
+        # Ensure default in-memory graph exists (once per session)
+        await self.ensure_graph_exists(edge_label, weight_property, orientation)
+
+        # Step 1: Run GDS Dijkstra to get node path
         query = f"""
         MATCH (start:{self.label} {{id: $start_node_id}}), (end:{self.label} {{id: $end_node_id}})
-        CALL gds.shortestPath.dijkstra.stream({{
-            nodeProjection: '{self.label}',
-            relationshipProjection: {{
-                road: {{
-                    type: '{edge_label}',
-                    properties: ['{weight_property}'],
-                    orientation: $directed ? 'NATURAL' : 'UNDIRECTED'
-                }}
-            }},
-            startNode: id(start),
-            endNode: id(end),
-            relationshipWeightProperty: '{weight_property}'
-        }})
-        YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs
-        RETURN
-            [nodeId IN nodeIds | gds.util.asNode(nodeId).id] AS nodePath,
-            totalCost
+        CALL gds.shortestPath.dijkstra.stream(
+            'defaultGraph',
+            {{
+                sourceNode: id(start),
+                targetNode: id(end),
+                relationshipWeightProperty: '{weight_property}'
+            }}
+        )
+        YIELD nodeIds
+        RETURN [nodeId IN nodeIds | gds.util.asNode(nodeId).id] AS nodePath
         """
 
-
-        
         result = await self.session.run(
             query,
             start_node_id=start_node_id,
             end_node_id=end_node_id,
-            directed=directed,
         )
-        
         record = await result.single()
-        
-        if record and record["path_edges"]:
-            path_edges = record["path_edges"]
-            # Convert to the expected format
-            result_path = []
-            for edge_data in path_edges:
-                edge_id = int(edge_data[0])  # Your custom edge id
-                node_id = int(edge_data[1])  # Your custom node id
-                result_path.append((edge_id, node_id))
-                
-            return result_path
-        
-        return []
+        if not record or len(record["nodePath"]) < 2:
+            return []
+
+        node_path = record["nodePath"]
+
+        # Step 2: Fetch edge IDs between each consecutive pair of nodes
+        query_edges = f"""
+        UNWIND range(0, size($nodes) - 2) AS i
+        MATCH (a:{self.label} {{id: $nodes[i]}})-[r:{edge_label}]->(b:{self.label} {{id: $nodes[i+1]}})
+        RETURN r.id AS edgeId, b.id AS nodeId
+        ORDER BY i
+        """
+
+        result_edges = await self.session.run(query_edges, nodes=node_path)
+        return [(record["edgeId"], record["nodeId"]) async for record in result_edges]
+
+    async def ensure_graph_exists(self, edge_label: str, weight_property: str, orientation: str):
+        check_query = "CALL gds.graph.exists('defaultGraph') YIELD exists RETURN exists"
+        result = await self.session.run(check_query)
+        record = await result.single()
+        if not record["exists"]:
+            # Project all nodes and edges of the given type with the weight
+            project_query = f"""
+            CALL gds.graph.project(
+                'defaultGraph',
+                '{self.label}',
+                {{
+                    {edge_label}: {{
+                        type: '{edge_label}',
+                        properties: ['{weight_property}'],
+                        orientation: '{orientation}'
+                    }}
+                }}
+            )
+            """
+            await self.session.run(project_query)
+
 
     async def _ensure_edge_constraint(self, edge_type: Type[BaseEdge]):
         """Ensure uniqueness constraint for an edge type"""
