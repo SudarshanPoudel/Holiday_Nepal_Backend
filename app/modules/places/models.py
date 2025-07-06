@@ -19,10 +19,10 @@ class Place(Base):
     longitude = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     description = Column(String, nullable=True)
-    municipality_id = Column(Integer, ForeignKey("municipalities.id"), nullable=False)
+    city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
     average_visit_duration = Column(Float, nullable=True)
     average_visit_cost = Column(Float, nullable=True)
 
     place_activities = relationship("PlaceActivity", back_populates="place", cascade="all, delete-orphan", uselist=True)
     images = relationship("Image", secondary=place_images, uselist=True)
-    municipality = relationship("Municipality", foreign_keys=[municipality_id])
+    city = relationship("City", foreign_keys=[city_id])

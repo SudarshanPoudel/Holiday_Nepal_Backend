@@ -22,15 +22,15 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 if not route:
                     raise HTTPException(status_code=404, detail=f"Route with ID {route_id} not found")
                 if not last_place:
-                    last_place = route.end_municipality_id
-                elif last_place == route.start_municipality_id:
-                    last_place = route.end_municipality_id
-                elif last_place == route.end_municipality_id:
-                    last_place = route.start_municipality_id
+                    last_place = route.end_city_id
+                elif last_place == route.start_city_id:
+                    last_place = route.end_city_id
+                elif last_place == route.end_city_id:
+                    last_place = route.start_city_id
                 else:
                     raise HTTPException(status_code=400, detail="Invalid route index")
 
-                last_place = route.end_municipality_id
+                last_place = route.end_city_id
 
                 segment = TransportServiceRouteSegment(
                     service_id=transport_service_id,

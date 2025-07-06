@@ -1,7 +1,7 @@
 [
   {
     "name": "Chitwan National Park",
-    "municipality": "Bharatpur Metropolitan City",
+    "city": "Bharatpur Metropolitan City",
     "category": "wildlife",
     "latitude": 27.5347,
     "longitude": 84.4531,
@@ -26,7 +26,7 @@
   },
   {
     "name": "Bandipur",
-    "municipality": "Bandipur Rural Municipality",
+    "city": "Bandipur Rural City",
     "category": "cultural",
     "latitude": 27.9431,
     "longitude": 84.4132,
@@ -38,7 +38,7 @@
   },
   {
     "name": "Gorkha Durbar",
-    "municipality": "Gorkha Municipality",
+    "city": "Gorkha City",
     "category": "historic",
     "latitude": 28.1344,
     "longitude": 84.6291,
@@ -50,7 +50,7 @@
   },
   {
     "name": "Phewa Lake",
-    "municipality": "Pokhara Metropolitan City",
+    "city": "Pokhara Metropolitan City",
     "category": "natural",
     "latitude": 28.2096,
     "longitude": 83.9826,
@@ -69,7 +69,7 @@
   },
   {
     "name": "Sarangkot Viewpoint",
-    "municipality": "Pokhara Metropolitan City",
+    "city": "Pokhara Metropolitan City",
     "category": "adventure",
     "latitude": 28.2156,
     "longitude": 83.8943,
@@ -88,7 +88,7 @@
   },
   {
     "name": "Gupteshwor Cave",
-    "municipality": "Pokhara Metropolitan City",
+    "city": "Pokhara Metropolitan City",
     "category": "religious",
     "latitude": 28.2102,
     "longitude": 83.9856,

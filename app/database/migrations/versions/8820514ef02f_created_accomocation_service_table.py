@@ -28,15 +28,16 @@ def upgrade() -> None:
     op.create_table(
         'accomodation_services',
         sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('name', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
-        sa.Column('service_provider_id', sa.Integer(), sa.ForeignKey('service_providers.id'), nullable=True),
-        sa.Column('municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
-        sa.Column('full_location', sa.String(), nullable=False),
+        sa.Column('city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
+        sa.Column('full_address', sa.String(), nullable=False),
         sa.Column('accomodation_category', accomodation_category_enum, nullable=False),
         sa.Column('longitude', sa.Float(), nullable=False),
         sa.Column('latitude', sa.Float(), nullable=False),
         sa.Column('cost_per_night', sa.Float(), nullable=False),
     )
+    
     op.create_table(
         'accomodation_service_images',
         sa.Column('accomodation_service_id', sa.Integer(), sa.ForeignKey('accomodation_services.id'), primary_key=True),

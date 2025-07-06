@@ -18,7 +18,7 @@ class PlanDayController:
         self.plan_repository = PlanRepository(db)
 
     async def get(self, plan_day_id: int):
-        plan_day = await self.repository.get(plan_day_id, load_relations=["steps.place", "steps.activities.image", "steps.municipality_start", "steps.municipality_end", "steps.image", "steps.route_hops"])
+        plan_day = await self.repository.get(plan_day_id, load_relations=["steps.place", "steps.activities.image", "steps.city_start", "steps.city_end", "steps.image", "steps.route_hops"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
         return BaseResponse(message="Plan day found", data=PlanDayRead.model_validate(plan_day, from_attributes=True))
@@ -46,7 +46,7 @@ class PlanDayController:
             index=day
         )
         plan_day = await self.repository.create(plan_day)
-        await self.graph_repository.create(PlanDayNode(id=plan_day.id, index=plan_day.index, total_time=0, total_cost=0, end_municiplaity_id=plan.end_municipality_id))
+        await self.graph_repository.create(PlanDayNode(id=plan_day.id, index=plan_day.index, total_time=0, total_cost=0, end_municiplaity_id=plan.end_city_id))
         if day == 0:
             await self.graph_repository.add_edge(PlanPlanDayEdge(source_id=plan_id, target_id=plan_day.id))
         else:

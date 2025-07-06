@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.address.schema import MunicipalityBase
+from app.modules.cities.schema import CityBase
 from app.modules.storage.schema import ImageRead
 from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteRead
 
@@ -23,19 +23,18 @@ class TransportServiceCreate(BaseModel):
     image_ids: Optional[List[int]] = None  
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_duration: Optional[int]
-
+    average_duration: Optional[float]
+    cost: Optional[float]
 
 class TransportServiceBase(BaseModel):
-    service_provider_id: int
-    start_municipality_id: int
-    end_municipality_id: int
+    start_city_id: int
+    end_city_id: int
     description: Optional[str]
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
     average_duration: Optional[int]
     total_distance: float
-
+    cost: Optional[float]
 
 class TransportServiceRouteSegmentRead(BaseModel):
     id: int
@@ -46,8 +45,8 @@ class TransportServiceRouteSegmentRead(BaseModel):
 class TransportServiceReadAll(BaseModel):
     id: int
     service_provider_id: int
-    start_municipality: MunicipalityBase
-    end_municipality: MunicipalityBase
+    start_city: CityBase
+    end_city: CityBase
     images: List[ImageRead] 
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
@@ -59,19 +58,8 @@ class TransportServiceRead(TransportServiceReadAll):
     description: Optional[str]
     route_segments: List[TransportServiceRouteSegmentRead]
 
-
-class TransportServiceUpdate(BaseModel):
-    service_provider_id: Optional[int]
-    description: Optional[str]
-    route_category: Optional[RouteCategoryEnum]
-    transport_category: Optional[TransportServiceCategoryEnum]
-    average_duration: Optional[int]
-    image_ids: Optional[List[int]] = None  
-
-
 class TransportServiceFilters(BaseModel):
-    service_provider_id: Optional[int] = None
-    start_municipality_id: Optional[int] = None
-    end_municipality_id: Optional[int] = None
+    start_city_id: Optional[int] = None
+    end_city_id: Optional[int] = None
     route_category: Optional[RouteCategoryEnum] = None
     transport_category: Optional[TransportServiceCategoryEnum] = None

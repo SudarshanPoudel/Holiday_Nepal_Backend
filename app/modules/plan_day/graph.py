@@ -2,7 +2,7 @@ from typing import ClassVar, Type
 from neo4j import AsyncSession
 from app.core.graph_repository import BaseGraphRepository
 from app.core.graph_schemas import BaseEdge, BaseNode
-from app.modules.address.graph import MunicipalityNode
+from app.modules.address.graph import CityNode
 from app.modules.plans.graph import PlanNode
 
 class PlanDayNode(BaseNode):

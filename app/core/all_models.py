@@ -1,6 +1,6 @@
-from app.modules.accomodation_service.models import AccomodationService
+from app.modules.accomodation_services.models import AccomodationService
 from app.modules.activities.models import Activity
-from app.modules.address.models import District, Municipality
+from app.modules.address.models import District, City
 from app.modules.auth.models import RefreshToken
 from app.modules.place_activities.models import PlaceActivity
 from app.modules.plan_day.models import PlanDay

@@ -4,37 +4,22 @@ from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
-from app.modules.accomodation_service.repository import AccomodationServiceRepository
-from app.modules.accomodation_service.schema import AccomodationServiceCreate, AccomodationServiceCreateInternal, AccomodationServiceRead, AccomodationServiceUpdate
-from app.modules.service_provider.repository import ServiceProviderRepository
+from app.modules.accomodation_services.repository import AccomodationServiceRepository
+from app.modules.accomodation_services.schema import AccomodationServiceBase, AccomodationServiceCreate, AccomodationServiceRead, AccomodationServiceUpdate
 
 
 class AccomodationServiceController():
-    def __init__(self, db: AsyncSession, user_id: int):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.user_id = user_id
         self.repository = AccomodationServiceRepository(db)
-        self.service_provider_repository = ServiceProviderRepository(db)
 
     async def create(self, accomodation_service: AccomodationServiceCreate):
-        service_provider_id = await self.service_provider_repository.get_id_by_user_id(self.user_id)
-        if not service_provider_id:
-            raise HTTPException(status_code=404, detail="Service provider not found")
-
-        service = AccomodationServiceCreateInternal(
-            service_provider_id=service_provider_id,
-            **accomodation_service.model_dump(exclude={"image_ids"})
-        )
-
-        res = await self.repository.create(service)
+        res = await self.repository.create(AccomodationServiceBase(**accomodation_service.model_dump(exclude={"image_ids"})))
         await self.repository.add_images(res.id, accomodation_service.image_ids)
         return BaseResponse(message="Accomodation service created successfully", data={"id": res.id})
     
-    async def update(self, accomodation_service_id: int, accomodation_service: AccomodationServiceUpdate):
-        res = await self.repository.update(accomodation_service_id, AccomodationServiceCreateInternal(**accomodation_service.model_dump(exclude={"image_ids"})))
-        if not res:
-            raise HTTPException(status_code=404, detail="Accomodation service not found")
-
+    async def update(self, accomodation_service_id: int, accomodation_service: AccomodationServiceCreate):
+        res = await self.repository.update(accomodation_service_id, AccomodationServiceBase(**accomodation_service.model_dump(exclude={"image_ids"})))
         await self.repository.update_images(accomodation_service_id, accomodation_service.image_ids)
         return BaseResponse(message="Accomodation service updated successfully", data={"id": res.id})
     

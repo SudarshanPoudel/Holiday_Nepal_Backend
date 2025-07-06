@@ -7,14 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
 
 from app.modules.places.controller import PlaceController
-from app.modules.places.schema import CreatePlace, PlaceFilters, UpdatePlace
+from app.modules.places.schema import  PlaceCreate, PlaceFilters, UpdatePlace
 
 
 router = APIRouter()
 
-
 @router.post("/")
-async def create_place(place: CreatePlace, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def create_place(place: PlaceCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.create(place)
@@ -25,7 +24,6 @@ async def create_place(place: CreatePlace, db: AsyncSession = Depends(get_db), g
     
 @router.get("/")
 async def index_places(
-    request: Request,
     search: Optional[str] = Query(None, description="Search query for service provider name"),
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
@@ -59,7 +57,7 @@ async def get_place(place_id: int, db: AsyncSession = Depends(get_db), graph_db:
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.put("/{place_id}")
-async def update_place(place_id: int, place: UpdatePlace, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def update_place(place_id: int, place: PlaceCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.update(place_id, place)

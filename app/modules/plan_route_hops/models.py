@@ -11,7 +11,7 @@ class PlanRouteHop(Base):
     plan_day_step_id = Column(Integer, ForeignKey("plan_day_steps.id"), nullable=False)
     route_id = Column(Integer, ForeignKey("transport_routes.id"), nullable=False)
     index = Column(Integer, nullable=False)
-    destination_municipality_id = Column(Integer, ForeignKey("municipalities.id"), nullable=False)
+    destination_city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
     
     route = relationship("TransportRoute")
     plan_day_step = relationship("PlanDayStep", back_populates="route_hops")

@@ -8,7 +8,6 @@ class Activity(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
-    name_slug = Column(String, unique=True, index=True)
     description = Column(String, nullable=True)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
 

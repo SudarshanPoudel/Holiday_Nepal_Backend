@@ -38,7 +38,7 @@ def upgrade() -> None:
         sa.Column('email', sa.String, unique=True, index=True, nullable=False),
         sa.Column('username', sa.String, unique=True, index=True, nullable=False),
         sa.Column('password', sa.String, nullable=False),
-        sa.Column('municipality_id', sa.Integer, sa.ForeignKey('municipalities.id'), index=True, nullable=True),
+        sa.Column('city_id', sa.Integer, sa.ForeignKey('cities.id'), index=True, nullable=True),
         sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
         sa.Column('created', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),

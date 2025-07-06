@@ -16,24 +16,19 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade() -> None:
-    op.create_table(
-        'districts',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.String, index=True, nullable=False),
-        sa.Column('headquarter', sa.String, nullable=True)
-    )
+def upgrade():
+    # Enable PostGIS
+    op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
 
-    op.create_table(
-        'municipalities',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.String, index=True, nullable=False),
-        sa.Column('district_id', sa.Integer, sa.ForeignKey('districts.id'), index=True, nullable=False),
-        sa.Column('longitude', sa.Float, nullable=True),
-        sa.Column('latitude', sa.Float, nullable=True)
-    )
+    op.add_column("cities", sa.Column("location", sa.types.UserDefinedType(), nullable=True))
+    op.execute("""
+        UPDATE cities
+        SET location = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography
+        WHERE longitude IS NOT NULL AND latitude IS NOT NULL
+    """)
+    op.execute("CREATE INDEX cities_location_idx ON cities USING GIST (location)")
 
-
-def downgrade() -> None:
-    op.drop_table('municipalities')
-    op.drop_table('districts')
+def downgrade():
+    op.drop_index("cities_location_idx", table_name="cities")
+    op.drop_column("cities", "location")
+    op.execute("DROP EXTENSION IF EXISTS postgis")

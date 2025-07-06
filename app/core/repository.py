@@ -140,7 +140,6 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         await self.db.refresh(record)
         return record
 
-
     async def delete(self, record_id: int) -> bool:
         """Delete a record."""
         query = await self.db.execute(select(self.model).filter_by(id=record_id))

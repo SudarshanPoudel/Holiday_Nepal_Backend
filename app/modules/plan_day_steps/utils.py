@@ -35,17 +35,17 @@ class PlanDayStepUtils():
     async def get_step_duration(self, step) -> float:
         return 4.0
     
-    async def get_step_cost(self) -> float:
+    async def get_step_cost(self, step, plan) -> float:
         return 1000
     
     async def get_step_image(self)->int:
         images = await self.image_repository.get_all()
         return images[0].id
     
-    async def get_curret_municipality_id(self, plan: Plan) -> int:
+    async def get_curret_city_id(self, plan: Plan) -> int:
         for plan_day in reversed(plan.days):
             for step in reversed(plan_day.steps):
-                if step.end_municipality_id:
-                    return step.end_municipality_id
+                if step.end_city_id:
+                    return step.end_city_id
 
-        return plan.start_municipality_id
+        return plan.start_city_id

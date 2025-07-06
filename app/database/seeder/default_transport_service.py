@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from sqlalchemy import insert, select
-from app.core.all_models import TransportService, TransportServiceRouteSegment, Municipality, TransportRoute, ServiceProvider, Image
+from app.core.all_models import TransportService, TransportServiceRouteSegment, City, TransportRoute, ServiceProvider, Image
 from app.modules.transport_service.models import transport_service_images
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.transport_service.schema import TransportServiceCategoryEnum
@@ -27,22 +27,22 @@ async def seed_default_transport_services(db):
         total_time = 0
 
         for segment in entry["segments"]:
-            start = await db.scalar(select(Municipality).where(Municipality.name == segment["start"]))
-            end = await db.scalar(select(Municipality).where(Municipality.name == segment["end"]))
+            start = await db.scalar(select(City).where(City.name == segment["start"]))
+            end = await db.scalar(select(City).where(City.name == segment["end"]))
 
             if not start or not end:
-                print(f"Invalid municipality: {segment}")
+                print(f"Invalid city: {segment}")
                 continue
 
             route = await db.scalar(select(TransportRoute).where(
-                TransportRoute.start_municipality_id == start.id,
-                TransportRoute.end_municipality_id == end.id
+                TransportRoute.start_city_id == start.id,
+                TransportRoute.end_city_id == end.id
             ))
 
             if not route:
                 route = await db.scalar(select(TransportRoute).where(
-                    TransportRoute.start_municipality_id == end.id,
-                    TransportRoute.end_municipality_id == start.id
+                    TransportRoute.start_city_id == end.id,
+                    TransportRoute.end_city_id == start.id
                 ))
                 if not route:
                     continue
@@ -51,14 +51,14 @@ async def seed_default_transport_services(db):
             total_distance += route.distance
             total_time += route.average_duration or 0
 
-        start_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][0]["start"]))
-        end_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][-1]["end"]))
+        start_mun = await db.scalar(select(City).where(City.name == entry["segments"][0]["start"]))
+        end_mun = await db.scalar(select(City).where(City.name == entry["segments"][-1]["end"]))
 
         new_service = TransportService(
             service_provider_id=provider.id,
             description=entry["description"],
-            start_municipality_id=start_mun.id,
-            end_municipality_id=end_mun.id,
+            start_city_id=start_mun.id,
+            end_city_id=end_mun.id,
             route_category=RouteCategoryEnum(entry["route_category"]),
             transport_category=TransportServiceCategoryEnum(entry["transport_category"]),
             total_distance=total_distance,

@@ -6,12 +6,12 @@
     "route_category": "road",
     "segments": [
       {
-        "start": "Gaindakot Municipality",
+        "start": "Gaindakot City",
         "end": "Bharatpur Metropolitan City"
       },
       {
         "start": "Bharatpur Metropolitan City",
-        "end": "Bandipur Rural Municipality"
+        "end": "Bandipur Rural City"
       }
     ],
     "image_paths": [
@@ -21,16 +21,16 @@
   },
   {
     "username": "yatayat2",
-    "description": "This minibus route from Bandipur to Pokhara via Byas Municipality is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
+    "description": "This minibus route from Bandipur to Pokhara via Byas City is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
     "transport_category": "minibus",
     "route_category": "road",
     "segments": [
       {
-        "start": "Bandipur Rural Municipality",
-        "end": "Byas Municipality"
+        "start": "Bandipur Rural City",
+        "end": "Byas City"
       },
       {
-        "start": "Byas Municipality",
+        "start": "Byas City",
         "end": "Pokhara Metropolitan City"
       }
     ],
@@ -46,8 +46,8 @@
     "route_category": "road",
     "segments": [
       {
-        "start": "Bandipur Rural Municipality",
-        "end": "Gorkha Municipality"
+        "start": "Bandipur Rural City",
+        "end": "Gorkha City"
       }
     ],
     "image_paths": [
@@ -78,14 +78,14 @@
     "segments": [
       {
         "start": "Bharatpur Metropolitan City",
-        "end": "Bandipur Rural Municipality"
+        "end": "Bandipur Rural City"
       },
       {
-        "start": "Bandipur Rural Municipality",
-        "end": "Byas Municipality"
+        "start": "Bandipur Rural City",
+        "end": "Byas City"
       },
       {
-        "start": "Byas Municipality",
+        "start": "Byas City",
         "end": "Pokhara Metropolitan City"
       }
     ],

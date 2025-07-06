@@ -42,7 +42,7 @@ def upgrade() -> None:
         sa.Column('longitude', sa.Float(), nullable=False),
         sa.Column('latitude', sa.Float(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
-        sa.Column('municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
+        sa.Column('city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
         sa.Column('average_visit_duration', sa.Float(), nullable=True),
         sa.Column('average_visit_cost', sa.Float(), nullable=True),
     )
@@ -53,6 +53,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('place_id', sa.Integer(), sa.ForeignKey('places.id'), index=True, nullable=False),
         sa.Column('activity_id', sa.Integer(), sa.ForeignKey('activities.id'), index=True, nullable=False),
+        sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('average_duration', sa.Float(), nullable=True),
         sa.Column('average_cost', sa.Float(), nullable=True),

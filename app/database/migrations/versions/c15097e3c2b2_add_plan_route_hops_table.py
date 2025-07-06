@@ -24,7 +24,7 @@ def upgrade() -> None:
         sa.Column('plan_day_step_id', sa.Integer(), sa.ForeignKey('plan_day_steps.id', ondelete="CASCADE"), nullable=False),
         sa.Column('route_id', sa.Integer(), sa.ForeignKey('transport_routes.id', ondelete="CASCADE"), nullable=False),
         sa.Column('index', sa.Integer(), nullable=False),
-        sa.Column('destination_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id', ondelete="CASCADE"), nullable=False),
+        sa.Column('destination_city_id', sa.Integer(), sa.ForeignKey('cities.id', ondelete="CASCADE"), nullable=False),
     )
 
 

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import secrets
 import re
 
-from app.modules.address.repository import MunicipalityRepository
+from app.modules.address.repository import CityRepository
 from app.modules.auth.email_template import get_otp_html, get_password_reset_html
 from app.modules.storage.repository import ImageRepository
 from app.modules.users.repository import UserRepository
@@ -35,11 +35,11 @@ class AuthController:
         if result.scalar_one_or_none():
             raise HTTPException(status_code=400, detail="This username is already taken..")
 
-        if user.municipality_id:
-            municipality_repo = MunicipalityRepository(db)
-            municipality = await municipality_repo.get(record_id=user.municipality_id)
-            if not municipality:
-                raise HTTPException(status_code=404, detail="Municipality not found")
+        if user.city_id:
+            city_repo = CityRepository(db)
+            city = await city_repo.get(record_id=user.city_id)
+            if not city:
+                raise HTTPException(status_code=404, detail="City not found")
 
         hashed_password = AuthService.hash_password(user.password)
         user_data = user.model_dump()

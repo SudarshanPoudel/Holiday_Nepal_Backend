@@ -1,7 +1,7 @@
 """Add transport tables
 
 Revision ID: 4951bfa9ccb5
-Revises: 60a90b9f72e2
+Revises: 86357a3cd56e
 Create Date: 2025-06-04 12:07:34.783276
 
 """
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '4951bfa9ccb5'
-down_revision: Union[str, None] = '60a90b9f72e2'
+down_revision: Union[str, None] = '86357a3cd56e'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -34,8 +34,8 @@ def upgrade() -> None:
     op.create_table(
         'transport_routes',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('start_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
-        sa.Column('end_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
+        sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
+        sa.Column('end_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('distance', sa.Float(), nullable=False),
         sa.Column('average_duration', sa.Float(), nullable=False),
@@ -45,14 +45,14 @@ def upgrade() -> None:
     op.create_table(
         'transport_services',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('service_provider_id', sa.Integer(), sa.ForeignKey('service_providers.id'), nullable=False),
-        sa.Column('start_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
-        sa.Column('end_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
+        sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
+        sa.Column('end_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('transport_category', transport_category_enum, nullable=False),
-        sa.Column('total_distance', sa.Float(), nullable=False),
-        sa.Column('average_duration', sa.Float(), nullable=True)
+        sa.Column('average_duration', sa.Float(), nullable=True),
+        sa.Column('distance', sa.Float(), nullable=False),
+        sa.Column('cost', sa.Float(), nullable=True)
     )
 
     op.create_table(

@@ -24,7 +24,6 @@ async def create_transport_service(transport_service: TransportServiceCreate, re
 @router.get("/")
 async def index_transport_services(
     request: Request,
-    # search: Optional[str] = Query(None, description="Search query for transport service name"),
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),

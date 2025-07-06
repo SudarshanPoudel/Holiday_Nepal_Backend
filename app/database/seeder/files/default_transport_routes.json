@@ -1,47 +1,47 @@
 [
     {
-        "start_municipality": "Gaindakot Municipality",
-        "end_municipality": "Bharatpur Metropolitan City",
+        "start_city": "Gaindakot City",
+        "end_city": "Bharatpur Metropolitan City",
         "route_category": "road",
         "distance": 10,
         "average_duration": 0.5,
         "average_cost": 1000
 },
     {
-        "start_municipality": "Bharatpur Metropolitan City",
-        "end_municipality": "Bandipur Rural Municipality",
+        "start_city": "Bharatpur Metropolitan City",
+        "end_city": "Bandipur Rural City",
         "route_category": "road",
         "distance": 60,
         "average_duration": 2,
         "average_cost": 1000
 },
     {
-        "start_municipality": "Bandipur Rural Municipality",
-        "end_municipality": "Byas Municipality",
+        "start_city": "Bandipur Rural City",
+        "end_city": "Byas City",
         "route_category": "road",
         "distance": 30,
         "average_duration": 1,
         "average_cost": 1000
 },
     {
-        "start_municipality": "Byas Municipality",
-        "end_municipality": "Pokhara Metropolitan City",
+        "start_city": "Byas City",
+        "end_city": "Pokhara Metropolitan City",
         "route_category": "road",
         "distance": 70,
         "average_duration": 2.5,
         "average_cost": 450
 },
     {
-        "start_municipality": "Bandipur Rural Municipality",
-        "end_municipality": "Gorkha Municipality",
+        "start_city": "Bandipur Rural City",
+        "end_city": "Gorkha City",
         "route_category": "road",
         "distance": 50,
         "average_duration": 1.5,
         "average_cost": 300
 },
     {
-        "start_municipality": "Pokhara Metropolitan City",
-        "end_municipality": "Bharatpur Metropolitan City",
+        "start_city": "Pokhara Metropolitan City",
+        "end_city": "Bharatpur Metropolitan City",
         "route_category": "air",
         "distance": 180,
         "average_duration": 0.5,

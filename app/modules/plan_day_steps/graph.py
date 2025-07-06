@@ -3,7 +3,7 @@ from neo4j import AsyncSession
 from app.core.graph_repository import BaseGraphRepository
 from app.core.graph_schemas import BaseEdge, BaseNode
 from app.modules.activities.graph import ActivityNode
-from app.modules.address.graph import MunicipalityNode
+from app.modules.address.graph import CityNode
 from app.modules.places.graph import PlaceNode
 from app.modules.plan_day.graph import PlanDayNode
 from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayTimeFrameEnum

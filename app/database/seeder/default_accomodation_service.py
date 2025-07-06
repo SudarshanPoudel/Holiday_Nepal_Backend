@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from starlette.concurrency import run_in_threadpool
 
-from app.core.all_models import User, Municipality, AccomodationService, ServiceProvider, Image
+from app.core.all_models import User, City, AccomodationService, ServiceProvider, Image
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.accomodation_service.schema import AccomodationCategoryEnum
+from app.modules.accomodation_services.schema import AccomodationCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
 from app.modules.storage.service import StorageService
@@ -28,10 +28,10 @@ async def seed_default_accomodation_services(db: AsyncSession):
             print(f"ServiceProvider for user {user.username} not found. Skipping.")
             continue
 
-        # Lookup Municipality
-        municipality = await db.scalar(select(Municipality).where(Municipality.name == data["municipality"]))
-        if not municipality:
-            print(f"Municipality {data['municipality']} not found. Skipping.")
+        # Lookup City
+        city = await db.scalar(select(City).where(City.name == data["city"]))
+        if not city:
+            print(f"City {data['city']} not found. Skipping.")
             continue
 
         # Upload images and create image records
@@ -61,7 +61,7 @@ async def seed_default_accomodation_services(db: AsyncSession):
         service = AccomodationService(
             description=data["description"],
             service_provider_id=sp.id,
-            municipality_id=municipality.id,
+            city_id=city.id,
             full_location=data["full_location"],
             accomodation_category=AccomodationCategoryEnum(data["accomodation_category"]),
             longitude=data["longitude"],

@@ -11,7 +11,7 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)    
 
-    municipality_id = Column(Integer, ForeignKey("municipalities.id"), index=True)
+    city_id = Column(Integer, ForeignKey("cities.id"), index=True)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
 
     created = Column(DateTime(timezone=True), server_default=func.now())

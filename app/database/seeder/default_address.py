@@ -1,18 +1,18 @@
-from app.modules.address.graph import MunicipalityGraphRepository, MunicipalityNode
-from app.modules.address.schema import DistrictBase, MunicipalityBase
-from app.modules.address.repository import DistrictRepository, MunicipalityRepository
+from app.modules.address.graph import CityGraphRepository, CityNode
+from app.modules.address.schema import DistrictBase, CityBase
+from app.modules.address.repository import DistrictRepository, CityRepository
 from app.database.seeder.utils import load_data
 
 async def seed_default_address(db, graph_db):
     district_entered = 0
-    municipality_entered = 0
+    city_entered = 0
 
 
     # Create default districts
     default_address = []
     dist_repo = DistrictRepository(db)
-    muni_repo = MunicipalityRepository(db)
-    graph_repo = MunicipalityGraphRepository(graph_db)
+    muni_repo = CityRepository(db)
+    graph_repo = CityGraphRepository(graph_db)
 
     default_address = load_data("files/default_address.json")
 
@@ -28,18 +28,18 @@ async def seed_default_address(db, graph_db):
             district_id = new_dist.id
             district_entered += 1
 
-        for muni in dist["municipalities"]:
+        for muni in dist["cities"]:
             if muni['location'] is None:    
                 continue
             existing_muni = await muni_repo.get_all_filtered(filters={"name": muni["name"], "district_id": district_id})
 
             if not existing_muni:
-                municipality = MunicipalityBase(
+                city = CityBase(
                     name=muni["name"], district_id=district_id, longitude=muni['location'][1], latitude=muni['location'][0]
                 )
-                db_municipality = await muni_repo.create(municipality)
-                municipality_node = MunicipalityNode(id=db_municipality.id, name=muni["name"])
-                await graph_repo.create(municipality_node)
-                municipality_entered += 1
+                db_city = await muni_repo.create(city)
+                city_node = CityNode(id=db_city.id, name=muni["name"])
+                await graph_repo.create(city_node)
+                city_entered += 1
                 
-    print(f"Seeder: Seeded {district_entered} districts and {municipality_entered} municipalities.")
+    print(f"Seeder: Seeded {district_entered} districts and {city_entered} cities.")

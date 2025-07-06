@@ -1,39 +1,28 @@
 from typing import Optional
 from pydantic import BaseModel
 
+from app.modules.activities.schema import ActivityReadWithImage
 from app.modules.storage.schema import ImageRead
 
 class PlaceActivityCreate(BaseModel):
     activity_id: int
+    title: str
     description: Optional[str] = None
     average_duration: Optional[int] = None
     average_cost: Optional[float] = None
 
-class PlaceActivityCreateInternal(PlaceActivityCreate):
+class PlaceActivityBase(PlaceActivityCreate):
     place_id: int
-
-class PlaceActivityUpdate(BaseModel):
-    activity_id: Optional[int] = None
-    description: Optional[str] = None
-    average_duration: Optional[int] = None
-    average_cost: Optional[float] = None
-
-class PlaceActivityUpdateInternal(PlaceActivityUpdate):
-    place_id: int
-
-class BaseActivity(BaseModel):
-    id: int
-    name: str
-    image: Optional[ImageRead]
-
-    class Config:
-        from_attributes = True
 
 class PlaceActivityRead(BaseModel):
-    activity : BaseActivity
+    id: int
+    title: str
+    place_id: int
     description: Optional[str] = None
     average_duration: Optional[int] = None
     average_cost: Optional[float] = None
 
+    activity : ActivityReadWithImage
+    
     class Config:
         from_attributes = True

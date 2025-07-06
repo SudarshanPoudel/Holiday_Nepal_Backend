@@ -2,7 +2,7 @@ from typing import ClassVar, List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.address.schema import MunicipalityBase
+from app.modules.cities.schema import CityBase
 from app.modules.place_activities.schema import PlaceActivityCreate, PlaceActivityCreateInternal, PlaceActivityRead, PlaceActivityUpdate
 from app.modules.storage.schema import ImageRead
 
@@ -17,40 +17,23 @@ class PlaceCategoryEnum(str, Enum):
     architectural = "architectural"
     other = "other"
 
-class CreatePlace(BaseModel):
+class PlaceBase(BaseModel):
     name: str
     category: PlaceCategoryEnum
     longitude: float
     latitude: float
     description: Optional[str] 
-    activities: Optional[List[PlaceActivityCreate]] 
-    image_ids: Optional[list[int]] 
-    municipality_id: Optional[int] 
+    city_id: Optional[int] 
 
     class Config:
         use_enum_values = True
 
-class CreatePlaceInternal(BaseModel):
-    name: str
-    category: PlaceCategoryEnum
-    longitude: float
-    latitude: float
-    description: Optional[str] 
-    municipality_id: Optional[int] 
 
-    class Config:
-        use_enum_values = True
-
-class UpdatePlace(BaseModel):
-    name: Optional[str] 
-    category: Optional[PlaceCategoryEnum]
-    longitude: Optional[float] 
-    latitude: Optional[float] 
-    description: Optional[str] 
-    municipality_id: Optional[int] 
+class PlaceCreate(PlaceBase):
     activities: Optional[List[PlaceActivityCreate]] 
     image_ids: Optional[list[int]] 
 
+    
 
 class UpdatePlaceInternal(BaseModel):
     name: Optional[str] 
@@ -58,7 +41,7 @@ class UpdatePlaceInternal(BaseModel):
     longitude: Optional[float] 
     latitude: Optional[float] 
     description: Optional[str] 
-    municipality_id: Optional[int] 
+    city_id: Optional[int] 
 
 class PlaceReadBasic(BaseModel):
     id: int
@@ -76,10 +59,10 @@ class PlaceRead(BaseModel):
     description: Optional[str]
     images: Optional[list[ImageRead]]
     place_activities: Optional[List[PlaceActivityRead]]
-    municipality: Optional[MunicipalityBase]
+    city: Optional[CityBase]
     
     class Config:
         from_attributes = True
 
 class PlaceFilters(BaseModel):
-    municipality_id: Optional[int] = None
+    city_id: Optional[int] = None

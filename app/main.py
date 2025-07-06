@@ -16,7 +16,7 @@ from app.modules.storage.routes import router as image_router
 from app.modules.service_provider.routes import router as service_provider_router
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
-from app.modules.accomodation_service.routes import router as accomodation_service_router
+from app.modules.accomodation_services.routes import router as accomodation_service_router
 from app.modules.plans.routes import router as plans_router
 from app.modules.plan_day.routes import router as plan_day_router
 from app.modules.plan_day_steps.routes import router as plan_day_step_router

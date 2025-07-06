@@ -16,7 +16,7 @@ class PlanService():
         if not place_start or not place_end:
             raise HTTPException(status_code=404, detail="Place not found")
         
-        if place_start.municipality_id == place_end.municipality_id:
+        if place_start.city_id == place_end.city_id:
             return None
         
         

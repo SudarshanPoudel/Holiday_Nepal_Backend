@@ -4,11 +4,11 @@ from sqlalchemy import insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository import BaseRepository
-from app.modules.accomodation_service.models import AccomodationService, accomodation_service_images
-from app.modules.accomodation_service.schema import AccomodationServiceCreate
+from app.modules.accomodation_services.models import AccomodationService, accomodation_service_images
+from app.modules.accomodation_services.schema import AccomodationServiceBase
 
-class AccomodationServiceRepository(BaseRepository[AccomodationService, AccomodationServiceCreate]):
-    def __init__(self, db):
+class AccomodationServiceRepository(BaseRepository[AccomodationService, AccomodationServiceBase]):
+    def __init__(self, db: AsyncSession):
         super().__init__(AccomodationService, db)
 
     async def add_images(self, accomodation_service_id: int, image_ids: List[int]):

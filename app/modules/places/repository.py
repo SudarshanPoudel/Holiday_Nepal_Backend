@@ -1,15 +1,15 @@
 from typing import List
-from sqlalchemy import insert, delete, select
+from sqlalchemy import insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from app.core.repository import BaseRepository
 from app.modules.place_activities.models import PlaceActivity
 from app.modules.place_activities.schema import PlaceActivityCreate
 from app.modules.places.models import Place, place_images
-from app.modules.places.schema import PlaceRead
+from app.modules.places.schema import PlaceBase
 
 
-class PlaceRepository(BaseRepository[Place, PlaceRead]):
+class PlaceRepository(BaseRepository[Place, PlaceBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(Place, db)
 
