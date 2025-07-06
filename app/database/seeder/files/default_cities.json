@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Bharatpur",
+    "location": [27.6768, 84.43589]
+  },
+  {
+    "name": "Gaindakot",
+    "location": [27.7283893, 84.3647199]
+  },
+  {
+    "name": "Gorkha",
+    "location": [27.9841839, 84.6269824]
+  },
+  {
+    "name": "Bandipur",
+    "location": [27.9170425, 84.406761]
+  },
+  {
+    "name": "Pokhara",
+    "location": [28.26689, 83.96851]
+  },
+  {
+    "name": "Palpa",
+    "location": [27.8892, 83.4643]
+  },
+  {
+    "name": "Butwal",
+    "location": [27.686386, 83.432426]
+  },
+  {
+    "name": "Lumbini",
+    "location": [27.4672, 83.27491]
+  },
+  {
+    "name": "Ratnanagar",
+    "location": [27.643141, 84.425194]
+  }
+]

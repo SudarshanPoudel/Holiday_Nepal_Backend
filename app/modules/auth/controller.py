@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import secrets
 import re
 
-from app.modules.address.repository import CityRepository
+from app.modules.cities.repository import CityRepository
 from app.modules.auth.email_template import get_otp_html, get_password_reset_html
 from app.modules.storage.repository import ImageRepository
 from app.modules.users.repository import UserRepository

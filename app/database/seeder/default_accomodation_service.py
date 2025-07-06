@@ -1,4 +1,5 @@
 import json
+from os import name
 from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,18 +17,6 @@ from app.utils.image_utils import validate_and_process_image
 async def seed_default_accomodation_services(db: AsyncSession):
     service_data = load_data("files/default_accommodation_services.json")
     for data in service_data:
-        # Lookup user
-        user = await db.scalar(select(User).where(User.username == data["username"]))
-        if not user:
-            print(f"User {data['username']} not found. Skipping.")
-            continue
-
-        # Lookup ServiceProvider
-        sp = await db.scalar(select(ServiceProvider).where(ServiceProvider.user_id == user.id))
-        if not sp:
-            print(f"ServiceProvider for user {user.username} not found. Skipping.")
-            continue
-
         # Lookup City
         city = await db.scalar(select(City).where(City.name == data["city"]))
         if not city:
@@ -59,10 +48,10 @@ async def seed_default_accomodation_services(db: AsyncSession):
 
         # Create and add AccomodationService
         service = AccomodationService(
+            name=data["name"],
             description=data["description"],
-            service_provider_id=sp.id,
             city_id=city.id,
-            full_location=data["full_location"],
+            full_address=data["full_address"],
             accomodation_category=AccomodationCategoryEnum(data["accomodation_category"]),
             longitude=data["longitude"],
             latitude=data["latitude"],

@@ -1,7 +1,7 @@
 [
   {
     "name": "Chitwan National Park",
-    "city": "Bharatpur Metropolitan City",
+    "city": "Bharatpur",
     "category": "wildlife",
     "latitude": 27.5347,
     "longitude": 84.4531,
@@ -12,12 +12,14 @@
     "activities": [
       {
         "name": "Elephant Ride",
+        "title": "Elephant Ride at Chitwan National Park",
         "description": "At Chitwan National Park, elephant rides provide a towering view of the forest canopy and open grasslands. As you traverse muddy trails and riverbanks, you can spot rhinos grazing and deer darting through the bushes. The experience is led by skilled mahouts who guide the elephants quietly through the jungle. It offers a unique, albeit debated, method of wildlife viewing that brings travelers closer to the wild than ever before. The rhythmic swaying of the elephant and the sounds of the jungle create an atmosphere of calm adventure. It's a signature activity of Chitwan, blending nature and culture into one unforgettable ride.",
         "average_duration": 3,
         "average_cost": 2000
       },
       {
         "name": "Boating",
+        "title": "Boating along the Rapti River in Chitwan",
         "description": "Boating along the Rapti River in Chitwan is a peaceful experience that contrasts beautifully with the intensity of jungle safaris. You’ll drift silently in a traditional canoe, often spotting gharials, marsh mugger crocodiles, and dozens of bird species along the banks. The surrounding forest casts beautiful reflections on the water, especially during sunrise or sunset. It’s not uncommon to see herds of deer or even rhinos drinking near the shore. Local guides steer the boat and share their knowledge of the river's ecosystem. It's a gentle, immersive way to observe wildlife and soak in the atmosphere of the lowland jungle.",
         "average_duration": 1,
         "average_cost": 1000
@@ -26,7 +28,7 @@
   },
   {
     "name": "Bandipur",
-    "city": "Bandipur Rural City",
+    "city": "Bandipur",
     "category": "cultural",
     "latitude": 27.9431,
     "longitude": 84.4132,
@@ -38,7 +40,7 @@
   },
   {
     "name": "Gorkha Durbar",
-    "city": "Gorkha City",
+    "city": "Gorkha",
     "category": "historic",
     "latitude": 28.1344,
     "longitude": 84.6291,
@@ -50,7 +52,7 @@
   },
   {
     "name": "Phewa Lake",
-    "city": "Pokhara Metropolitan City",
+    "city": "Pokhara",
     "category": "natural",
     "latitude": 28.2096,
     "longitude": 83.9826,
@@ -61,6 +63,7 @@
     "activities": [
       {
         "name": "Boating",
+        "title": "Boating on Phewa Lake",
         "description": "Boating on Phewa Lake offers a relaxing escape with panoramic mountain views and a touch of spiritual adventure. You can paddle yourself or hire a rower to guide your journey across the lake's serene surface. Many visitors stop by the island temple to offer prayers or simply enjoy the peaceful setting. The boats are colorful and traditional, adding charm to the whole experience. Mornings are calm and misty, while evenings bring warm golden light dancing on the water. It's a must-do activity that defines the Pokhara experience.",
         "average_duration": 1,
         "average_cost": 800
@@ -69,7 +72,7 @@
   },
   {
     "name": "Sarangkot Viewpoint",
-    "city": "Pokhara Metropolitan City",
+    "city": "Pokhara",
     "category": "adventure",
     "latitude": 28.2156,
     "longitude": 83.8943,
@@ -80,6 +83,7 @@
     "activities": [
       {
         "name": "Paragliding",
+        "title": "Paragliding from Sarangkot",
         "description": "Launching from Sarangkot’s ridge offers a thrilling paragliding experience with unmatched views of the Himalayas and Pokhara Valley. After takeoff, you’ll glide over Phewa Lake and the city, carried by gentle thermals and mountain breezes. The ride lasts long enough to take in both the adrenaline and the stunning landscapes below. Experienced pilots handle the controls, making it safe even for first-timers. Depending on the season, you may spot eagles flying alongside you. This is Pokhara’s most iconic adventure activity—and for good reason.",
         "average_duration": 2,
         "average_cost": 4000
@@ -88,7 +92,7 @@
   },
   {
     "name": "Gupteshwor Cave",
-    "city": "Pokhara Metropolitan City",
+    "city": "Pokhara",
     "category": "religious",
     "latitude": 28.2102,
     "longitude": 83.9856,

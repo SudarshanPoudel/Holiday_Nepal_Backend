@@ -4,7 +4,7 @@ from app.modules.plan_day.graph import PlanDayNode
 from app.modules.activities.graph import ActivityNode
 from app.modules.plan_day_steps.graph import PlanDayStepNode
 from app.modules.plans.graph import PlanNode
-from app.modules.address.graph import CityNode
+from app.modules.cities.graph import CityNode
 
 from typing import Type, Optional, Dict
 from app.core.graph_schemas import BaseNode  # assuming all nodes inherit this

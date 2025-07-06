@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import graph_repository
 from app.core.all_models import City, TransportRoute  # adjust import paths
 from app.database.seeder.utils import load_data
-from app.modules.address.graph import CityGraphRepository
+from app.modules.cities.graph import CityGraphRepository
 from app.modules.transport_route.graph import TransportRouteEdge
 from app.modules.transport_route.schema import RouteCategoryEnum
 
@@ -63,4 +63,4 @@ async def seed_default_transport_routes(db: AsyncSession, graph_db: Neo4jSession
 
 
     await db.commit()
-    print("Default transport routes seeded.")
+    print("Seeder: Default transport routes seeded.")

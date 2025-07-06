@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.activities.graph import ActivityGraphRepository, ActivityNode
-from app.utils.helper import slugify
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
@@ -16,7 +15,6 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
     activities = load_data("files/default_activities.json")
     for activity in activities:
         name = activity["name"]
-        slug = slugify(name)
         description = activity.get("description")
         image_path = get_file_path(f"files/images/activities/{activity['image_path']}")
         result = await db.execute(select(Activity).filter_by(name_slug=slug))
@@ -36,7 +34,6 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
         await db.flush()  # to get image.id
         activity = Activity(
             name=name,
-            name_slug=slug,
             description=description,
             image_id=image.id
         )

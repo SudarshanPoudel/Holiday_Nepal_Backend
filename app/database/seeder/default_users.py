@@ -14,7 +14,7 @@ async def seed_default_users(db: AsyncSession):
     for user_data in users_data:
         email = user_data["email"]
         username = user_data["username"]
-        city_name = user_data["muicipality"]
+        city_name = user_data["city"]
 
         # Check if user already exists
         existing_user = await db.execute(
@@ -44,4 +44,4 @@ async def seed_default_users(db: AsyncSession):
         db.add(new_user)
 
     await db.commit()
-    print("Default users seeded.")
+    print("Seeder: Default users seeded.")

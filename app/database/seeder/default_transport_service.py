@@ -17,11 +17,6 @@ from app.utils.image_utils import validate_and_process_image
 async def seed_default_transport_services(db):
     transport_services = load_data("files/default_transport_services.json")
     for entry in transport_services:
-        provider = await db.scalar(select(ServiceProvider).join(ServiceProvider.user).where(ServiceProvider.user.has(username=entry["username"])))
-        if not provider:
-            print(f"ServiceProvider not found for username: {entry['username']}")
-            continue
-
         route_ids = []
         total_distance = 0
         total_time = 0
@@ -55,14 +50,14 @@ async def seed_default_transport_services(db):
         end_mun = await db.scalar(select(City).where(City.name == entry["segments"][-1]["end"]))
 
         new_service = TransportService(
-            service_provider_id=provider.id,
             description=entry["description"],
             start_city_id=start_mun.id,
             end_city_id=end_mun.id,
             route_category=RouteCategoryEnum(entry["route_category"]),
             transport_category=TransportServiceCategoryEnum(entry["transport_category"]),
             total_distance=total_distance,
-            average_duration=total_time
+            average_duration=total_time,
+            cost=entry.get("cost")
         )
         db.add(new_service)
         await db.flush()
@@ -107,4 +102,4 @@ async def seed_default_transport_services(db):
         
 
     await db.commit()
-    print("Transport services seeded.")
+    print("Seeder: Transport services seeded.")

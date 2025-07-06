@@ -9,7 +9,7 @@ from app.middlerware.cors import add_cors_middleware
 
 from app.utils.homeage_router import router as homeage_router
 from app.modules.auth.routes import router as auth_router
-from app.modules.address.routes import router as address_router
+from app.modules.cities.routes import router as address_router
 from app.modules.activities.routes import router as activities_router
 from app.modules.places.routes import router as places_router
 from app.modules.storage.routes import router as image_router
@@ -29,17 +29,16 @@ add_cors_middleware(app)
 
 app.include_router(homeage_router, tags=["Home"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(image_router, prefix="/image", tags=["Images"])
+app.include_router(image_router, prefix="/images", tags=["Images"])
 app.include_router(plans_router, prefix="/plans", tags=["Plans"])
-app.include_router(plan_day_router, prefix="/plan-day", tags=["Plan Day"])
-app.include_router(plan_day_step_router, prefix="/plan-day-step", tags=["Plan Day Step"])
-app.include_router(address_router, prefix="/address", tags=["Address"])
+app.include_router(plan_day_router, prefix="/plan-days", tags=["Plan Day"])
+app.include_router(plan_day_step_router, prefix="/plan-day-steps", tags=["Plan Day Step"])
+app.include_router(address_router, prefix="/cities", tags=["Cities"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])
-app.include_router(service_provider_router, prefix="/service-provider", tags=["Service Provider"])
-app.include_router(transport_route_router, prefix="/transport-route", tags=["Transport Route"])
-app.include_router(transport_service_router, prefix="/transport-service", tags=["Transport Service"])
-app.include_router(accomodation_service_router, prefix="/accomodation-service", tags=["Accomodation Service"])
+app.include_router(transport_route_router, prefix="/transport-routes", tags=["Transport Route"])
+app.include_router(transport_service_router, prefix="/transport-services", tags=["Transport Service"])
+app.include_router(accomodation_service_router, prefix="/accomodation-services", tags=["Accomodation Service"])
 
 def custom_openapi():
     if app.openapi_schema:

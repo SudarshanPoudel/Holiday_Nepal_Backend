@@ -14,7 +14,7 @@ from app.utils.helper import slugify, symmetric_pair
 from app.modules.places.models import Place, place_images
 from app.modules.place_activities.models import PlaceActivity
 from app.modules.storage.models import Image, ImageCategoryEnum
-from app.modules.address.models import City
+from app.modules.cities.models import City
 from app.modules.activities.models import Activity
 from app.modules.storage.service import StorageService 
 
@@ -44,8 +44,8 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         place = Place(
             name=entry["name"],
             category=PlaceCategoryEnum(entry.get("category")),
-            longitude=entry["longitude"],
             latitude=entry["latitude"],
+            longitude=entry["longitude"],
             description=entry.get("description"),
             city_id=mun.id,
             average_visit_duration=entry.get("average_visit_duration"),
@@ -117,6 +117,7 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             pa = PlaceActivity(
                 place_id=place.id,
                 activity_id=activity.id,
+                title=act_entry.get("title"),
                 description=act_entry.get("description"),
                 average_duration=act_entry.get("average_duration", 60),
                 average_cost=act_entry.get("average_cost", 1000)
@@ -129,4 +130,4 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
 
         await db.commit()
 
-    print("Default places seeded.")
+    print("Seeder: Default places seeded.")
