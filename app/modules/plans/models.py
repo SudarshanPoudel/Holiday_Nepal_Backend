@@ -24,4 +24,4 @@ class Plan(Base):
     end_municipality_id = Column(Integer, ForeignKey("municipalities.id"), nullable=False)
 
     user = relationship("User")
-    days = relationship("PlanDay", uselist=True, cascade="all, delete-orphan")
+    days = relationship("PlanDay", uselist=True, cascade="all, delete-orphan", order_by="PlanDay.index")

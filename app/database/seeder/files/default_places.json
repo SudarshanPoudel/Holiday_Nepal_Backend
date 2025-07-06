@@ -7,17 +7,19 @@
     "longitude": 84.4531,
     "description": "Chitwan National Park is Nepal’s first national park and a UNESCO World Heritage Site, renowned for its incredible biodiversity and lush subtropical jungle. It’s one of the few places in the world where you can observe endangered species like the one-horned rhinoceros and Bengal tiger in their natural habitat. The park’s dense forests, expansive grasslands, and meandering rivers provide the perfect environment for wildlife to thrive.\n\nVisitors to Chitwan can immerse themselves in nature through safaris, boat rides, jungle walks, and cultural experiences with the local Tharu community. The serene landscape is complemented by the presence of exotic birds, gharials, elephants, and wild boars. Whether you’re a nature enthusiast or a curious traveler, Chitwan offers a deeply engaging eco-tourism experience.",
     "images": ["1.jpg", "2.png"],
+    "average_visit_duration": 4,
+    "average_visit_cost": 5000,
     "activities": [
       {
         "name": "Elephant Ride",
         "description": "At Chitwan National Park, elephant rides provide a towering view of the forest canopy and open grasslands. As you traverse muddy trails and riverbanks, you can spot rhinos grazing and deer darting through the bushes. The experience is led by skilled mahouts who guide the elephants quietly through the jungle. It offers a unique, albeit debated, method of wildlife viewing that brings travelers closer to the wild than ever before. The rhythmic swaying of the elephant and the sounds of the jungle create an atmosphere of calm adventure. It's a signature activity of Chitwan, blending nature and culture into one unforgettable ride.",
-        "average_duration": 180,
+        "average_duration": 3,
         "average_cost": 2000
       },
       {
         "name": "Boating",
         "description": "Boating along the Rapti River in Chitwan is a peaceful experience that contrasts beautifully with the intensity of jungle safaris. You’ll drift silently in a traditional canoe, often spotting gharials, marsh mugger crocodiles, and dozens of bird species along the banks. The surrounding forest casts beautiful reflections on the water, especially during sunrise or sunset. It’s not uncommon to see herds of deer or even rhinos drinking near the shore. Local guides steer the boat and share their knowledge of the river's ecosystem. It's a gentle, immersive way to observe wildlife and soak in the atmosphere of the lowland jungle.",
-        "average_duration": 60,
+        "average_duration": 1,
         "average_cost": 1000
       }
     ]
@@ -30,6 +32,8 @@
     "longitude": 84.4132,
     "description": "Bandipur is a picturesque hilltop town that perfectly preserves its rich Newari heritage amidst sweeping Himalayan views. The town’s stone-paved streets, traditional homes, and centuries-old temples reflect its cultural charm. Perched high above the Marsyangdi Valley, Bandipur is a peaceful retreat that feels untouched by time.\n\nVisitors can enjoy panoramic views of the Annapurna and Langtang ranges while exploring its unique architectural beauty. The absence of traffic in the town center enhances its tranquil and authentic vibe. Whether you’re sipping tea at a local café or watching the clouds roll in from Tundikhel, Bandipur offers a calm yet enriching cultural escape.",
     "images": ["3.webp"],
+    "average_visit_duration": 2,
+    "average_visit_cost": 1000,
     "activities": []
   },
   {
@@ -40,6 +44,8 @@
     "longitude": 84.6291,
     "description": "Gorkha Durbar is a historic hilltop palace that once served as the ancestral seat of Nepal’s Shah kings. The architectural masterpiece combines fort, temple, and palace features, offering insight into Nepal’s unification era. From its elevated perch, it overlooks deep valleys and snow-capped mountains, symbolizing the power and legacy of its former rulers.\n\nReaching the palace involves a steep climb, but the breathtaking views from the top make it worth every step. Inside, you’ll find intricate wood carvings, sacred shrines, and panoramic terraces. It's a must-visit destination for history lovers and those interested in Nepal’s monarchical past.",
     "images": ["4.jpg"],
+    "average_visit_duration": 2,
+    "average_visit_cost": 1000,
     "activities": []
   },
   {
@@ -50,11 +56,13 @@
     "longitude": 83.9826,
     "description": "Phewa Lake is the shimmering heart of Pokhara, famous for its calm waters and stunning reflections of the Annapurna range. Boats dot the lake throughout the day, offering travelers a peaceful way to explore its vast surface. The iconic Tal Barahi Temple, situated on a small island in the middle of the lake, adds cultural and spiritual depth to the scenery.\n\nSurrounding the lake are cafés, walking trails, and viewpoints that capture the lake’s changing colors from dawn to dusk. Whether you're watching paragliders descend from Sarangkot or just enjoying the tranquility, Phewa Lake invites you to slow down and connect with nature. It’s a place that balances leisure and beauty in perfect harmony.",
     "images": ["5.jpg", "6.jpg"],
+    "average_visit_duration": 2,
+    "average_visit_cost": 1000,
     "activities": [
       {
         "name": "Boating",
         "description": "Boating on Phewa Lake offers a relaxing escape with panoramic mountain views and a touch of spiritual adventure. You can paddle yourself or hire a rower to guide your journey across the lake's serene surface. Many visitors stop by the island temple to offer prayers or simply enjoy the peaceful setting. The boats are colorful and traditional, adding charm to the whole experience. Mornings are calm and misty, while evenings bring warm golden light dancing on the water. It's a must-do activity that defines the Pokhara experience.",
-        "average_duration": 60,
+        "average_duration": 1,
         "average_cost": 800
       }
     ]
@@ -67,11 +75,13 @@
     "longitude": 83.8943,
     "description": "Sarangkot Viewpoint is a popular destination in Pokhara, known for its mesmerizing sunrise views over the Annapurna and Dhaulagiri ranges. In the early morning, travelers gather to watch the first rays of sunlight illuminate the mountains in a golden glow. The hilltop also offers sweeping views of Pokhara Valley and Phewa Lake.\n\nAs the day progresses, Sarangkot becomes a hub for thrill-seekers looking to paraglide from its ridges. The combination of natural beauty and adventure opportunities makes it an iconic part of the Pokhara experience. It’s a place where serenity and adrenaline coexist, making it ideal for all kinds of travelers.",
     "images": ["7.jpg"],
+    "average_visit_duration": 2,
+    "average_visit_cost": 1000,
     "activities": [
       {
         "name": "Paragliding",
         "description": "Launching from Sarangkot’s ridge offers a thrilling paragliding experience with unmatched views of the Himalayas and Pokhara Valley. After takeoff, you’ll glide over Phewa Lake and the city, carried by gentle thermals and mountain breezes. The ride lasts long enough to take in both the adrenaline and the stunning landscapes below. Experienced pilots handle the controls, making it safe even for first-timers. Depending on the season, you may spot eagles flying alongside you. This is Pokhara’s most iconic adventure activity—and for good reason.",
-        "average_duration": 120,
+        "average_duration": 2,
         "average_cost": 4000
       }
     ]

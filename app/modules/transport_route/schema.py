@@ -17,14 +17,14 @@ class TransportRouteCreate(BaseModel):
     end_municipality_id: int
     route_category: RouteCategoryEnum
     distance: float
-    average_time: Optional[int]
+    average_duration: Optional[float]
 
 class TransportRouteUpdate(BaseModel):
     start_municipality_id: Optional[int]
     end_municipality_id: Optional[int]
     route_category: Optional[RouteCategoryEnum]
     distance: Optional[float]
-    average_time: Optional[int]
+    average_duration: Optional[float]
 
 class TransportRouteRead(BaseModel):
     id: int
@@ -32,7 +32,7 @@ class TransportRouteRead(BaseModel):
     end_municipality: MunicipalityBase
     route_category: RouteCategoryEnum
     distance: float
-    average_time: Optional[int]
+    average_duration: Optional[float]
 
     class Config:
         from_attributes = True

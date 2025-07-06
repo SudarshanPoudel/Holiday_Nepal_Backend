@@ -18,7 +18,8 @@ class TransportRoute(Base):
     end_municipality_id = Column(Integer, ForeignKey('municipalities.id'), nullable=False)
     route_category = Column(Enum(RouteCategoryEnum), nullable=False)
     distance = Column(Float, nullable=False)
-    average_time = Column(Integer, nullable=True)
+    average_duration = Column(Float, nullable=True)
+    average_cost = Column(Float, nullable=True)
 
     start_municipality = relationship("Municipality", foreign_keys=[start_municipality_id])
     end_municipality = relationship("Municipality", foreign_keys=[end_municipality_id])

@@ -49,7 +49,7 @@ async def seed_default_transport_services(db):
 
             route_ids.append(route.id)
             total_distance += route.distance
-            total_time += route.average_time or 0
+            total_time += route.average_duration or 0
 
         start_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][0]["start"]))
         end_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][-1]["end"]))
@@ -62,7 +62,7 @@ async def seed_default_transport_services(db):
             route_category=RouteCategoryEnum(entry["route_category"]),
             transport_category=TransportServiceCategoryEnum(entry["transport_category"]),
             total_distance=total_distance,
-            average_time=total_time
+            average_duration=total_time
         )
         db.add(new_service)
         await db.flush()
@@ -71,7 +71,7 @@ async def seed_default_transport_services(db):
             db.add(TransportServiceRouteSegment(
                 service_id=new_service.id,
                 route_id=route_id,
-                sequence=idx
+                index=idx
             ))
 
         transport_images = []

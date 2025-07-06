@@ -38,7 +38,8 @@ def upgrade() -> None:
         sa.Column('end_municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('distance', sa.Float(), nullable=False),
-        sa.Column('average_time', sa.Integer(), nullable=True)
+        sa.Column('average_duration', sa.Float(), nullable=False),
+        sa.Column('average_cost', sa.Float(), nullable=False)
     )
 
     op.create_table(
@@ -51,7 +52,7 @@ def upgrade() -> None:
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('transport_category', transport_category_enum, nullable=False),
         sa.Column('total_distance', sa.Float(), nullable=False),
-        sa.Column('average_time', sa.Integer(), nullable=True)
+        sa.Column('average_duration', sa.Float(), nullable=True)
     )
 
     op.create_table(
@@ -59,7 +60,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('service_id', sa.Integer(), sa.ForeignKey('transport_services.id'), nullable=False),
         sa.Column('route_id', sa.Integer(), sa.ForeignKey('transport_routes.id'), nullable=False),
-        sa.Column('sequence', sa.Integer(), nullable=False)
+        sa.Column('index', sa.Integer(), nullable=False)
     )
 
     op.create_table(

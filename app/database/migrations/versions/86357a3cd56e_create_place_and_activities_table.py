@@ -26,41 +26,43 @@ def upgrade() -> None:
 
     op.create_table(
         'activities',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.String, unique=True, index=True, nullable=False),
-        sa.Column('name_slug', sa.String, unique=True, index=True, nullable=False),
-        sa.Column('description', sa.String, nullable=True),
-        sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id'), nullable=True),
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('name', sa.String(), unique=True, index=True, nullable=False),
+        sa.Column('name_slug', sa.String(), unique=True, index=True, nullable=False),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), nullable=True),
     )
 
     # Create places table
     op.create_table(
         'places',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.String, index=True, nullable=False),
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('name', sa.String(), index=True, nullable=False),
         sa.Column('category', place_category_enum, nullable=True),
-        sa.Column('longitude', sa.Float, nullable=False),
-        sa.Column('latitude', sa.Float, nullable=False),
-        sa.Column('description', sa.String, nullable=True),
-        sa.Column('municipality_id', sa.Integer, sa.ForeignKey('municipalities.id'), nullable=False),
+        sa.Column('longitude', sa.Float(), nullable=False),
+        sa.Column('latitude', sa.Float(), nullable=False),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('municipality_id', sa.Integer(), sa.ForeignKey('municipalities.id'), nullable=False),
+        sa.Column('average_visit_duration', sa.Float(), nullable=True),
+        sa.Column('average_visit_cost', sa.Float(), nullable=True),
     )
 
     # Create place_activities association table
     op.create_table(
         'place_activities',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('place_id', sa.Integer, sa.ForeignKey('places.id'), index=True, nullable=False),
-        sa.Column('activity_id', sa.Integer, sa.ForeignKey('activities.id'), index=True, nullable=False),
-        sa.Column('description', sa.String, nullable=True),
-        sa.Column('average_duration', sa.Integer, nullable=True),
-        sa.Column('average_cost', sa.Float, nullable=True),
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('place_id', sa.Integer(), sa.ForeignKey('places.id'), index=True, nullable=False),
+        sa.Column('activity_id', sa.Integer(), sa.ForeignKey('activities.id'), index=True, nullable=False),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('average_duration', sa.Float(), nullable=True),
+        sa.Column('average_cost', sa.Float(), nullable=True),
     )
 
     # Create place_images association tabless
     op.create_table(
         'place_images',
-        sa.Column('place_id', sa.Integer, sa.ForeignKey('places.id', ondelete="CASCADE"), primary_key=True),
-        sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id', ondelete="CASCADE"), primary_key=True)
+        sa.Column('place_id', sa.Integer(), sa.ForeignKey('places.id', ondelete="CASCADE"), primary_key=True),
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id', ondelete="CASCADE"), primary_key=True)
     )
 
 

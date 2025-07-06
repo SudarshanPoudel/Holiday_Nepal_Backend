@@ -27,6 +27,17 @@ async def get_all_municipality(db: AsyncSession = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+    
+@router.get("/municiality/search")
+async def get_municipality_by_name(name: str, db: AsyncSession = Depends(get_db)):
+    try:
+        controller = AddressController(db)
+        return await controller.search(name)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/municipality/{district_id}")
 async def get_municipality_by_district(district_id: int, db: AsyncSession = Depends(get_db)):

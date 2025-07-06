@@ -11,7 +11,7 @@ class PlaceActivity(Base):
     activity_id = Column(Integer, ForeignKey("activities.id"), index=True)
     description = Column(String, nullable=True)
 
-    average_duration = Column(Integer, nullable=True)
+    average_duration = Column(Float, nullable=True)
     average_cost = Column(Float, nullable=True)
 
     place = relationship("Place", back_populates="place_activities")

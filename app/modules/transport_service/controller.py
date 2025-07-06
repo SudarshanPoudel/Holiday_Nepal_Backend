@@ -42,7 +42,7 @@ class TransportServiceController:
             description=transport_service.description,
             route_category=transport_service.route_category,
             transport_category=transport_service.transport_category,
-            average_time=transport_service.average_time,
+            average_duration=transport_service.average_duration,
             total_distance=total_distance,
             image_ids=transport_service.image_ids,
         )
@@ -113,7 +113,7 @@ class TransportServiceController:
             description=transport_service.description or existing.description,
             route_category=transport_service.route_category or existing.route_category,
             transport_category=transport_service.transport_category or existing.transport_category,
-            average_time=transport_service.average_time or existing.average_time,
+            average_duration=transport_service.average_duration or existing.average_duration,
             total_distance=total_distance,
             image_ids=transport_service.image_ids or [img.id for img in existing.images],
         )

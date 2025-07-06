@@ -7,7 +7,8 @@ class PlanDay(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     plan_id = Column(Integer, ForeignKey("plans.id"), nullable=False)
-    day = Column(Integer, nullable=False)
+    index = Column(Integer, nullable=False)
     title = Column(String, nullable=False)
     
-    steps = relationship("PlanDayStep", uselist=True, cascade="all, delete-orphan") 
+    steps = relationship("PlanDayStep", uselist=True, cascade="all, delete-orphan", order_by="PlanDayStep.index") 
+    plan = relationship("Plan", back_populates="days")

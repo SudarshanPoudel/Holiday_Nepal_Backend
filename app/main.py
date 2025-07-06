@@ -18,6 +18,8 @@ from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
 from app.modules.accomodation_service.routes import router as accomodation_service_router
 from app.modules.plans.routes import router as plans_router
+from app.modules.plan_day.routes import router as plan_day_router
+from app.modules.plan_day_steps.routes import router as plan_day_step_router
 
 app = FastAPI()
 
@@ -29,6 +31,8 @@ app.include_router(homeage_router, tags=["Home"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(image_router, prefix="/image", tags=["Images"])
 app.include_router(plans_router, prefix="/plans", tags=["Plans"])
+app.include_router(plan_day_router, prefix="/plan-day", tags=["Plan Day"])
+app.include_router(plan_day_step_router, prefix="/plan-day-step", tags=["Plan Day Step"])
 app.include_router(address_router, prefix="/address", tags=["Address"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])

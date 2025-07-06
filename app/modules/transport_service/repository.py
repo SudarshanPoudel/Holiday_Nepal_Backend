@@ -28,14 +28,14 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 elif last_place == route.end_municipality_id:
                     last_place = route.start_municipality_id
                 else:
-                    raise HTTPException(status_code=400, detail="Invalid route sequence")
+                    raise HTTPException(status_code=400, detail="Invalid route index")
 
                 last_place = route.end_municipality_id
 
                 segment = TransportServiceRouteSegment(
                     service_id=transport_service_id,
                     route_id=route_id,
-                    sequence=i
+                    index=i
                 )
                 self.db.add(segment)
 

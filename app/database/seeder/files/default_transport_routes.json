@@ -4,41 +4,47 @@
         "end_municipality": "Bharatpur Metropolitan City",
         "route_category": "road",
         "distance": 10,
-        "average_time": 30
-    },
+        "average_duration": 0.5,
+        "average_cost": 1000
+},
     {
         "start_municipality": "Bharatpur Metropolitan City",
         "end_municipality": "Bandipur Rural Municipality",
         "route_category": "road",
         "distance": 60,
-        "average_time": 120
-    },
+        "average_duration": 2,
+        "average_cost": 1000
+},
     {
         "start_municipality": "Bandipur Rural Municipality",
         "end_municipality": "Byas Municipality",
         "route_category": "road",
         "distance": 30,
-        "average_time": 60
-    },
+        "average_duration": 1,
+        "average_cost": 1000
+},
     {
         "start_municipality": "Byas Municipality",
         "end_municipality": "Pokhara Metropolitan City",
         "route_category": "road",
         "distance": 70,
-        "average_time": 150
-    },
+        "average_duration": 2.5,
+        "average_cost": 450
+},
     {
         "start_municipality": "Bandipur Rural Municipality",
         "end_municipality": "Gorkha Municipality",
         "route_category": "road",
         "distance": 50,
-        "average_time": 100
-    },
+        "average_duration": 1.5,
+        "average_cost": 300
+},
     {
         "start_municipality": "Pokhara Metropolitan City",
         "end_municipality": "Bharatpur Metropolitan City",
         "route_category": "air",
         "distance": 180,
-        "average_time": 30
+        "average_duration": 0.5,
+        "average_cost": 8000
     }
 ]

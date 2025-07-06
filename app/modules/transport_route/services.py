@@ -1,8 +1,6 @@
 from typing import Optional
 from fastapi import HTTPException
 from app.core.schemas import Neo4jSession, AsyncSession
-from app.modules.places.repository import PlaceRepository
-from app.modules.transport_route.graph import TransportRouteGraphRepository
 from app.modules.transport_route.schema import RouteCategoryEnum
 
 

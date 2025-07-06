@@ -9,12 +9,12 @@ class PlanCreate(BaseModel):
     title: str
     description: Optional[str]
     start_municipality_id: int
+    end_municipality_id: int
     no_of_people: int = 1
     is_private: bool = True
 
 class PlanCreateInternal(PlanCreate):
     user_id: int
-    end_municipality_id: int
     total_cost: Optional[float] = 0.0
     min_budget: Optional[float] = 0.0
     max_budget: Optional[float] = 0.0
@@ -33,8 +33,12 @@ class PlanRead(BaseModel):
     min_travel_distance: Optional[float] = 0.0
     rating: Optional[float] = 0.0
     vote_count: Optional[int] = 0
+    start_municipality_id: int
+    end_municipality_id: int
+    is_private: bool
 
     days: List[PlanDayRead]
+    user: UserRead
 
     class Config:
         from_attributes = True

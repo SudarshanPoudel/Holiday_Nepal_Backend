@@ -1,19 +1,17 @@
 from typing import Dict, Optional
 from fastapi import HTTPException
-from app.modules.place_activities.graph import PlaceActivityEdge, PlaceActivityGraphRepository
-from app.modules.places.graph import MuncipalityPlaceEdge, MunicipalityPlaceGraphRepository, PlaceGraphRepository, PlaceNode
+from app.modules.place_activities.graph import PlaceActivityEdge
+from app.modules.places.graph import MunicipalityPlaceEdge, PlaceGraphRepository, PlaceNode
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
 from neo4j import AsyncSession as Neo4jSession
-from app.modules.activities.schema import ActivityCreateInternal
 from app.modules.place_activities.repository import PlaceActivityRepository
 from app.modules.place_activities.schema import PlaceActivityCreateInternal, PlaceActivityUpdateInternal
 from app.modules.places.repository import PlaceRepository
 from app.modules.places.schema import CreatePlace, CreatePlaceInternal, PlaceRead, UpdatePlace, UpdatePlaceInternal
 from app.utils.helper import slugify, symmetric_pair
-from app.utils.image_utils import validate_and_process_image
 
 
 class PlaceController():
@@ -23,8 +21,6 @@ class PlaceController():
         self.repository = PlaceRepository(db)
         self.graph_repository = PlaceGraphRepository(graph_db)
         self.place_activity_repository = PlaceActivityRepository(db)
-        self.place_activity_graph_repository = PlaceActivityGraphRepository(graph_db)
-        self.municipality_place_graph_repository = MunicipalityPlaceGraphRepository(graph_db)
 
     async def create(self, place: CreatePlace):
         slug = slugify(place.name)
@@ -32,13 +28,13 @@ class PlaceController():
         place_db = CreatePlaceInternal(**place.model_dump(exclude={"activities", "image_ids"}), name_slug=slug)
         place_db = await self.repository.create(place_db)
         await self.graph_repository.create(PlaceNode(id=place_db.id, name=place.name, category=place.category))
-        await self.municipality_place_graph_repository.create(MuncipalityPlaceEdge(start_id=place.municipality_id, end_id=place_db.id))
+        await self.graph_repository.add_edge(MunicipalityPlaceEdge(source_id=place.municipality_id, target_id=place_db.id))
         await self.repository.add_images(place_db.id, place.image_ids)
         for activity in place.activities:
             try:
                 place_acitivity = PlaceActivityCreateInternal(place_id=place_db.id, **activity.model_dump())
                 place_activity = await self.place_activity_repository.create(place_acitivity)
-                await self.place_activity_graph_repository.create(PlaceActivityEdge(start_id=place_db.id, end_id=place_activity.activity_id))
+                await self.graph_repository.add_edge(PlaceActivityEdge(id=place_acitivity.id, source_id=place_db.id, target_id=place_activity.activity_id))
             except:
                 raise HTTPException(status_code=404, detail="Activity not found")
 
@@ -64,19 +60,14 @@ class PlaceController():
         place_db = await self.repository.update(place_id, place_internal)
         if not place_db:
             raise HTTPException(status_code=404, detail="Place not found")
-        await self.graph_repository.update(place_id, {"name": place.name, "category": place.category})
         await self.repository.update_images(place_id, place.image_ids)
-        await self.place_activity_repository.clear_place_activities(place_id)
+        await self.repository.update_activities(place_id, place.activities)
+        await self.graph_repository.update(PlaceNode(id=place_id, name=place.name, category=place.category))
         await self.graph_repository.clear_edges(place_id, edge_type=PlaceActivityEdge)
-        await self.graph_repository.clear_edges(place_id, edge_type=MuncipalityPlaceEdge)
-        await self.municipality_place_graph_repository.create(MuncipalityPlaceEdge(start_id=place.municipality_id, end_id=place_id))
+        await self.graph_repository.clear_edges(place_id, edge_type=MunicipalityPlaceEdge)
+        await self.graph_repository.add_edge(MunicipalityPlaceEdge(source_id=place.municipality_id, target_id=place_id))
         for activity in place.activities:
-            try:
-                place_acitivity = PlaceActivityUpdateInternal(place_id=place.id, **activity.model_dump())
-                await self.place_activity_repository.update(activity.id, place_acitivity)
-                await self.place_activity_graph_repository.update(symmetric_pair(place_id, activity.id), {"end_id": activity.activity_id})
-            except:
-                raise HTTPException(status_code=404, detail="Activity not found")
+            await self.graph_repository.add_edge(PlaceActivityEdge(id=activity.id, source_id=place_id, target_id=activity.activity_id))
         return BaseResponse(message="Place updated successfully", data={"id": place_db.id})
     
     async def index(

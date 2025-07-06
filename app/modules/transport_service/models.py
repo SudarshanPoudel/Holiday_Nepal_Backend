@@ -26,7 +26,7 @@ class TransportService(Base):
     route_category = Column(Enum(RouteCategoryEnum), nullable=False)
     transport_category = Column(Enum(TransportServiceCategoryEnum, name="transportcategoryenum"), nullable=False)
     total_distance = Column(Float, nullable=False)
-    average_time = Column(Integer, nullable=True)
+    average_duration = Column(Integer, nullable=True)
 
     start_municipality = relationship("Municipality", foreign_keys=[start_municipality_id])
     end_municipality = relationship("Municipality", foreign_keys=[end_municipality_id])
@@ -38,7 +38,7 @@ class TransportService(Base):
     route_segments = relationship(
         'TransportServiceRouteSegment',
         back_populates='service',
-        order_by='TransportServiceRouteSegment.sequence',
+        order_by='TransportServiceRouteSegment.index',
         cascade='all, delete-orphan'
     )
 
@@ -49,7 +49,7 @@ class TransportServiceRouteSegment(Base):
     id = Column(Integer, primary_key=True)
     service_id = Column(Integer, ForeignKey('transport_services.id', ondelete='CASCADE'), nullable=False)
     route_id = Column(Integer, ForeignKey('transport_routes.id'), nullable=False)
-    sequence = Column(Integer, nullable=False)
+    index = Column(Integer, nullable=False)
 
     service = relationship('TransportService', back_populates='route_segments')
     route = relationship('TransportRoute')

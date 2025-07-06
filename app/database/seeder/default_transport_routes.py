@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import graph_repository
 from app.core.all_models import Municipality, TransportRoute  # adjust import paths
 from app.database.seeder.utils import load_data
-from app.modules.transport_route.graph import TransportRouteEdge, TransportRouteGraphRepository
+from app.modules.address.graph import MunicipalityGraphRepository
+from app.modules.transport_route.graph import TransportRouteEdge
 from app.modules.transport_route.schema import RouteCategoryEnum
 
 async def seed_default_transport_routes(db: AsyncSession, graph_db: Neo4jSession):
     routes_data = load_data("files/default_transport_routes.json")
-    graph_repository = TransportRouteGraphRepository(graph_db)
+    graph_repository = MunicipalityGraphRepository(graph_db)
     for route in routes_data:
         start_name = route["start_municipality"]
         end_name = route["end_municipality"]
@@ -50,14 +51,15 @@ async def seed_default_transport_routes(db: AsyncSession, graph_db: Neo4jSession
             end_municipality_id=end.id,
             route_category=RouteCategoryEnum(route["route_category"]),
             distance=route["distance"],
-            average_time=route.get("average_time")
+            average_duration=route.get("average_duration"),
+            average_cost = route.get("average_cost")
         )
 
         db.add(new_route)
         await db.flush()
 
-        new_route_edge = TransportRouteEdge(id=new_route.id, start_id=start.id, end_id=end.id, route_category=RouteCategoryEnum(route["route_category"]), distance=route["distance"], average_time=route.get("average_time"))
-        await graph_repository.create(new_route_edge)
+        new_route_edge = TransportRouteEdge(id=new_route.id, source_id=start.id, target_id=end.id, route_category=RouteCategoryEnum(route["route_category"]), distance=route["distance"], average_duration=route.get("average_duration"))
+        await graph_repository.add_edge(new_route_edge)
 
 
     await db.commit()

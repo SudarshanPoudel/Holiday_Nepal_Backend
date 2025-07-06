@@ -5,7 +5,8 @@ from app.core.graph_schemas import BaseNode
 
 
 class MunicipalityNode(BaseNode):
-    label: ClassVar[str] = "MUNICIPALITY"
+    label: ClassVar[str] = "Municipality"
+    child_relationships = {"MUNICIPALITY_CONTAINS_PLACE": "Place"}
     name: str
 
 

@@ -33,3 +33,12 @@ class AddressController():
             raise HTTPException(status_code=404, detail="Municipalities not found")
         return BaseResponse(message="Municipalities fetched successfully", data=[MunicipalityBase.model_validate(m, from_attributes=True) for m in res.items])
         
+    async def search(self, search: str):
+        res = await self.municipality_repo.index(
+            params=Params(size=100, page=1),
+            search_fields=["name"],
+            search_query=search,
+        )
+        if not res:
+            raise HTTPException(status_code=404, detail="Municipalities not found")
+        return BaseResponse(message="Municipalities fetched successfully", data=[MunicipalityBase.model_validate(m, from_attributes=True) for m in res.items])

@@ -23,7 +23,7 @@ class TransportServiceCreate(BaseModel):
     image_ids: Optional[List[int]] = None  
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_time: Optional[int]
+    average_duration: Optional[int]
 
 
 class TransportServiceBase(BaseModel):
@@ -33,13 +33,13 @@ class TransportServiceBase(BaseModel):
     description: Optional[str]
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_time: Optional[int]
+    average_duration: Optional[int]
     total_distance: float
 
 
 class TransportServiceRouteSegmentRead(BaseModel):
     id: int
-    sequence: int
+    index: int
     route: TransportRouteRead
 
 
@@ -52,7 +52,7 @@ class TransportServiceReadAll(BaseModel):
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
     total_distance: float
-    average_time: Optional[int]
+    average_duration: Optional[int]
 
 
 class TransportServiceRead(TransportServiceReadAll):
@@ -65,7 +65,7 @@ class TransportServiceUpdate(BaseModel):
     description: Optional[str]
     route_category: Optional[RouteCategoryEnum]
     transport_category: Optional[TransportServiceCategoryEnum]
-    average_time: Optional[int]
+    average_duration: Optional[int]
     image_ids: Optional[List[int]] = None  
 
 
