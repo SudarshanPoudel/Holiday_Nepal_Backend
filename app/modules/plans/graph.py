@@ -1,4 +1,4 @@
-from typing import ClassVar, Type
+from typing import ClassVar
 from neo4j import AsyncSession
 from app.core.graph_repository import BaseGraphRepository
 from app.core.graph_schemas import  BaseNode
@@ -9,7 +9,6 @@ class PlanNode(BaseNode):
     user_id: int
     no_of_people: int
     start_city_id: int
-    end_city_id: int
     max_time_per_day: int = 14*60
 
 class PlanGraphRepository(BaseGraphRepository[PlanNode]):

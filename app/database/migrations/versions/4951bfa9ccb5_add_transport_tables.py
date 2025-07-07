@@ -51,7 +51,7 @@ def upgrade() -> None:
         sa.Column('route_category', route_category_enum, nullable=False),
         sa.Column('transport_category', transport_category_enum, nullable=False),
         sa.Column('average_duration', sa.Float(), nullable=True),
-        sa.Column('distance', sa.Float(), nullable=False),
+        sa.Column('total_distance', sa.Float(), nullable=False),
         sa.Column('cost', sa.Float(), nullable=True)
     )
 

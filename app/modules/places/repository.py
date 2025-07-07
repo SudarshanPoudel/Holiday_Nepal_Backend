@@ -35,13 +35,7 @@ class PlaceRepository(BaseRepository[Place, PlaceBase]):
 
         await self.db.commit()
 
-    async def update_activities(self, place_id: int, activities: List[PlaceActivityCreate]):
+    async def delete_activities(self, place_id: int):
         delete_stmt = delete(PlaceActivity).where(PlaceActivity.place_id == place_id)
         await self.db.execute(delete_stmt)
-
-        # Add new image mappings
-        if activities:
-            values = [{"place_id": place_id, **activity.model_dump()} for activity in activities]
-            await self.db.execute(insert(PlaceActivity).values(values))
-
         await self.db.commit()

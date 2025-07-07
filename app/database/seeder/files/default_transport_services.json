@@ -6,12 +6,12 @@
     "cost": 350,
     "segments": [
       {
-        "start": "Gaindakot City",
-        "end": "Bharatpur Metropolitan City"
+        "start": "Gaindakot",
+        "end": "Bharatpur"
       },
       {
-        "start": "Bharatpur Metropolitan City",
-        "end": "Bandipur Rural City"
+        "start": "Bharatpur",
+        "end": "Bandipur"
       }
     ],
     "image_paths": [
@@ -20,18 +20,14 @@
     ]
   },
   {
-    "description": "This minibus route from Bandipur to Pokhara via Byas City is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
+    "description": "This minibus route from Bandipur to Pokhara via Byas is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
     "transport_category": "minibus",
     "route_category": "road",
     "cost": 200,
     "segments": [
       {
-        "start": "Bandipur Rural City",
-        "end": "Byas City"
-      },
-      {
-        "start": "Byas City",
-        "end": "Pokhara Metropolitan City"
+        "start": "Bandipur",
+        "end": "Pokhara"
       }
     ],
     "image_paths": [
@@ -46,8 +42,8 @@
     "cost": 500,
     "segments": [
       {
-        "start": "Bandipur Rural City",
-        "end": "Gorkha City"
+        "start": "Bandipur",
+        "end": "Gorkha"
       }
     ],
     "image_paths": [
@@ -62,8 +58,8 @@
     "cost": 4000,
     "segments": [
       {
-        "start": "Pokhara Metropolitan City",
-        "end": "Bharatpur Metropolitan City"
+        "start": "Pokhara",
+        "end": "Bharatpur"
       }
     ],
     "image_paths": [
@@ -77,16 +73,12 @@
     "cost": 700,
     "segments": [
       {
-        "start": "Bharatpur Metropolitan City",
-        "end": "Bandipur Rural City"
+        "start": "Bharatpur",
+        "end": "Bandipur"
       },
       {
-        "start": "Bandipur Rural City",
-        "end": "Byas City"
-      },
-      {
-        "start": "Byas City",
-        "end": "Pokhara Metropolitan City"
+        "start": "Bandipur",
+        "end": "Pokhara"
       }
     ],
     "image_paths": [

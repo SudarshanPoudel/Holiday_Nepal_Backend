@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from starlette.concurrency import run_in_threadpool
 
-from app.core.all_models import User, City, AccomodationService, ServiceProvider, Image
+from app.core.all_models import User, City, AccomodationService, Image
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.accomodation_services.schema import AccomodationCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum

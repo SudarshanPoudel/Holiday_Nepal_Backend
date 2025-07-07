@@ -35,7 +35,7 @@ class PlanDayStepUtils():
     async def get_step_duration(self, step) -> float:
         return 4.0
     
-    async def get_step_cost(self, step, plan) -> float:
+    async def get_step_cost(self) -> float:
         return 1000
     
     async def get_step_image(self)->int:

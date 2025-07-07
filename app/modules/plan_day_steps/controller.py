@@ -37,12 +37,6 @@ class PlanDayStepController:
         self.place_activity_repository = PlaceActivityRepository(db)
         self.utils = PlanDayStepUtils(db)
 
-    async def get(self, plan_day_step_id: int):
-        plan_day_step = await self.repository.get(plan_day_step_id)
-        if not plan_day_step:
-            raise HTTPException(status_code=404, detail="Plan day step not found")
-        return BaseResponse(message="Plan day step found", data=PlanDayStepRead.model_validate(plan_day_step, from_attributes=True))
-   
     async def add_plan_day_step(self, step: PlanDayStepCreate):
         plan = await self.plan_repository.get(step.plan_id, load_relations=["days.steps"])
         if not plan:
@@ -54,11 +48,11 @@ class PlanDayStepController:
         
         latest_day = plan.days[-1]
         last_step = None
-        if len(latest_day.steps) > 0:
-            last_step = latest_day.steps[-1]
-        elif len(plan.days) > 1:
-            last_step = plan.days[-2].steps[-1]
-        
+        for day in reversed(plan.days):
+            if day.steps:
+                last_step = day.steps[-1]
+                break
+
         current_city_id = await self.utils.get_curret_city_id(plan)
         
         # Check if we need to add automatic transport step
@@ -92,17 +86,15 @@ class PlanDayStepController:
                 destination_city_id
             )
             steps_created.append(transport_step)
-            plan.estimated_cost += self.utils.get_step_cost(transport_step, plan)
+            plan.estimated_cost += await self.utils.get_step_cost()
 
         # Add the requested step
         requested_step = await self._create_requested_step(step, latest_day, last_step)
         steps_created.append(requested_step)
-        plan.estimated_cost += self.utils.get_step_cost(requested_step, plan)
+        plan.estimated_cost += await self.utils.get_step_cost()
         
-        return BaseResponse(
-            message="Day step(s) added successfully", 
-            data={"steps_created": [{"id": s.id, "title": s.title} for s in steps_created]}
-        )
+        plan_data = await self.plan_repository.get_updated_plan(plan.id)
+        return BaseResponse(message="Step added successfully", data=plan_data)
 
     async def _create_transport_step(self, latest_day, last_step, start_city_id, end_city_id):
         """Create and save a transport step"""
@@ -358,5 +350,6 @@ class PlanDayStepController:
         step_id = plan.days[-1].steps[-1].id
         await self.repository.delete(step_id)
         await self.graph_repository.delete(step_id)
-        return BaseResponse(message="Day step deleted successfully")
+        plan_data = self.plan_repository.get_updated_plan(plan_id)
+        return BaseResponse(message="Day step deleted successfully", data=plan_data)
         

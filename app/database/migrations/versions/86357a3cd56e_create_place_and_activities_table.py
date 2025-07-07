@@ -28,7 +28,6 @@ def upgrade() -> None:
         'activities',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('name', sa.String(), unique=True, index=True, nullable=False),
-        sa.Column('name_slug', sa.String(), unique=True, index=True, nullable=False),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), nullable=True),
     )

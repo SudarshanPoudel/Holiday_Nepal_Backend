@@ -32,7 +32,7 @@ class TransportServiceBase(BaseModel):
     description: Optional[str]
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_duration: Optional[int]
+    average_duration: Optional[float]
     total_distance: float
     cost: Optional[float]
 
@@ -44,14 +44,13 @@ class TransportServiceRouteSegmentRead(BaseModel):
 
 class TransportServiceReadAll(BaseModel):
     id: int
-    service_provider_id: int
     start_city: CityBase
     end_city: CityBase
     images: List[ImageRead] 
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
     total_distance: float
-    average_duration: Optional[int]
+    average_duration: Optional[float]
 
 
 class TransportServiceRead(TransportServiceReadAll):

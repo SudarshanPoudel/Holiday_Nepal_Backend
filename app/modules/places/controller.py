@@ -28,13 +28,14 @@ class PlaceController():
         for activity in place.activities:
             try:
                 place_acitivity = PlaceActivityBase(place_id=place_db.id, **activity.model_dump())
-                place_activity = await self.place_activity_repository.create(place_acitivity)
-                await self.graph_repository.add_edge(PlaceActivityEdge(id=place_acitivity.id, source_id=place_db.id, target_id=place_activity.activity_id))
-            except:
+                place_activity_db = await self.place_activity_repository.create(place_acitivity)
+                await self.graph_repository.add_edge(PlaceActivityEdge(id=place_activity_db.id, source_id=place_db.id, target_id=place_activity_db.activity_id))
+            except Exception as e:
+                print(e)
                 raise HTTPException(status_code=404, detail="Activity not found")
 
-        return BaseResponse(message="Place created successfully", data={"id": place_db.id})
-    
+        place_info = await self.repository.get(place_db.id, load_relations=["images", "place_activities.activity.image", "city"])
+        return BaseResponse(message="Place created successfully", data=PlaceRead.model_validate(place_info))
     
     async def get(self, place_id: int):
         place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image", "city"])
@@ -56,14 +57,17 @@ class PlaceController():
         if not place_db:
             raise HTTPException(status_code=404, detail="Place not found")
         await self.repository.update_images(place_id, place.image_ids)
-        await self.repository.update_activities(place_id, place.activities)
+        await self.repository.delete_activities(place_id)
         await self.graph_repository.update(PlaceNode(id=place_id, name=place.name, category=place.category))
         await self.graph_repository.clear_edges(place_id, edge_type=PlaceActivityEdge)
         await self.graph_repository.clear_edges(place_id, edge_type=CityPlaceEdge)
         await self.graph_repository.add_edge(CityPlaceEdge(source_id=place.city_id, target_id=place_id))
         for activity in place.activities:
-            await self.graph_repository.add_edge(PlaceActivityEdge(id=activity.id, source_id=place_id, target_id=activity.activity_id))
-        return BaseResponse(message="Place updated successfully", data={"id": place_db.id})
+            place_activity = PlaceActivityBase(place_id=place_id, **activity.model_dump())
+            place_activity = await self.place_activity_repository.create(place_activity)
+            await self.graph_repository.add_edge(PlaceActivityEdge(id=place_activity.id, source_id=place_id, target_id=activity.activity_id))
+        place = await self.repository.get(place_id, load_relations=["images", "place_activities.activity.image", "city"])
+        return BaseResponse(message="Place updated successfully", data=PlaceRead.model_validate(place))
     
     async def index(
         self,

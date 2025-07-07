@@ -8,6 +8,6 @@ class City(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
-    longitude = Column(Float, nullable=True)
     latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     location = Column(Geography(geometry_type="POINT", srid=4326), nullable=True)

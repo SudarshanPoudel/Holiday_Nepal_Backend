@@ -5,14 +5,6 @@ from app.database.database import Base
 from app.modules.plan_day_steps.schema import PlanDayTimeFrameEnum, PlanDayStepCategoryEnum
 from app.modules.plan_route_hops.models import PlanRouteHop
 
-
-plan_day_step_activities = Table(
-    "plan_day_step_activities",
-    Base.metadata,
-    Column("plan_day_step_id", Integer, ForeignKey("plan_day_steps.id"), primary_key=True),
-    Column("activity_id", Integer, ForeignKey("activities.id"), primary_key=True),
-)
-
 class PlanDayStep(Base):
     __tablename__ = "plan_day_steps"
     id = Column(Integer, primary_key=True, index=True)
@@ -31,7 +23,7 @@ class PlanDayStep(Base):
 
     image = relationship("Image")
     place = relationship("Place")
-    activities = relationship("Activity", secondary=plan_day_step_activities)
+    place_activity = relationship("PlaceActivity")
     city_start = relationship("City", foreign_keys=[start_city_id])
     city_end = relationship("City", foreign_keys=[end_city_id])
     route_hops = relationship("PlanRouteHop", back_populates="plan_day_step", uselist=True, cascade="all, delete-orphan")

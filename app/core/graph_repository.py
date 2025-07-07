@@ -313,12 +313,13 @@ class BaseGraphRepository(Generic[NodeType]):
         
         query = f"""
         MATCH ()-[r:{edge_label} {{id: $edge_id}}]-()
-        RETURN r
+        RETURN r, id(startNode(r)) AS source_id, id(endNode(r)) AS dest_id
         """
         
         result = await self.session.run(query, edge_id=edge_id)
         record = await result.single()
-        return edge_type(**dict(record["r"])) if record else None
+
+        return edge_type(**dict(record["r"]), source_id=record["source_id"], target_id=record["dest_id"]) if record else None
 
     async def get_edges(self, edge_type: Type[BaseEdge], node_id: int, direction: str = "both") -> List[BaseEdge]:
         """Get edges connected to a node"""
@@ -341,13 +342,17 @@ class BaseGraphRepository(Generic[NodeType]):
             query = f"""
             MATCH (n:{self.label} {{id: $node_id}})
             MATCH (n)-[r:{edge_label}]-()
-            RETURN r
+            RETURN r, id(startNode(r)) AS source_id, id(endNode(r)) AS dest_id
             """
-        
+            
         result = await self.session.run(query, node_id=node_id)
-        records = await result.data()
-        return [edge_type(**dict(record["r"])) for record in records]
-
+        edges = []
+        async for record in result:
+            rel = record["r"]  # this is a real Relationship object
+            props = dict(rel)  # extract properties
+            edges.append(edge_type(**props, source_id=record["source_id"], target_id=record["dest_id"]))
+        return edges
+        
     async def clear_edges(self, node_id: int, edge_type: Optional[Type[BaseEdge]] = None, direction: str = "both") -> None:
         """Clear edges from a node"""
         if direction not in {"outgoing", "incoming", "both"}:

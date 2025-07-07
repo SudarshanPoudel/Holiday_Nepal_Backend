@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import UploadFile
 
+import traceback
 from app.database.database import get_db
+
 from app.modules.storage.controller import StorageController
 from app.modules.storage.schema import ImageCategoryEnum
 from app.modules.storage.service import StorageService
@@ -16,7 +18,8 @@ async def upload_image(file: UploadFile, category: ImageCategoryEnum, db: AsyncS
         return await controller.upload_image(file, category)
     except HTTPException as e:
         raise e
-    except Exception as e:
+    except Exception as e:        
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/")
@@ -26,7 +29,8 @@ async def get_image(id: int, db: AsyncSession = Depends(get_db), storage = Depen
         return await controller.get_image(id)
     except HTTPException as e:
         raise e
-    except Exception as e:
+    except Exception as e:        
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))  
 
 @router.put("/")
@@ -36,7 +40,8 @@ async def update_image(id: int, file: UploadFile, db: AsyncSession = Depends(get
         return await controller.update_image(id, file)
     except HTTPException as e:
         raise e
-    except Exception as e:
+    except Exception as e:        
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
     
 
@@ -47,5 +52,6 @@ async def delete_image(id: int, db: AsyncSession = Depends(get_db), storage = De
         return await controller.delete_image(id)
     except HTTPException as e:
         raise e
-    except Exception as e:
+    except Exception as e:        
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))

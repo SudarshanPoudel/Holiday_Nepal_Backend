@@ -1,15 +1,11 @@
-import json
-from pathlib import Path
 from sqlalchemy import insert, select
-from app.core.all_models import TransportService, TransportServiceRouteSegment, City, TransportRoute, ServiceProvider, Image
+from app.core.all_models import TransportService, TransportServiceRouteSegment, City, TransportRoute, Image
 from app.modules.transport_service.models import transport_service_images
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.transport_service.schema import TransportServiceCategoryEnum
 from app.modules.transport_route.schema import RouteCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
-from fastapi.concurrency import run_in_threadpool
-from fastapi import HTTPException
 from app.modules.storage.service import StorageService
 from app.utils.image_utils import validate_and_process_image 
 
@@ -49,6 +45,9 @@ async def seed_default_transport_services(db):
         start_mun = await db.scalar(select(City).where(City.name == entry["segments"][0]["start"]))
         end_mun = await db.scalar(select(City).where(City.name == entry["segments"][-1]["end"]))
 
+        if not start_mun or not end_mun:
+            continue
+        
         new_service = TransportService(
             description=entry["description"],
             start_city_id=start_mun.id,

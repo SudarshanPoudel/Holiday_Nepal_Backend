@@ -58,7 +58,7 @@ async def seed_default_transport_routes(db: AsyncSession, graph_db: Neo4jSession
         db.add(new_route)
         await db.flush()
 
-        new_route_edge = TransportRouteEdge(id=new_route.id, source_id=start.id, target_id=end.id, route_category=RouteCategoryEnum(route["route_category"]), distance=route["distance"], average_duration=route.get("average_duration"))
+        new_route_edge = TransportRouteEdge(id=new_route.id, source_id=start.id, target_id=end.id, route_category=RouteCategoryEnum(route["route_category"]), distance=route["distance"], average_duration=route.get("average_duration"), average_cost=route.get("average_cost"))
         await graph_repository.add_edge(new_route_edge)
 
 

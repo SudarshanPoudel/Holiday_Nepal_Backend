@@ -10,7 +10,9 @@ class CityRepository(BaseRepository[City, CityBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(model=City, db=db)
 
-    async def get_nearest(self, lng: float, lat: float, params: Params):
+    async def get_nearest(self, lat: float, lng: float, params: Params):
+        limit = params.size
+        offset = (params.page - 1) * limit
         query = text("""
             SELECT id, name, longitude, latitude,
                 ST_Distance(location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) AS distance
@@ -22,8 +24,8 @@ class CityRepository(BaseRepository[City, CityBase]):
         result = await self.db.execute(query, {
             "lng": lng,
             "lat": lat,
-            "limit": params.limit,
-            "offset": params.offset
+            "limit": limit,
+            "offset": offset
         })
         rows = result.fetchall()
 

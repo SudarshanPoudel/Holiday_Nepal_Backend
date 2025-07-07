@@ -22,13 +22,13 @@ class AccomodationServiceRepository(BaseRepository[AccomodationService, Accomoda
             await self.db.rollback()
             raise
 
-    async def update_images(self, place_id: int, image_ids: List[int]):
-        delete_stmt = delete(accomodation_service_images).where(accomodation_service_images.c.place_id == place_id)
+    async def update_images(self, accomodation_service_id: int, image_ids: List[int]):
+        delete_stmt = delete(accomodation_service_images).where(accomodation_service_images.c.accomodation_service_id == accomodation_service_id)
         await self.db.execute(delete_stmt)
 
         # Add new image mappings
         if image_ids:
-            values = [{"place_id": place_id, "image_id": image_id} for image_id in image_ids]
+            values = [{"accomodation_service_id": accomodation_service_id, "image_id": image_id} for image_id in image_ids]
             await self.db.execute(insert(accomodation_service_images).values(values))
 
         await self.db.commit()

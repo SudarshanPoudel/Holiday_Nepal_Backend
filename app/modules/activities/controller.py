@@ -18,7 +18,7 @@ class ActivityController():
     async def create(self, activity: ActivityCreate):
         activity_db = await self.repository.create(activity)
         await self.graph_repository.create(ActivityNode(id=activity_db.id, name=activity.name))
-        return BaseResponse(message="Activity created successfully", data={"id": activity_db.id})   
+        return BaseResponse(message="Activity created successfully", data={"id": activity_db.id, **activity.model_dump()})   
     
     async def get(self, activity_id: int):
         activity = await self.repository.get(activity_id, load_relations=["image"])
@@ -31,7 +31,7 @@ class ActivityController():
         if not activity:
             raise HTTPException(status_code=404, detail="Activity not found")
         await self.graph_repository.update(ActivityNode(id=activity_id, name=activity.name))
-        return BaseResponse(message="Activity updated successfully", data={"id": activity.id})
+        return BaseResponse(message="Activity updated successfully", data={"id": activity.id, **activity.model_dump()})
 
     async def delete(self, activity_id: int):
         delete = await self.repository.delete(activity_id)
@@ -55,5 +55,5 @@ class ActivityController():
             sort_order=order,
             load_relations=["image"]
         )
-        return BaseResponse(message="Transport services fetched successfully", data=[ActivityRead.model_validate(ts, from_attributes=True) for ts in data.items])
+        return BaseResponse(message="Activities fetched successfully", data=[ActivityRead.model_validate(ts, from_attributes=True) for ts in data.items])
 

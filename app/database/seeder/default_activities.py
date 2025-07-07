@@ -9,6 +9,7 @@ from neo4j import AsyncSession as Neo4jSession
 from app.modules.activities.models import Activity
 from app.modules.storage.models import Image, ImageCategoryEnum
 from app.modules.storage.service import StorageService  # Use your actual S3 service import
+from app.utils.helper import slugify
 from app.utils.image_utils import validate_and_process_image
 
 async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
@@ -17,14 +18,14 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
         name = activity["name"]
         description = activity.get("description")
         image_path = get_file_path(f"files/images/activities/{activity['image_path']}")
-        result = await db.execute(select(Activity).filter_by(name_slug=slug))
+        result = await db.execute(select(Activity).filter_by(name=name))
         if result.scalar():
             continue
 
         with open(image_path, "rb") as f:
             content = validate_and_process_image(f.read(), resize_to=(1080, 720))
 
-        s3_key = f"activities/{slug}.webp"
+        s3_key = f"activities/{slugify(name)}.webp"
         s3_service = StorageService()
         await s3_service.upload_file(key=s3_key, file_content=content, content_type="image/webp")
         image_url = s3_service.get_file_url(s3_key)

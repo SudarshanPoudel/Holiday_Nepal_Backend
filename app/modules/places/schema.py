@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from enum import Enum
 
 from app.modules.cities.schema import CityBase
-from app.modules.place_activities.schema import PlaceActivityCreate, PlaceActivityCreateInternal, PlaceActivityRead, PlaceActivityUpdate
+from app.modules.place_activities.schema import PlaceActivityCreate,  PlaceActivityRead
 from app.modules.storage.schema import ImageRead
 
 class PlaceCategoryEnum(str, Enum):
@@ -33,15 +33,6 @@ class PlaceCreate(PlaceBase):
     activities: Optional[List[PlaceActivityCreate]] 
     image_ids: Optional[list[int]] 
 
-    
-
-class UpdatePlaceInternal(BaseModel):
-    name: Optional[str] 
-    category: Optional[PlaceCategoryEnum]
-    longitude: Optional[float] 
-    latitude: Optional[float] 
-    description: Optional[str] 
-    city_id: Optional[int] 
 
 class PlaceReadBasic(BaseModel):
     id: int

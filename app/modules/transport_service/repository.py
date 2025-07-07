@@ -12,7 +12,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         super().__init__(TransportService, db)
 
 
-    async def add_route_segment(self, transport_service_id: int, route_ids: list[int]):
+    async def add_route_segment(self, service_id: int, route_ids: list[int]):
         last_place = None
         route_repo = TransportRouteRepository(self.db)
 
@@ -33,7 +33,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 last_place = route.end_city_id
 
                 segment = TransportServiceRouteSegment(
-                    service_id=transport_service_id,
+                    service_id=service_id,
                     route_id=route_id,
                     index=i
                 )
@@ -57,5 +57,5 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         await self.attach_images(service_id, image_ids)
 
     async def clear_route_segments(self, service_id: int):
-        await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.transport_service_id == service_id))
+        await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.service_id == service_id))
         await self.db.commit()

@@ -41,7 +41,6 @@ def upgrade() -> None:
         sa.Column('vote_count', sa.Integer(), nullable=True),
         sa.Column('is_private', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
-        sa.Column('end_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.now()),
         sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now())
     )
@@ -73,16 +72,9 @@ def upgrade() -> None:
         sa.Column('end_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=True)
     )
 
-    # plan_day_step_activities association table
-    op.create_table(
-        'plan_day_step_activities',
-        sa.Column('plan_day_step_id', sa.Integer(), sa.ForeignKey('plan_day_steps.id'), primary_key=True),
-        sa.Column('activity_id', sa.Integer(), sa.ForeignKey('activities.id'), primary_key=True)
-    )
 
 
 def downgrade() -> None:
-    op.drop_table('plan_day_step_activities')
     op.drop_table('plan_day_steps')
     op.drop_table('plan_days')
     op.drop_table('plans')

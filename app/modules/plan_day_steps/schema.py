@@ -2,8 +2,9 @@ from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.activities.schema import ActivityRead
+from app.modules.activities.schema import ActivityRead, ActivityReadWithImage
 from app.modules.cities.schema import CityBase
+from app.modules.place_activities.schema import PlaceActivityRead
 from app.modules.places.schema import  PlaceReadBasic
 from app.modules.plan_route_hops.schema import PlanRouteHopRead
 from app.modules.storage.schema import ImageRead
@@ -28,7 +29,7 @@ class PlanDayStepRead(BaseModel):
     category: PlanDayStepCategoryEnum
     
     image: ImageRead
-    activities: List[ActivityRead]
+    place_activity: Optional[PlaceActivityRead]
     place: Optional[PlaceReadBasic]
     city_start: Optional[CityBase]
     city_end: Optional[CityBase]

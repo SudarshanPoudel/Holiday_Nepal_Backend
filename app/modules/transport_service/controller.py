@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.schemas import BaseResponse
 from app.modules.transport_route.repository import TransportRouteRepository
 from app.modules.transport_service.repository import TransportServiceRepository
-from app.modules.transport_service.schema import TransportServiceBase, TransportServiceCreate, TransportServiceRead, TransportServiceReadAll, TransportServiceUpdate
+from app.modules.transport_service.schema import TransportServiceBase, TransportServiceCreate, TransportServiceRead, TransportServiceReadAll
 
 
 class TransportServiceController:
@@ -48,8 +48,8 @@ class TransportServiceController:
         except Exception as e:
             await self.repository.delete(res.id)
             raise e
-
-        return BaseResponse(message="Transport service created successfully", data={"id": res.id})
+        service = await self.repository.get(res.id, load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"])
+        return BaseResponse(message="Transport service created successfully", data=TransportServiceRead.model_validate(service, from_attributes=True))
 
     async def get(self, transport_service_id: int):
         res = await self.repository.get(
@@ -110,9 +110,9 @@ class TransportServiceController:
         )
 
         res = await self.repository.update(transport_service_id, service)
-        await self.repository.replace_images(transport_service_id, service.image_ids)
-
-        return BaseResponse(message="Transport service updated successfully", data={"id": res.id})
+        await self.repository.replace_images(transport_service_id, transport_service.image_ids)
+        service = await self.repository.get(res.id, load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"])
+        return BaseResponse(message="Transport service updated successfully", data=TransportServiceRead.model_validate(service, from_attributes=True))
 
     async def delete(self, transport_service_id: int):
         deleted = await self.repository.delete(transport_service_id)

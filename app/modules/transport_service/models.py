@@ -25,7 +25,7 @@ class TransportService(Base):
     route_category = Column(Enum(RouteCategoryEnum), nullable=False)
     transport_category = Column(Enum(TransportServiceCategoryEnum, name="transportcategoryenum"), nullable=False)
     total_distance = Column(Float, nullable=False)
-    average_duration = Column(Integer, nullable=True)
+    average_duration = Column(Float, nullable=True)
     cost = Column(Float, nullable=True)
 
     start_city = relationship("City", foreign_keys=[start_city_id])

@@ -8,7 +8,7 @@ from neo4j import AsyncSession as Neo4jSession
 
 from app.core.schemas import BaseResponse
 from app.modules.transport_route.repository import TransportRouteRepository
-from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteCreate, TransportRouteRead, TransportRouteUpdate
+from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteCreate, TransportRouteRead
 
 
 class TransportRouteController():
@@ -33,7 +33,8 @@ class TransportRouteController():
             distance=transport_route.distance,
             route_category=transport_route.route_category
         ))
-        return BaseResponse(message="Transport route created successfully", data={"id": res.id})
+        route = await self.repository.get(res.id, load_relations=["start_city", "end_city"])
+        return BaseResponse(message="Transport route created successfully", data=TransportRouteRead.model_validate(route, from_attributes=True))
     
     async def get(self, transport_route_id: int):
         res = await self.repository.get(transport_route_id, load_relations=["start_city", "end_city"])
@@ -54,16 +55,18 @@ class TransportRouteController():
         if not res:
             raise HTTPException(status_code=404, detail="Transport route not found")
         await self.graph_repository.update_edge(
-            update_data=TransportRouteEdge(
+            TransportRouteEdge(
                 id=transport_route_id,
                 source_id=transport_route.start_city_id,
                 target_id=transport_route.end_city_id,
                 average_duration=transport_route.average_duration,
                 distance=transport_route.distance,
-                route_category=transport_route.route_category
+                route_category=transport_route.route_category,
+                average_cost=transport_route.average_cost
             )
         )
-        return BaseResponse(message="Transport route updated successfully", data={"id": res.id})
+        rouete = await self.repository.get(transport_route_id, load_relations=["start_city", "end_city"])
+        return BaseResponse(message="Transport route updated successfully", data=TransportRouteRead.model_validate(rouete, from_attributes=True))
     
     async def delete(self, transport_route_id: int):
         delete = await self.repository.delete(transport_route_id)

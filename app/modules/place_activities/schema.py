@@ -8,7 +8,7 @@ class PlaceActivityCreate(BaseModel):
     activity_id: int
     title: str
     description: Optional[str] = None
-    average_duration: Optional[int] = None
+    average_duration: Optional[float] = None
     average_cost: Optional[float] = None
 
 class PlaceActivityBase(PlaceActivityCreate):
@@ -19,7 +19,7 @@ class PlaceActivityRead(BaseModel):
     title: str
     place_id: int
     description: Optional[str] = None
-    average_duration: Optional[int] = None
+    average_duration: Optional[float] = None
     average_cost: Optional[float] = None
 
     activity : ActivityReadWithImage

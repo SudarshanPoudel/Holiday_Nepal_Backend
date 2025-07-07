@@ -19,16 +19,16 @@ class PlanController():
     async def create(self, plan: PlanCreate):
         plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
         plan_db = await self.repository.create(plan_internal)
-        await self.graph_repository.create(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id, end_city_id=plan.end_city_id)), 
-        return BaseResponse(message="Plan created successfully", data={"id": plan_db.id})
+        await self.graph_repository.create(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id)), 
+        plan_data = await self.repository.get_updated_plan(plan_db.id)
+        return BaseResponse(message="Plan created successfully", data=plan_data)
 
     async def get(self, plan_id: int):
-        plan = await self.repository.get(plan_id, load_relations=["days.steps.place", "days.steps.activities", "days.steps.city_start", "days.steps.city_end", "days.steps.image", "days.steps.route_hops", "user.image"])
+        plan = await self.repository.get_updated_plan(plan_id)
         if not plan:
             raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id and plan.is_private:
+        if plan.user.id != self.user_id and plan.is_private:
             raise HTTPException(status_code=403, detail="Plan is private")
-        plan = PlanRead.model_validate(plan, from_attributes=True)
         return BaseResponse(message="Plan fetched successfully", data=plan)
     
     async def delete(self, plan_id: int):
@@ -40,3 +40,15 @@ class PlanController():
         delete = await self.repository.delete(plan_id)
         await self.graph_repository.delete(plan_id)
         return BaseResponse(message="Plan deleted successfully")
+    
+    async def update(self, plan_id: int, plan: PlanCreate):
+        plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
+        past_data = await self.repository.get(plan_id, load_relations=["days.steps"])
+        if past_data.start_city_id != plan.start_city_id and past_data.days and past_data.days[0].steps:
+            raise HTTPException(status_code=403, detail="You can't change start city after adding steps")
+        plan_db = await self.repository.update(plan_id, plan_internal)
+        if not plan_db:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        await self.graph_repository.update(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id))
+        plan_data = await self.repository.get_updated_plan(plan_db.id)
+        return BaseResponse(message="Plan updated successfully", data=plan_data)

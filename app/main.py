@@ -13,7 +13,6 @@ from app.modules.cities.routes import router as address_router
 from app.modules.activities.routes import router as activities_router
 from app.modules.places.routes import router as places_router
 from app.modules.storage.routes import router as image_router
-from app.modules.service_provider.routes import router as service_provider_router
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
 from app.modules.accomodation_services.routes import router as accomodation_service_router

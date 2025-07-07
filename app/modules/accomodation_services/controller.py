@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
 from app.modules.accomodation_services.repository import AccomodationServiceRepository
-from app.modules.accomodation_services.schema import AccomodationServiceBase, AccomodationServiceCreate, AccomodationServiceRead, AccomodationServiceUpdate
+from app.modules.accomodation_services.schema import AccomodationServiceBase, AccomodationServiceCreate, AccomodationServiceRead
 
 
 class AccomodationServiceController():
@@ -16,12 +16,12 @@ class AccomodationServiceController():
     async def create(self, accomodation_service: AccomodationServiceCreate):
         res = await self.repository.create(AccomodationServiceBase(**accomodation_service.model_dump(exclude={"image_ids"})))
         await self.repository.add_images(res.id, accomodation_service.image_ids)
-        return BaseResponse(message="Accomodation service created successfully", data={"id": res.id})
+        return BaseResponse(message="Accomodation service created successfully", data={'id':res.id, **accomodation_service.model_dump()})
     
     async def update(self, accomodation_service_id: int, accomodation_service: AccomodationServiceCreate):
         res = await self.repository.update(accomodation_service_id, AccomodationServiceBase(**accomodation_service.model_dump(exclude={"image_ids"})))
         await self.repository.update_images(accomodation_service_id, accomodation_service.image_ids)
-        return BaseResponse(message="Accomodation service updated successfully", data={"id": res.id})
+        return BaseResponse(message="Accomodation service updated successfully", data={'id':res.id, **accomodation_service.model_dump()})
     
     async def get(self, accomodation_service_id: int):
         res = await self.repository.get(accomodation_service_id, load_relations=["images"])
@@ -29,6 +29,12 @@ class AccomodationServiceController():
             raise HTTPException(status_code=404, detail="Accomodation service not found")
         return BaseResponse(message="Accomodation service fetched successfully", data=AccomodationServiceRead.model_validate(res, from_attributes=True))
     
+    async def delete(self, accomodation_service_id: int):
+        delete = await self.repository.delete(accomodation_service_id)
+        if not delete:
+            raise HTTPException(status_code=404, detail="Accomodation service not found")
+        return BaseResponse(message="Accomodation service deleted successfully")
+
     async def index(
         self,
         params: Params,

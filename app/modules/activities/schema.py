@@ -1,7 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel
 
-from app.modules.places.schema import PlaceRead
 from app.modules.storage.schema import ImageRead
 
 

@@ -8,6 +8,7 @@ Create Date: 2025-04-10 06:53:51.589937
 from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
+from geoalchemy2 import Geography
 
 # revision identifiers, used by Alembic.
 revision: str = 'a9ba372271f7'
@@ -20,15 +21,21 @@ def upgrade():
     # Enable PostGIS
     op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
 
-    op.add_column("cities", sa.Column("location", sa.types.UserDefinedType(), nullable=True))
-    op.execute("""
-        UPDATE cities
-        SET location = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography
-        WHERE longitude IS NOT NULL AND latitude IS NOT NULL
-    """)
+    # Create 'cities' table
+    op.create_table(
+        "cities",
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("name", sa.String, nullable=False, index=True),
+        sa.Column("longitude", sa.Float, nullable=True),
+        sa.Column("latitude", sa.Float, nullable=True),
+        sa.Column("location", Geography(geometry_type='POINT', srid=4326), nullable=True)
+    )
+
+    # Optional: Add GIST index for spatial queries
     op.execute("CREATE INDEX cities_location_idx ON cities USING GIST (location)")
 
+
 def downgrade():
-    op.drop_index("cities_location_idx", table_name="cities")
-    op.drop_column("cities", "location")
+    op.execute("DROP INDEX IF EXISTS cities_location_idx")
+    op.drop_table("cities")
     op.execute("DROP EXTENSION IF EXISTS postgis")

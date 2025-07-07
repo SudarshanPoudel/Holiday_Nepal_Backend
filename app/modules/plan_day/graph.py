@@ -12,7 +12,6 @@ class PlanDayNode(BaseNode):
     index: int
     total_time: int
     total_cost: float
-    end_municiplaity_id: int
 
 class PlanPlanDayEdge(BaseEdge):
     label: ClassVar[str] = "PLAN_STARTS_AT_PLAN_DAY"
