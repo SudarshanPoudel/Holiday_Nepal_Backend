@@ -1,37 +1,37 @@
+from typing import Dict, Optional
 from fastapi import HTTPException
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from neo4j import AsyncSession as Neo4jSession
+from fastapi_pagination import Params
 
 from app.core.schemas import BaseResponse
-from app.modules.plan_day.repository import PlanDayRepository
-from app.modules.plan_day.schema import PlanDayCreate
-from app.modules.plan_day_steps.repository import PlanDayStepRepositary
-from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreate, PlanDayStepCreateInternal, PlanDayTimeFrameEnum
+from app.modules.plans.graph import PlanGraphRepository, PlanNode
 from app.modules.plans.repository import PlanRepository
-from app.modules.plans.schema import PlanCreate, PlanCreateInternal, PlanRead
-from app.modules.plans.utils import PlanUtils
+from app.modules.plans.schema import PlanBase, PlanCreate, PlanFiltersInternal, PlanIndex, PlanRead
 
 
 class PlanController():
-    def __init__(self, db: AsyncSession, user_id: int):
+    def __init__(self, db: AsyncSession, graph_db: Neo4jSession, user_id: int):
         self.db = db
+        self.graph_db = graph_db
         self.repository = PlanRepository(db)
-        self.plan_day_repository = PlanDayRepository(db)
-        self.plan_day_step_repository = PlanDayStepRepositary(db)
+        self.graph_repository = PlanGraphRepository(graph_db)
         self.user_id = user_id
-        self.utils = PlanUtils(db)
 
     async def create(self, plan: PlanCreate):
-        plan_internal = PlanCreateInternal(user_id=self.user_id, end_municipality_id=plan.start_municipality_id, **plan.model_dump())
+        plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
         plan_db = await self.repository.create(plan_internal)
-        return BaseResponse(message="Plan created successfully", data={"id": plan_db.id})
+        await self.graph_repository.create(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id)), 
+        plan_data = await self.repository.get_updated_plan(plan_db.id)
+        return BaseResponse(message="Plan created successfully", data=plan_data)
 
     async def get(self, plan_id: int):
-        plan = await self.repository.get(plan_id, load_relations=["days.steps.place", "days.steps.activities", "days.steps.municipality_start", "days.steps.municipality_end", "days.steps.image"])
+        plan = await self.repository.get_updated_plan(plan_id)
         if not plan:
             raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id and plan.is_private:
+        if plan.user.id != self.user_id and plan.is_private:
             raise HTTPException(status_code=403, detail="Plan is private")
-        plan = PlanRead.model_validate(plan, from_attributes=True)
         return BaseResponse(message="Plan fetched successfully", data=plan)
     
     async def delete(self, plan_id: int):
@@ -41,85 +41,36 @@ class PlanController():
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only delete your plans")
         delete = await self.repository.delete(plan_id)
-        if not delete:
-            raise HTTPException(status_code=404, detail="Plan not found")
+        await self.graph_repository.delete(plan_id)
         return BaseResponse(message="Plan deleted successfully")
     
-    async def add_day(self, plan_id: int, title: str):
-        plan = await self.repository.get(plan_id, load_relations=["days"])
-        if not plan:
+    async def update(self, plan_id: int, plan: PlanCreate):
+        plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
+        past_data = await self.repository.get(plan_id, load_relations=["days.steps"])
+        if past_data.start_city_id != plan.start_city_id and past_data.days and past_data.days[0].steps:
+            raise HTTPException(status_code=403, detail="You can't change start city after adding steps")
+        plan_db = await self.repository.update(plan_id, plan_internal)
+        if not plan_db:
             raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id:
-            raise HTTPException(status_code=403, detail="You can only update your plans")
-        plan_day = PlanDayCreate(
-            plan_id=plan_id,
-            title=title,
-            day=len(plan.days) + 1
-        )
-        plan_day = await self.plan_day_repository.create(plan_day)
-        return BaseResponse(message="Day added successfully", data={"id": plan_day.id})
-    
-    async def delete_day(self, plan_id: int):
-        plan = await self.repository.get(plan_id, load_relations=["days"])
-        if not plan:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id:
-            raise HTTPException(status_code=403, detail="You can only update your plans")
-        if len(plan.days) <= 0:
-            raise HTTPException(status_code=403, detail="This plan doesn't contain any days.")
-        await self.plan_day_repository.delete(plan.days[-1].id)
-        return BaseResponse(message="Day deleted successfully")
+        await self.graph_repository.update(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id))
+        plan_data = await self.repository.get_updated_plan(plan_db.id)
+        return BaseResponse(message="Plan updated successfully", data=plan_data)
 
-    async def add_day_step(self, plan_id: int, step: PlanDayStepCreate):
-        plan = await self.repository.get(plan_id, load_relations=["days.steps"])
-        if not plan:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id:
-            raise HTTPException(status_code=403, detail="You can only update your plans")
-        if len(plan.days) <= 0:
-            raise HTTPException(status_code=403, detail="This plan doesn't contain any days.")
-        latest_day = plan.days[-1]
-        
-        
-        time_frame = await self.utils.get_step_time_frame()
-        duration = await self.utils.get_step_duration()
-        image_id = await self.utils.get_step_image()
-        current_municipality_id = await self.utils.get_curret_municipality_id()
-
-        place_id = None
-        municipality_start_id = None
-        municipality_end_id = None
-        title = None
-        if step.category == PlanDayStepCategoryEnum.transport:
-            municipality_start_id = current_municipality_id
-            municipality_end_id = step.place_id
-            title = "Go From A to B"
-        else:
-            place_id = step.place_id
-            title = "Visit Place"
-        step_internal = PlanDayStepCreateInternal(
-            plan_day_id=latest_day.id,
-            title=title,
-            category=step.category,
-            time_frame=time_frame,
-            duration=duration,
-            image_id=image_id,
-            place_id=place_id,
-            municipality_start_id=municipality_start_id,
-            municipality_end_id=municipality_end_id
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+        filters: Optional[BaseModel] = None
+    ):
+        data = await self.repository.index(
+            params=params,
+            search_fields=["title"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["start_city", "user.image"],
+            filters=PlanFiltersInternal(**filters.model_dump())
         )
-        step = await self.plan_day_step_repository.create(step_internal)
-        return BaseResponse(message="Day step added successfully", data={"id": step.id})
-    
-    async def delete_day_step(self, plan_id: int):
-        plan = await self.repository.get(plan_id, load_relations=["days.steps"])
-        if not plan:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id:
-            raise HTTPException(status_code=403, detail="You can only update your plans")
-        if len(plan.days) <= 0:
-            raise HTTPException(status_code=403, detail="This plan doesn't contain any days.")
-        if len(plan.days[-1].steps) <= 0:
-            raise HTTPException(status_code=403, detail="This day doesn't contain any steps.")
-        await self.plan_day_step_repository.delete(plan.days[-1].steps[-1].id)
-        return BaseResponse(message="Day step deleted successfully")
+        return BaseResponse(message="Plans fetched successfully", data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in data.items])

@@ -1,13 +1,15 @@
 from typing import List
-from sqlalchemy import insert, delete, select
+from sqlalchemy import insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from app.core.repository import BaseRepository
+from app.modules.place_activities.models import PlaceActivity
+from app.modules.place_activities.schema import PlaceActivityCreate
 from app.modules.places.models import Place, place_images
-from app.modules.places.schema import PlaceRead
+from app.modules.places.schema import PlaceBase
 
 
-class PlaceRepository(BaseRepository[Place, PlaceRead]):
+class PlaceRepository(BaseRepository[Place, PlaceBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(Place, db)
 
@@ -31,4 +33,9 @@ class PlaceRepository(BaseRepository[Place, PlaceRead]):
             values = [{"place_id": place_id, "image_id": image_id} for image_id in image_ids]
             await self.db.execute(insert(place_images).values(values))
 
+        await self.db.commit()
+
+    async def delete_activities(self, place_id: int):
+        delete_stmt = delete(PlaceActivity).where(PlaceActivity.place_id == place_id)
+        await self.db.execute(delete_stmt)
         await self.db.commit()

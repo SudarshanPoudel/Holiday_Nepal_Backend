@@ -1,15 +1,11 @@
-import json
-from pathlib import Path
 from sqlalchemy import insert, select
-from app.core.all_models import TransportService, TransportServiceRouteSegment, Municipality, TransportRoute, ServiceProvider, Image
+from app.core.all_models import TransportService, TransportServiceRouteSegment, City, TransportRoute, Image
 from app.modules.transport_service.models import transport_service_images
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.transport_service.schema import TransportServiceCategoryEnum
 from app.modules.transport_route.schema import RouteCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
-from fastapi.concurrency import run_in_threadpool
-from fastapi import HTTPException
 from app.modules.storage.service import StorageService
 from app.utils.image_utils import validate_and_process_image 
 
@@ -17,52 +13,50 @@ from app.utils.image_utils import validate_and_process_image
 async def seed_default_transport_services(db):
     transport_services = load_data("files/default_transport_services.json")
     for entry in transport_services:
-        provider = await db.scalar(select(ServiceProvider).join(ServiceProvider.user).where(ServiceProvider.user.has(username=entry["username"])))
-        if not provider:
-            print(f"ServiceProvider not found for username: {entry['username']}")
-            continue
-
         route_ids = []
         total_distance = 0
         total_time = 0
 
         for segment in entry["segments"]:
-            start = await db.scalar(select(Municipality).where(Municipality.name == segment["start"]))
-            end = await db.scalar(select(Municipality).where(Municipality.name == segment["end"]))
+            start = await db.scalar(select(City).where(City.name == segment["start"]))
+            end = await db.scalar(select(City).where(City.name == segment["end"]))
 
             if not start or not end:
-                print(f"Invalid municipality: {segment}")
+                print(f"Invalid city: {segment}")
                 continue
 
             route = await db.scalar(select(TransportRoute).where(
-                TransportRoute.start_municipality_id == start.id,
-                TransportRoute.end_municipality_id == end.id
+                TransportRoute.start_city_id == start.id,
+                TransportRoute.end_city_id == end.id
             ))
 
             if not route:
                 route = await db.scalar(select(TransportRoute).where(
-                    TransportRoute.start_municipality_id == end.id,
-                    TransportRoute.end_municipality_id == start.id
+                    TransportRoute.start_city_id == end.id,
+                    TransportRoute.end_city_id == start.id
                 ))
                 if not route:
                     continue
 
             route_ids.append(route.id)
             total_distance += route.distance
-            total_time += route.average_time or 0
+            total_time += route.average_duration or 0
 
-        start_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][0]["start"]))
-        end_mun = await db.scalar(select(Municipality).where(Municipality.name == entry["segments"][-1]["end"]))
+        start_mun = await db.scalar(select(City).where(City.name == entry["segments"][0]["start"]))
+        end_mun = await db.scalar(select(City).where(City.name == entry["segments"][-1]["end"]))
 
+        if not start_mun or not end_mun:
+            continue
+        
         new_service = TransportService(
-            service_provider_id=provider.id,
             description=entry["description"],
-            start_municipality_id=start_mun.id,
-            end_municipality_id=end_mun.id,
+            start_city_id=start_mun.id,
+            end_city_id=end_mun.id,
             route_category=RouteCategoryEnum(entry["route_category"]),
             transport_category=TransportServiceCategoryEnum(entry["transport_category"]),
             total_distance=total_distance,
-            average_time=total_time
+            average_duration=total_time,
+            cost=entry.get("cost")
         )
         db.add(new_service)
         await db.flush()
@@ -71,7 +65,7 @@ async def seed_default_transport_services(db):
             db.add(TransportServiceRouteSegment(
                 service_id=new_service.id,
                 route_id=route_id,
-                sequence=idx
+                index=idx
             ))
 
         transport_images = []
@@ -107,4 +101,4 @@ async def seed_default_transport_services(db):
         
 
     await db.commit()
-    print("Transport services seeded.")
+    print("Seeder: Transport services seeded.")

@@ -8,16 +8,17 @@ class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
-    municipality_id: Optional[int]
+    city_id: Optional[int]
 
 # Schema for reading user data
 class UserRead(BaseModel):
     id: int
     email: EmailStr
     username: str
-    image_id: Optional[int] = None
-    municipality_id: Optional[int] = None
+    city_id: Optional[int] = None
 
+    image: Optional[ImageRead] = None
+    
     class Config:
         from_attributes = True
 
@@ -27,7 +28,7 @@ class UserUpdate(BaseModel):
     password: Optional[str]
     username: Optional[str]
 
-    municipality_id: Optional[int]
+    city_id: Optional[int]
 
     class Config:
         from_attributes = True

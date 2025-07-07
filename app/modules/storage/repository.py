@@ -12,9 +12,8 @@ class ImageRepository(BaseRepository[Image, ImageRead]):
 
     async def delete(self, id: int):
         storage_service = StorageService()
-        image = await self.repository.get(id)
+        image = await self.get(id)
         if not image:
             raise HTTPException(detail="Image not found", status_code=404)
-        await self.delete(id)
         await storage_service.delete_file(image.key)
-        return True
+        return await super().delete(id)

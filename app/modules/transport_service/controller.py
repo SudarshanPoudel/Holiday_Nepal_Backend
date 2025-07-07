@@ -4,25 +4,18 @@ from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
-from app.modules.service_provider.repository import ServiceProviderRepository
 from app.modules.transport_route.repository import TransportRouteRepository
 from app.modules.transport_service.repository import TransportServiceRepository
-from app.modules.transport_service.schema import TransportServiceBase, TransportServiceCreate, TransportServiceRead, TransportServiceReadAll, TransportServiceUpdate
+from app.modules.transport_service.schema import TransportServiceBase, TransportServiceCreate, TransportServiceRead, TransportServiceReadAll
 
 
 class TransportServiceController:
-    def __init__(self, db: AsyncSession, user_id: int):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.user_id = user_id
         self.repository = TransportServiceRepository(db)
         self.route_repository = TransportRouteRepository(db)
-        self.service_provider_repository = ServiceProviderRepository(db)
 
     async def create(self, transport_service: TransportServiceCreate):
-        service_provider_id = await self.service_provider_repository.get_id_by_user_id(self.user_id)
-        if not service_provider_id:
-            raise HTTPException(status_code=404, detail="Service provider not found")
-
         start_route = await self.route_repository.get(transport_service.route_ids[0])
         end_route = await self.route_repository.get(transport_service.route_ids[-1])
         if not start_route or not end_route:
@@ -36,15 +29,14 @@ class TransportServiceController:
             total_distance += route.distance
 
         service = TransportServiceBase(
-            service_provider_id=service_provider_id,
-            start_municipality_id=start_route.start_municipality_id,
-            end_municipality_id=end_route.end_municipality_id,
+            start_city_id=start_route.start_city_id,
+            end_city_id=end_route.end_city_id,
             description=transport_service.description,
             route_category=transport_service.route_category,
             transport_category=transport_service.transport_category,
-            average_time=transport_service.average_time,
+            average_duration=transport_service.average_duration,
             total_distance=total_distance,
-            image_ids=transport_service.image_ids,
+            cost=transport_service.cost
         )
 
         res = await self.repository.create(service)
@@ -56,18 +48,18 @@ class TransportServiceController:
         except Exception as e:
             await self.repository.delete(res.id)
             raise e
-
-        return BaseResponse(message="Transport service created successfully", data={"id": res.id})
+        service = await self.repository.get(res.id, load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"])
+        return BaseResponse(message="Transport service created successfully", data=TransportServiceRead.model_validate(service, from_attributes=True))
 
     async def get(self, transport_service_id: int):
         res = await self.repository.get(
             transport_service_id,
             load_relations=[
                 "images",
-                "start_municipality",
-                "end_municipality",
-                "route_segments.route.start_municipality",
-                "route_segments.route.end_municipality"
+                "start_city",
+                "end_city",
+                "route_segments.route.start_city",
+                "route_segments.route.end_city"
             ],
         )
         if not res:
@@ -77,13 +69,13 @@ class TransportServiceController:
             data=TransportServiceRead.model_validate(res, from_attributes=True),
         )
 
-    async def update(self, transport_service_id: int, transport_service: TransportServiceUpdate):
+    async def update(self, transport_service_id: int, transport_service: TransportServiceCreate):
         existing = await self.repository.get(transport_service_id)
         if not existing:
             raise HTTPException(status_code=404, detail="Transport service not found")
 
-        start = existing.start_municipality_id
-        end = existing.end_municipality_id
+        start = existing.start_city_id
+        end = existing.end_city_id
         total_distance = existing.total_distance
 
         # Optional update to route IDs and recalculate distance if provided
@@ -93,8 +85,8 @@ class TransportServiceController:
             if not start_route or not end_route:
                 raise HTTPException(status_code=404, detail="Invalid route(s)")
 
-            start = start_route.start_municipality_id
-            end = end_route.end_municipality_id
+            start = start_route.start_city_id
+            end = end_route.end_city_id
 
             total_distance = 0
             for route_id in transport_service.route_ids:
@@ -107,21 +99,20 @@ class TransportServiceController:
             await self.repository.add_route_segment(transport_service_id, transport_service.route_ids)
 
         service = TransportServiceBase(
-            service_provider_id=transport_service.service_provider_id or existing.service_provider_id,
-            start_municipality_id=start,
-            end_municipality_id=end,
+            start_city_id=start,
+            end_city_id=end,
             description=transport_service.description or existing.description,
             route_category=transport_service.route_category or existing.route_category,
             transport_category=transport_service.transport_category or existing.transport_category,
-            average_time=transport_service.average_time or existing.average_time,
+            average_duration=transport_service.average_duration or existing.average_duration,
             total_distance=total_distance,
-            image_ids=transport_service.image_ids or [img.id for img in existing.images],
+            cost=transport_service.cost 
         )
 
         res = await self.repository.update(transport_service_id, service)
-        await self.repository.replace_images(transport_service_id, service.image_ids)
-
-        return BaseResponse(message="Transport service updated successfully", data={"id": res.id})
+        await self.repository.replace_images(transport_service_id, transport_service.image_ids)
+        service = await self.repository.get(res.id, load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"])
+        return BaseResponse(message="Transport service updated successfully", data=TransportServiceRead.model_validate(service, from_attributes=True))
 
     async def delete(self, transport_service_id: int):
         deleted = await self.repository.delete(transport_service_id)
@@ -144,7 +135,7 @@ class TransportServiceController:
             search_query=search,
             sort_field=sort_by,
             sort_order=order,
-            load_relations=["images", "start_municipality", "end_municipality"]
+            load_relations=["images", "start_city", "end_city"]
         )
         return BaseResponse(message="Transport services fetched successfully", data=[TransportServiceReadAll.model_validate(ts, from_attributes=True) for ts in data.items])
 

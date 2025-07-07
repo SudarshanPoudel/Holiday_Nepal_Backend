@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, Request, Response, UploadFile
 from app.modules.auth.controller import AuthController
 from app.modules.auth.schemas import UserLogin
 from app.modules.users.schemas import UserCreate
+import traceback
 from app.database.database import get_db
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()

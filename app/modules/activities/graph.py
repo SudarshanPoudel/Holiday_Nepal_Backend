@@ -5,7 +5,7 @@ from app.core.graph_schemas import BaseNode
 
 
 class ActivityNode(BaseNode):
-    label: ClassVar[str] = "ACTIVITY"
+    label: ClassVar[str] = "Activity"
     name: str
 
 class ActivityGraphRepository(BaseGraphRepository[ActivityNode]):

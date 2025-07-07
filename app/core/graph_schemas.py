@@ -1,45 +1,49 @@
-from pyclbr import Class
-from typing import ClassVar, Type
-from pydantic import BaseModel, model_validator, root_validator
+# graph_schema.py
+from typing import ClassVar, Tuple, Type, List, Dict
+from pydantic import BaseModel, model_validator
 
 from app.utils.helper import symmetric_pair
-
-
+from typing import ClassVar, Dict
+from pydantic import BaseModel
 
 class BaseNode(BaseModel):
     id: int
-    label: ClassVar[str]  # to be defined in subclass
+    label: ClassVar[str] 
+
+    # relationship name -> child label
+    child_relationships: ClassVar[Dict[str, str]] = {}
+    sequential_child_relationships: ClassVar[Dict[str, str]] = {}
 
     class Config:
         extra = "forbid"  # forbid unknown fields like label in input
 
     @property
-    def label(self) -> str:
+    def label_name(self) -> str:
         return self.__class__.label
 
 
 class BaseEdge(BaseModel):
     id: int
-    start_id: int
-    end_id: int
-
+    source_id: int
+    target_id: int
     label: ClassVar[str]
-    start_model: ClassVar[Type["BaseNode"]]
-    end_model: ClassVar[Type["BaseNode"]]
-
+    source_model: ClassVar[Type["BaseNode"]]
+    target_model: ClassVar[Type["BaseNode"]]
+    
     @model_validator(mode='before')
     @classmethod
     def infer_id(cls, values: dict) -> dict:
         if "id" not in values or values["id"] is None:
-            start = values.get("start_id")
-            end = values.get("end_id")
-            if start is not None and end is not None:
-                values["id"] = symmetric_pair(start, end)
+            source = values.get("source_id")
+            target = values.get("target_id")
+            if source is not None and target is not None:
+                # You can implement symmetric_pair or use a simple concatenation
+                values["id"] = symmetric_pair(source, target)
         return values
-
+    
     @property
-    def label(self) -> str:
+    def label_name(self) -> str:
         return self.__class__.label
-
+    
     class Config:
         extra = "forbid"

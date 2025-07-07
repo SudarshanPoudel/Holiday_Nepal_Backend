@@ -9,9 +9,10 @@ class PlaceActivity(Base):
     id = Column(Integer, primary_key=True)
     place_id = Column(Integer, ForeignKey("places.id"), index=True)
     activity_id = Column(Integer, ForeignKey("activities.id"), index=True)
+    title = Column(String, nullable=False)
     description = Column(String, nullable=True)
 
-    average_duration = Column(Integer, nullable=True)
+    average_duration = Column(Float, nullable=True)
     average_cost = Column(Float, nullable=True)
 
     place = relationship("Place", back_populates="place_activities")

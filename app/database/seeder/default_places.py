@@ -5,8 +5,8 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.place_activities.graph import PlaceActivityEdge, PlaceActivityGraphRepository
-from app.modules.places.graph import MuncipalityPlaceEdge, MunicipalityPlaceGraphRepository, PlaceGraphRepository, PlaceNode
+from app.modules.place_activities.graph import PlaceActivityEdge
+from app.modules.places.graph import CityPlaceEdge, PlaceGraphRepository, PlaceNode
 from app.modules.places.schema import PlaceCategoryEnum
 from app.utils.image_utils import validate_and_process_image
 from app.utils.helper import slugify, symmetric_pair
@@ -14,7 +14,7 @@ from app.utils.helper import slugify, symmetric_pair
 from app.modules.places.models import Place, place_images
 from app.modules.place_activities.models import PlaceActivity
 from app.modules.storage.models import Image, ImageCategoryEnum
-from app.modules.address.models import Municipality
+from app.modules.cities.models import City
 from app.modules.activities.models import Activity
 from app.modules.storage.service import StorageService 
 
@@ -22,21 +22,19 @@ from app.modules.storage.service import StorageService
 async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
     data = load_data("files/default_places.json")
     place_repository = PlaceGraphRepository(graph_db)
-    place_activity_repository = PlaceActivityGraphRepository(graph_db)
-    place_municipality_repository = MunicipalityPlaceGraphRepository(graph_db)
     for entry in data:
-        # Municipality lookup
+        # City lookup
         mun = await db.scalar(
-            select(Municipality).where(Municipality.name == entry["municipality"])
+            select(City).where(City.name == entry["city"])
         )
         if not mun:
-            print(f"Municipality not found: {entry['municipality']}")
+            print(f"City not found: {entry['city']}")
             continue
 
         # Skip if place already exists
         existing = await db.scalar(
             select(Place).where(
-                Place.name == entry["name"], Place.municipality_id == mun.id
+                Place.name == entry["name"], Place.city_id == mun.id
             )
         )
         if existing:
@@ -46,18 +44,20 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         place = Place(
             name=entry["name"],
             category=PlaceCategoryEnum(entry.get("category")),
-            longitude=entry["longitude"],
             latitude=entry["latitude"],
+            longitude=entry["longitude"],
             description=entry.get("description"),
-            municipality_id=mun.id
+            city_id=mun.id,
+            average_visit_duration=entry.get("average_visit_duration"),
+            average_visit_cost=entry.get("average_visit_cost")
         )
         db.add(place)
         await db.flush()  # get place.id
 
         place_node = PlaceNode(id=place.id, name=entry['name'], category=entry['category'])
         await place_repository.create(place_node)
-        municipality_place = MuncipalityPlaceEdge(id=symmetric_pair(mun.id, place.id), start_id=mun.id, end_id=place.id)
-        await place_municipality_repository.create(municipality_place)
+        city_place = CityPlaceEdge(source_id=mun.id, target_id=place.id)
+        await place_repository.add_edge(city_place)
         
         # Upload images to S3 and associate
         images = []
@@ -117,6 +117,7 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             pa = PlaceActivity(
                 place_id=place.id,
                 activity_id=activity.id,
+                title=act_entry.get("title"),
                 description=act_entry.get("description"),
                 average_duration=act_entry.get("average_duration", 60),
                 average_cost=act_entry.get("average_cost", 1000)
@@ -124,9 +125,9 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             db.add(pa)
             await db.flush()
 
-            edge = PlaceActivityEdge(id=pa.id, start_id=place.id, end_id=activity.id)
-            await place_activity_repository.create(edge)
+            edge = PlaceActivityEdge(id=pa.id, source_id=place.id, target_id=activity.id)
+            await place_repository.add_edge(edge)
 
         await db.commit()
 
-    print("Default places seeded.")
+    print("Seeder: Default places seeded.")

@@ -12,7 +12,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         super().__init__(TransportService, db)
 
 
-    async def add_route_segment(self, transport_service_id: int, route_ids: list[int]):
+    async def add_route_segment(self, service_id: int, route_ids: list[int]):
         last_place = None
         route_repo = TransportRouteRepository(self.db)
 
@@ -22,20 +22,20 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 if not route:
                     raise HTTPException(status_code=404, detail=f"Route with ID {route_id} not found")
                 if not last_place:
-                    last_place = route.end_municipality_id
-                elif last_place == route.start_municipality_id:
-                    last_place = route.end_municipality_id
-                elif last_place == route.end_municipality_id:
-                    last_place = route.start_municipality_id
+                    last_place = route.end_city_id
+                elif last_place == route.start_city_id:
+                    last_place = route.end_city_id
+                elif last_place == route.end_city_id:
+                    last_place = route.start_city_id
                 else:
-                    raise HTTPException(status_code=400, detail="Invalid route sequence")
+                    raise HTTPException(status_code=400, detail="Invalid route index")
 
-                last_place = route.end_municipality_id
+                last_place = route.end_city_id
 
                 segment = TransportServiceRouteSegment(
-                    service_id=transport_service_id,
+                    service_id=service_id,
                     route_id=route_id,
-                    sequence=i
+                    index=i
                 )
                 self.db.add(segment)
 
@@ -57,5 +57,5 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         await self.attach_images(service_id, image_ids)
 
     async def clear_route_segments(self, service_id: int):
-        await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.transport_service_id == service_id))
+        await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.service_id == service_id))
         await self.db.commit()

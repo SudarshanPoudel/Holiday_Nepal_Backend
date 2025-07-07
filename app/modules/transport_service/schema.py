@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.address.schema import MunicipalityBase
+from app.modules.cities.schema import CityRead
 from app.modules.storage.schema import ImageRead
 from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteRead
 
@@ -23,55 +23,42 @@ class TransportServiceCreate(BaseModel):
     image_ids: Optional[List[int]] = None  
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_time: Optional[int]
-
+    average_duration: Optional[float]
+    cost: Optional[float]
 
 class TransportServiceBase(BaseModel):
-    service_provider_id: int
-    start_municipality_id: int
-    end_municipality_id: int
+    start_city_id: int
+    end_city_id: int
     description: Optional[str]
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
-    average_time: Optional[int]
+    average_duration: Optional[float]
     total_distance: float
-
+    cost: Optional[float]
 
 class TransportServiceRouteSegmentRead(BaseModel):
     id: int
-    sequence: int
+    index: int
     route: TransportRouteRead
 
 
 class TransportServiceReadAll(BaseModel):
     id: int
-    service_provider_id: int
-    start_municipality: MunicipalityBase
-    end_municipality: MunicipalityBase
+    start_city: CityRead
+    end_city: CityRead
     images: List[ImageRead] 
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum
     total_distance: float
-    average_time: Optional[int]
+    average_duration: Optional[float]
 
 
 class TransportServiceRead(TransportServiceReadAll):
     description: Optional[str]
     route_segments: List[TransportServiceRouteSegmentRead]
 
-
-class TransportServiceUpdate(BaseModel):
-    service_provider_id: Optional[int]
-    description: Optional[str]
-    route_category: Optional[RouteCategoryEnum]
-    transport_category: Optional[TransportServiceCategoryEnum]
-    average_time: Optional[int]
-    image_ids: Optional[List[int]] = None  
-
-
 class TransportServiceFilters(BaseModel):
-    service_provider_id: Optional[int] = None
-    start_municipality_id: Optional[int] = None
-    end_municipality_id: Optional[int] = None
+    start_city_id: Optional[int] = None
+    end_city_id: Optional[int] = None
     route_category: Optional[RouteCategoryEnum] = None
     transport_category: Optional[TransportServiceCategoryEnum] = None

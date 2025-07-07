@@ -16,12 +16,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/auth/verify_email", "/auth/resend_otp",
             "/auth/forget_password", "/auth/change_password_with_token",
             "/docs", "/redoc", "/openapi.json", 
-            "/address/district", "/address/municipality",
+            "/address/district", "/address/city",
         ]
 
         # Add regex patterns for dynamic paths
         allowed_path_patterns = [
-            r"^/address/municipality/\d+$",  # matches /address/10, /address/20, etc.
+            r"^/address/city/\d+$",  # matches /address/10, /address/20, etc.
         ]
 
         path = request.url.path.rstrip('/')

@@ -1,9 +1,9 @@
 [
     {
-      "username": "hotelwala2",
+      "name": "Morden Hotel and Resort",
       "description": "Situated along the picturesque shores of Phewa Lake, this modern hotel offers a peaceful escape with stunning lake and mountain views. Guests are welcomed into spacious rooms featuring contemporary furnishings, warm lighting, and large windows that open to the calm waters and distant peaks. The property is surrounded by vibrant cafes, local craft shops, and evening music spots, making it a perfect base for both relaxation and exploration. Complimentary breakfast is served on a rooftop terrace, where the morning mist dances across the lake as paragliders soar above. With attentive staff and a tranquil atmosphere, it's an ideal retreat for couples, solo travelers, and nature lovers alike.\n\nThe hotel’s interior blends minimalistic design with cultural elements—handmade Thangka paintings and traditional wood carvings adorn the common areas. Each room includes high-speed Wi-Fi, air conditioning, and private balconies offering either lake or courtyard views. The in-house restaurant features both local delicacies and continental dishes made with fresh, organic ingredients sourced from nearby farms. Laundry, airport shuttle, and tour arrangements are available on request. Eco-conscious travelers will appreciate the hotel’s solar heating system and waste reduction practices.\n\nStep outside and you’re moments away from boating on the lake, hiking to the World Peace Pagoda, or visiting the iconic Tal Barahi Temple situated on an island in the lake. As the sun sets, the lakefront transforms into a soft glow of lanterns and music, creating a magical setting. Guests frequently describe their stay as both refreshing and inspiring, with many returning to relive the experience. Whether you're planning a short weekend or a weeklong escape, this hotel promises comfort, views, and memories that last.\n\nFor those working remotely, the peaceful surroundings and cozy ambiance create the perfect \"workcation\" setting. The hotel also offers guided city walks and access to outdoor activities such as cycling and kayaking. The staff is multilingual and happy to assist international guests with travel tips, SIM cards, and local experiences. This property balances natural beauty with modern hospitality, capturing the true spirit of Pokhara.",
-      "full_location": "Lakeside, Pokhara",
-      "municipality": "Pokhara Metropolitan City",
+      "full_address": "Lakeside, Pokhara",
+      "city": "Pokhara",
       "accomodation_category": "hotel",
       "longitude": 83.9810,
       "latitude": 28.2095,
@@ -11,10 +11,10 @@
       "images": ["1.jpg", "2.jpg"]
     },
     {
-      "username": "hotelwala3",
+      "name": "Bandipur Motel",
       "description": "Perched on a peaceful hilltop overlooking the terraced valleys of Bandipur, this charming motel offers a quiet sanctuary steeped in tradition and history. Originally a renovated Newari guesthouse, the property retains its rustic elegance with carved wooden pillars, red brick walls, and earthy tones. Each room is uniquely decorated and equipped with cozy bedding, wooden furniture, and mountain-view windows. Guests can wake up to birdsong and enjoy breakfast in the tranquil courtyard, surrounded by blooming flowers and distant Himalayan silhouettes. The cool mountain air and the absence of traffic noise make it a rejuvenating hideaway from city life.\n\nThe motel is a short walk from Tundikhel, Bandipur’s open hilltop field known for panoramic views and stargazing. Despite its modest appearance, the motel provides all essential amenities—hot showers, Wi-Fi, and room service—with an emphasis on hospitality and local flavor. Guests are invited to join the evening bonfire and storytelling sessions that recount the legends of the ancient trade route. Meals are home-cooked and made from locally grown vegetables, reflecting the culinary heritage of the Magar and Newar communities. Cultural travelers will find this setting ideal for immersive, slow-paced exploration.\n\nBeyond the rooms, the surrounding village offers cobblestone paths, historical temples, and welcoming locals. The area is rich with day hikes leading to Siddha Gufa (Nepal’s largest cave) or the Gurungche Hill viewpoint. Guests frequently share that the authentic ambiance and unhurried rhythm of the motel enhance their appreciation of rural Nepal. Artists, writers, and meditation seekers often extend their stays to soak in the stillness. For those in search of a meaningful cultural retreat rather than luxury, this motel provides a deeply grounding experience.\n\nThe motel staff are all locals who take pride in showcasing Bandipur’s heritage. Guests often leave with new friends, heartfelt stories, and a better understanding of Nepali village life. Whether you're just passing through or planning a contemplative escape, this quiet gem in the hills is a soulful pause on any journey through Nepal.",
-      "full_location": "Tundikhel, Bandipur",
-      "municipality": "Bandipur Rural Municipality",
+      "full_address": "Tundikhel, Bandipur",
+      "city": "Bandipur",
       "accomodation_category": "motel",
       "longitude": 84.4095,
       "latitude": 27.9350,
@@ -22,10 +22,10 @@
       "images": ["3.jpg"]
     },
     {
-      "username": "hotelwala4",
+      "name": "Naryani Hotel",
       "description": "Tucked away in the lush surroundings of Bharatpur Heights, this luxury eco-resort blends indulgence with nature in one of Nepal’s most biodiverse regions. The resort is built across a sprawling estate filled with tropical trees, walking paths, and colorful flora, offering a perfect backdrop for both relaxation and exploration. Rooms are elegantly designed with handcrafted furniture, floor-to-ceiling glass panels, and private terraces that open into gardens or forest views. Guests can unwind in the infinity pool or enjoy drinks at the outdoor lounge while listening to birdsong and the gentle rustle of trees. The tranquil environment is particularly popular among honeymooners and wellness travelers.\n\nThe resort’s spa and wellness center offers Ayurvedic treatments, yoga classes, and herbal baths inspired by traditional Tharu healing practices. Dining is an experience in itself—each meal is prepared by top chefs using organic ingredients sourced from the in-house farm. Room service is available, but most guests prefer to dine in the open-air restaurant under the stars. The staff ensures every detail is attended to, from arranging candle-lit dinners to organizing private safari tours in nearby Chitwan National Park. Environmental sustainability is at the heart of the resort’s operations, with solar power, rainwater harvesting, and composting systems in place.\n\nLocated just a 30-minute drive from Sauraha, the resort offers convenient access to wildlife adventures including elephant safaris, jeep tours, and canoe rides. Guests often combine their luxury stay with wildlife photography or conservation volunteer work, supported by the resort’s partnerships with local NGOs. The peaceful location also makes it an ideal venue for company retreats, wellness camps, or creative residencies. Multiple reviews highlight the sense of inner peace and deep connection with nature that guests feel during their stay. Whether you're an adventurer or a luxury seeker, this resort delivers an unforgettable experience.\n\nChildren and families are also well-catered with dedicated play areas, nature trails, and educational tours about local wildlife and ecosystems. The blend of elegance and eco-consciousness positions this resort as a unique offering in central Nepal. With top-tier service and deep respect for the environment, it’s more than just a stay—it’s an immersive natural journey.",
-      "full_location": "Bharatpur Heights",
-      "municipality": "Bharatpur Metropolitan City",
+      "full_address": "Bharatpur Heights",
+      "city": "Bharatpur",
       "accomodation_category": "resort",
       "longitude": 84.4371,
       "latitude": 27.6667,

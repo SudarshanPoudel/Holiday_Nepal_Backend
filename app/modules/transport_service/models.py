@@ -19,26 +19,24 @@ class TransportService(Base):
     __tablename__ = 'transport_services'
 
     id = Column(Integer, primary_key=True)
-    service_provider_id = Column(Integer, ForeignKey('service_providers.id'), nullable=False)
-    start_municipality_id = Column(Integer, ForeignKey('municipalities.id'), nullable=False)
-    end_municipality_id = Column(Integer, ForeignKey('municipalities.id'), nullable=False)
+    start_city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
+    end_city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
     description = Column(String, nullable=True)
     route_category = Column(Enum(RouteCategoryEnum), nullable=False)
     transport_category = Column(Enum(TransportServiceCategoryEnum, name="transportcategoryenum"), nullable=False)
     total_distance = Column(Float, nullable=False)
-    average_time = Column(Integer, nullable=True)
+    average_duration = Column(Float, nullable=True)
+    cost = Column(Float, nullable=True)
 
-    start_municipality = relationship("Municipality", foreign_keys=[start_municipality_id])
-    end_municipality = relationship("Municipality", foreign_keys=[end_municipality_id])
-    provider = relationship("ServiceProvider")
-
+    start_city = relationship("City", foreign_keys=[start_city_id])
+    end_city = relationship("City", foreign_keys=[end_city_id])
     images = relationship("Image", secondary=transport_service_images)
 
     # Existing relationship
     route_segments = relationship(
         'TransportServiceRouteSegment',
         back_populates='service',
-        order_by='TransportServiceRouteSegment.sequence',
+        order_by='TransportServiceRouteSegment.index',
         cascade='all, delete-orphan'
     )
 
@@ -49,7 +47,7 @@ class TransportServiceRouteSegment(Base):
     id = Column(Integer, primary_key=True)
     service_id = Column(Integer, ForeignKey('transport_services.id', ondelete='CASCADE'), nullable=False)
     route_id = Column(Integer, ForeignKey('transport_routes.id'), nullable=False)
-    sequence = Column(Integer, nullable=False)
+    index = Column(Integer, nullable=False)
 
     service = relationship('TransportService', back_populates='route_segments')
     route = relationship('TransportRoute')

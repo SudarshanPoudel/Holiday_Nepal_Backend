@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.address.schema import MunicipalityBase
+from app.modules.cities.schema import CityRead
 
 
 class RouteCategoryEnum(str, Enum):
@@ -13,26 +13,32 @@ class RouteCategoryEnum(str, Enum):
     air = 'air'
 
 class TransportRouteCreate(BaseModel):
-    start_municipality_id: int
-    end_municipality_id: int
+    start_city_id: int
+    end_city_id: int
     route_category: RouteCategoryEnum
     distance: float
-    average_time: Optional[int]
+    average_duration: Optional[float]
+    average_cost: Optional[float]
 
-class TransportRouteUpdate(BaseModel):
-    start_municipality_id: Optional[int]
-    end_municipality_id: Optional[int]
-    route_category: Optional[RouteCategoryEnum]
-    distance: Optional[float]
-    average_time: Optional[int]
+class TransportRouteReadMinimal(BaseModel):
+    id: int
+    distance: float
+    average_duration: Optional[float]
+    average_cost: Optional[float]
+    start_city_id: int
+    end_city_id: int
+
+    class Config:
+        from_attributes = True
 
 class TransportRouteRead(BaseModel):
     id: int
-    start_municipality: MunicipalityBase
-    end_municipality: MunicipalityBase
     route_category: RouteCategoryEnum
     distance: float
-    average_time: Optional[int]
+    average_duration: Optional[float]
+    average_cost: Optional[float]
+    start_city: CityRead
+    end_city: CityRead
 
     class Config:
         from_attributes = True
