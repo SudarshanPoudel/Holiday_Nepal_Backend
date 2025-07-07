@@ -27,7 +27,7 @@ async def create_place(place: PlaceCreate, db: AsyncSession = Depends(get_db), g
     
 @router.get("/")
 async def index_places(
-    search: Optional[str] = Query(None, description="Search query for service place name"),
+    search: Optional[str] = Query(None, description="Search query for place name"),
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),

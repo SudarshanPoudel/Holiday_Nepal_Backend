@@ -27,11 +27,11 @@ class ActivityController():
         return BaseResponse(message="Activity fetched successfully", data=ActivityReadFull.model_validate(activity, from_attributes=True))
 
     async def update(self, activity_id: int, activity: ActivityCreate):
-        activity = await self.repository.update(activity_id, activity)
-        if not activity:
+        activity_db = await self.repository.update(activity_id, activity)
+        if not activity_db:
             raise HTTPException(status_code=404, detail="Activity not found")
         await self.graph_repository.update(ActivityNode(id=activity_id, name=activity.name))
-        return BaseResponse(message="Activity updated successfully", data={"id": activity.id, **activity.model_dump()})
+        return BaseResponse(message="Activity updated successfully", data={"id": activity_db.id, **activity.model_dump()})
 
     async def delete(self, activity_id: int):
         delete = await self.repository.delete(activity_id)

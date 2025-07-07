@@ -10,8 +10,6 @@ class PlanDayNode(BaseNode):
     child_relationships = {"PLAN_DAY_STARTS_AT_PLAN_DAY_STEP": "PlanDayStep"}
     sequential_child_relationships = {"NEXT_PLAN_DAY": "PlanDay"}
     index: int
-    total_time: int
-    total_cost: float
 
 class PlanPlanDayEdge(BaseEdge):
     label: ClassVar[str] = "PLAN_STARTS_AT_PLAN_DAY"

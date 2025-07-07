@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel
 
 class CityCreate(BaseModel):
@@ -6,8 +6,8 @@ class CityCreate(BaseModel):
     latitude: float
     longitude: float
 
-class CityBase(BaseModel):
-    id: Optional[int] = None
+class CityRead(BaseModel):
+    id: int
     name: str
     latitude: float
     longitude: float
@@ -15,7 +15,7 @@ class CityBase(BaseModel):
     class Config:
         from_attributes = True
 
-class CityNearest(CityBase):
+class CityNearest(CityRead):
     distance: Optional[float]
 
     class Config:

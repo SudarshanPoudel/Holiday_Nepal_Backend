@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from enum import Enum
 
 from app.modules.activities.schema import ActivityRead, ActivityReadWithImage
-from app.modules.cities.schema import CityBase
+from app.modules.cities.schema import CityRead
 from app.modules.place_activities.schema import PlaceActivityRead
 from app.modules.places.schema import  PlaceReadBasic
 from app.modules.plan_route_hops.schema import PlanRouteHopRead
@@ -14,7 +14,7 @@ class PlanDayTimeFrameEnum(str, Enum):
     afternoon = "afternoon"
     evening = "evening"
     night = "night"
-    full_day = "full day"
+    full_day = "full_day"
 
 class PlanDayStepCategoryEnum(str, Enum):
     visit = "visit"
@@ -27,12 +27,13 @@ class PlanDayStepRead(BaseModel):
     title: str
     time_frame: PlanDayTimeFrameEnum
     category: PlanDayStepCategoryEnum
+    cost: float
     
     image: ImageRead
     place_activity: Optional[PlaceActivityRead]
     place: Optional[PlaceReadBasic]
-    city_start: Optional[CityBase]
-    city_end: Optional[CityBase]
+    city_start: Optional[CityRead]
+    city_end: Optional[CityRead]
     route_hops: Optional[List[PlanRouteHopRead]]
     
 class PlanDayStepCreate(BaseModel):

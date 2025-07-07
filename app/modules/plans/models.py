@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, func, DateTime
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -18,6 +18,9 @@ class Plan(Base):
     vote_count = Column(Integer, nullable=True)
     is_private = Column(Boolean, nullable=False, default=True)
     start_city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
+    created_at = Column(DateTime(), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(), nullable=False, onupdate=func.now(), server_default=func.now())
     
     user = relationship("User")
     days = relationship("PlanDay", uselist=True, cascade="all, delete-orphan", order_by="PlanDay.index")
+    start_city = relationship("City", foreign_keys=[start_city_id])

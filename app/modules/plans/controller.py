@@ -1,11 +1,14 @@
+from typing import Dict, Optional
 from fastapi import HTTPException
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
+from fastapi_pagination import Params
 
 from app.core.schemas import BaseResponse
 from app.modules.plans.graph import PlanGraphRepository, PlanNode
 from app.modules.plans.repository import PlanRepository
-from app.modules.plans.schema import PlanBase, PlanCreate, PlanRead
+from app.modules.plans.schema import PlanBase, PlanCreate, PlanFiltersInternal, PlanIndex, PlanRead
 
 
 class PlanController():
@@ -52,3 +55,22 @@ class PlanController():
         await self.graph_repository.update(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id))
         plan_data = await self.repository.get_updated_plan(plan_db.id)
         return BaseResponse(message="Plan updated successfully", data=plan_data)
+
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+        filters: Optional[BaseModel] = None
+    ):
+        data = await self.repository.index(
+            params=params,
+            search_fields=["title"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["start_city", "user.image"],
+            filters=PlanFiltersInternal(**filters.model_dump())
+        )
+        return BaseResponse(message="Plans fetched successfully", data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in data.items])

@@ -15,9 +15,10 @@ class UserRead(BaseModel):
     id: int
     email: EmailStr
     username: str
-    image_id: Optional[int] = None
     city_id: Optional[int] = None
 
+    image: Optional[ImageRead] = None
+    
     class Config:
         from_attributes = True
 

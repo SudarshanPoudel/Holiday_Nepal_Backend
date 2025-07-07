@@ -426,7 +426,7 @@ class BaseGraphRepository(Generic[NodeType]):
         # Step 2: Fetch edge IDs between each consecutive pair of nodes
         query_edges = f"""
         UNWIND range(0, size($nodes) - 2) AS i
-        MATCH (a:{self.label} {{id: $nodes[i]}})-[r:{edge_label}]->(b:{self.label} {{id: $nodes[i+1]}})
+        MATCH (a:{self.label} {{id: $nodes[i]}})-[r:{edge_label}]-{">" if directed else ""}(b:{self.label} {{id: $nodes[i+1]}})
         RETURN r.id AS edgeId, b.id AS nodeId
         ORDER BY i
         """

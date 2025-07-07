@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.cities.schema import CityBase
+from app.modules.cities.schema import CityRead
 from app.modules.storage.schema import ImageRead
 from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteRead
 
@@ -44,8 +44,8 @@ class TransportServiceRouteSegmentRead(BaseModel):
 
 class TransportServiceReadAll(BaseModel):
     id: int
-    start_city: CityBase
-    end_city: CityBase
+    start_city: CityRead
+    end_city: CityRead
     images: List[ImageRead] 
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum

@@ -18,7 +18,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 # Enums
 plan_day_time_frame_enum = sa.Enum(
-    'morning', 'afternoon', 'evening', 'night', 'full day',
+    'morning', 'afternoon', 'evening', 'night', 'full_day',
     name='plandaytimeframeenum'
 )
 plan_day_step_category_enum = sa.Enum(

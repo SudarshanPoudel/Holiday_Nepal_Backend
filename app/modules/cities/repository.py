@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_pagination import Params
 
 from app.modules.cities.models import City
-from app.modules.cities.schema import CityBase
+from app.modules.cities.schema import CityRead
 
-class CityRepository(BaseRepository[City, CityBase]):
+class CityRepository(BaseRepository[City, CityRead]):
     def __init__(self, db: AsyncSession):
         super().__init__(model=City, db=db)
 

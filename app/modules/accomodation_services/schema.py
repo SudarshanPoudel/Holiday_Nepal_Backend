@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.cities.schema import CityBase
+from app.modules.cities.schema import CityRead
 from app.modules.storage.schema import ImageRead
 
 class AccomodationCategoryEnum(str, Enum):

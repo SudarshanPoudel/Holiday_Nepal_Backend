@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.modules.cities.schema import CityBase
+from app.modules.cities.schema import CityRead
 
 
 class RouteCategoryEnum(str, Enum):
@@ -24,6 +24,7 @@ class TransportRouteReadMinimal(BaseModel):
     id: int
     distance: float
     average_duration: Optional[float]
+    average_cost: Optional[float]
     start_city_id: int
     end_city_id: int
 
@@ -35,8 +36,9 @@ class TransportRouteRead(BaseModel):
     route_category: RouteCategoryEnum
     distance: float
     average_duration: Optional[float]
-    start_city: CityBase
-    end_city: CityBase
+    average_cost: Optional[float]
+    start_city: CityRead
+    end_city: CityRead
 
     class Config:
         from_attributes = True
