@@ -14,7 +14,7 @@ from app.modules.auth.otp_service import OTPService
 from app.modules.users.models import User
 from app.core.config import settings
 from app.modules.auth.schemas import Token, UserLogin
-from app.modules.users.schemas import UserCreate, UserRead
+from app.modules.users.schemas import UserCreate, UserReadMinimal
 from app.modules.auth.service import AuthService
 from app.core.schemas import BaseResponse
 from app.modules.auth.models import RefreshToken
@@ -131,7 +131,7 @@ class AuthController:
         user = await user_repo.get(record_id=user_id, load_relations=["image"])
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        user_read = UserRead.model_validate(user, from_attributes=True)
+        user_read = UserReadMinimal.model_validate(user, from_attributes=True)
         return BaseResponse(message="Profile fetched  success", data=user_read)
 
 

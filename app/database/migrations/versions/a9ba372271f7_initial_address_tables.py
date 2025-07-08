@@ -38,4 +38,3 @@ def upgrade():
 def downgrade():
     op.execute("DROP INDEX IF EXISTS cities_location_idx")
     op.drop_table("cities")
-    op.execute("DROP EXTENSION IF EXISTS postgis")

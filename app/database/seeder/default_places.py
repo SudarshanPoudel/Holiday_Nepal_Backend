@@ -77,11 +77,8 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             content = validate_and_process_image(content, resize_to=(1080, 720))
             s3_service = StorageService()
             await s3_service.upload_file(key=key, file_content=content, content_type="image/webp")
-            url = s3_service.get_file_url(key)
-
             img = Image(
                 key=key,
-                url=url,
                 category=ImageCategoryEnum.place
             )
             db.add(img)

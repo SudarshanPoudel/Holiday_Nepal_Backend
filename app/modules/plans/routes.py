@@ -108,3 +108,55 @@ async def update_plan(
     except Exception as e:        
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/{plan_id}/toggle-save")
+async def toggle_save_plan(
+    plan_id: int, 
+    request: Request, 
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanController(db, graph_db, user_id)
+        return await controller.toggle_save(plan_id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/{plan_id}/rate")
+async def rate_plan(
+    plan_id: int, 
+    rating: int, 
+    request: Request, 
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanController(db, graph_db, user_id)
+        return await controller.rate(plan_id, rating)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.delete("/{plan_id}/rate")
+async def delete_rate_plan(
+    plan_id: int, 
+    request: Request, 
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanController(db, graph_db, user_id)
+        return await controller.delete_rate(plan_id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))

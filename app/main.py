@@ -9,7 +9,9 @@ from app.middlerware.cors import add_cors_middleware
 
 from app.utils.homeage_router import router as homeage_router
 from app.modules.auth.routes import router as auth_router
-from app.modules.cities.routes import router as address_router
+from app.modules.me.routes import router as me_router
+from app.modules.users.routes import router as users_router
+from app.modules.cities.routes import router as city_router
 from app.modules.activities.routes import router as activities_router
 from app.modules.places.routes import router as places_router
 from app.modules.storage.routes import router as image_router
@@ -28,11 +30,13 @@ add_cors_middleware(app)
 
 app.include_router(homeage_router, tags=["Home"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(me_router, prefix="/me", tags=["Me"])   
+app.include_router(users_router, prefix="/users", tags=["Users"])
 app.include_router(image_router, prefix="/images", tags=["Images"])
 app.include_router(plans_router, prefix="/plans", tags=["Plans"])
 app.include_router(plan_day_router, prefix="/plan-days", tags=["Plan Day"])
 app.include_router(plan_day_step_router, prefix="/plan-day-steps", tags=["Plan Day Step"])
-app.include_router(address_router, prefix="/cities", tags=["Cities"])
+app.include_router(city_router, prefix="/cities", tags=["Cities"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])
 app.include_router(transport_route_router, prefix="/transport-routes", tags=["Transport Route"])

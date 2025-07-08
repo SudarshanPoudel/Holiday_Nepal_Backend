@@ -1,19 +1,115 @@
 from typing import Optional
-from sqlalchemy import select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload , joinedload
 
 from app.core.repository import BaseRepository
-from app.modules.plans.models import Plan
+from app.modules.plans.models import Plan, UserPlanRating, user_saved_plans
 from app.modules.plans.schema import PlanBase, PlanRead
 
 class PlanRepository(BaseRepository[Plan, PlanBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(Plan, db)
-        
+
+    async def rate_plan(self, user_id: int, plan_id: int, rating: int) -> bool:
+        existing_rating_value = await self.get_rating(user_id, plan_id)
+        plan = await self.get(plan_id)
+        if plan.is_private:
+            return False
+
+        if existing_rating_value is not None:
+            total_rating = plan.rating * plan.vote_count
+            total_rating = total_rating - existing_rating_value + rating
+            plan.rating = round(total_rating / plan.vote_count, 2)
+
+            stmt = select(UserPlanRating).where(
+                UserPlanRating.user_id == user_id,
+                UserPlanRating.plan_id == plan_id
+            )
+            result = await self.db.execute(stmt)
+            existing_rating = result.scalar_one()
+            existing_rating.rating = rating
+        else:
+            total_rating = (plan.rating or 0) * (plan.vote_count or 0)
+            total_rating += rating
+            plan.vote_count = (plan.vote_count or 0) + 1
+            plan.rating = round(total_rating / plan.vote_count, 2)
+
+            new_rating = UserPlanRating(user_id=user_id, plan_id=plan_id, rating=rating)
+            self.db.add(new_rating)
+
+        await self.db.commit()
+        return True
     
-    async def get_updated_plan(self, plan_id: int, calculate_cost: bool = False) -> Optional[PlanRead]:
+    async def remove_plan_rating(self, user_id: int, plan_id: int) -> bool:
+        existing_rating_value = await self.get_rating(user_id, plan_id)
+        if existing_rating_value is None:
+            return False
+
+        stmt = select(UserPlanRating).where(
+            UserPlanRating.user_id == user_id,
+            UserPlanRating.plan_id == plan_id
+        )
+        result = await self.db.execute(stmt)
+        rating_row = result.scalar_one()
+
+        plan = await self.get(plan_id)
+
+        if plan.vote_count and plan.vote_count > 1:
+            total_rating = plan.rating * plan.vote_count
+            total_rating -= existing_rating_value
+            plan.vote_count -= 1
+            plan.rating = round(total_rating / plan.vote_count, 2)
+        else:
+            plan.vote_count = 0
+            plan.rating = None
+
+        await self.db.delete(rating_row)
+        await self.db.commit()
+        return True
+        
+    async def toggle_save_plan(self, user_id: int, plan_id: int) -> bool:
+        """
+        Toggles save/unsave. Returns True if saved, False if unsaved.
+        """
+        if self.is_saved(user_id, plan_id):
+            delete_stmt = delete(user_saved_plans).where(
+                user_saved_plans.c.user_id == user_id,
+                user_saved_plans.c.plan_id == plan_id
+            )
+            await self.db.execute(delete_stmt)
+            await self.db.commit()
+            return False
+        else:
+            insert_stmt = insert(user_saved_plans).values(
+                user_id=user_id, plan_id=plan_id
+            )
+            await self.db.execute(insert_stmt)
+            await self.db.commit()
+            return True
+
+    async def is_saved(self, user_id: int, plan_id: int) -> bool:
+        stmt = select(user_saved_plans).where(
+            user_saved_plans.c.user_id == user_id,
+            user_saved_plans.c.plan_id == plan_id
+        )
+        result = await self.db.execute(stmt)
+        return result.first() is not None
+
+    async def get_rating(self, user_id: int, plan_id: int) -> Optional[int]:
+        stmt = select(UserPlanRating.rating).where(
+            UserPlanRating.user_id == user_id,
+            UserPlanRating.plan_id == plan_id
+        )
+        result = await self.db.execute(stmt)
+        rating = result.scalar_one_or_none()
+        return rating
+
+    
+    
+    async def get_updated_plan(self, plan_id: int, user_id: int) -> Optional[PlanRead]:
         load_relations = [
+            "image",
             "start_city",
             "days.steps.place",
             "days.steps.place_activity.activity.image",
@@ -49,7 +145,8 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
             return None
         
         plan_data = PlanRead.model_validate(plan, from_attributes=True)
-    
+        plan_data.self_rating = await self.get_rating(user_id, plan_id)
+        plan_data.is_saved = await self.is_saved(user_id, plan_id)
         cost = 0
         for day in plan_data.days:
             for step in day.steps:
