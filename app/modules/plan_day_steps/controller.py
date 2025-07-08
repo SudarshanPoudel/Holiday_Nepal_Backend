@@ -66,7 +66,7 @@ class PlanDayStepController:
         steps_created.append(requested_step)
         plan.estimated_cost += requested_step.cost
         
-        plan_data = await self.plan_repository.get_updated_plan(plan.id)
+        plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Step added successfully", data=plan_data)
 
     async def delete_day_step(self, plan_id: int):
@@ -80,7 +80,7 @@ class PlanDayStepController:
         await self.repository.delete(step_id)
         await self.graph_repository.delete(step_id)
         
-        plan_data = await self.plan_repository.get_updated_plan(plan_id)
+        plan_data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
         return BaseResponse(message="Day step deleted successfully", data=plan_data)
 
     async def _validate_and_get_plan_context(self, plan_id: int):

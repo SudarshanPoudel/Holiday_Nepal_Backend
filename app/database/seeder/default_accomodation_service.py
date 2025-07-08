@@ -39,7 +39,6 @@ async def seed_default_accomodation_services(db: AsyncSession):
             await file_service.upload_file(key=key, file_content=content, content_type="image/webp")
             image = Image(
                 key=key,
-                url=file_service.get_file_url(key),
                 category=ImageCategoryEnum.services
             )
             db.add(image)
@@ -62,4 +61,4 @@ async def seed_default_accomodation_services(db: AsyncSession):
         db.add(service)
 
     await db.commit()
-    print("Accomodation services seeded.")
+    print("Seeder: Accomodation services seeded.")

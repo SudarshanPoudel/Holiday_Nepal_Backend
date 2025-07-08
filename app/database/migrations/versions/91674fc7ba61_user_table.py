@@ -28,7 +28,6 @@ def upgrade() -> None:
         'images',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('key', sa.String, unique=True, index=True, nullable=False),
-        sa.Column('url', sa.String, nullable=True),
         sa.Column('category', image_category_enum, nullable=True),
     )
 
@@ -40,8 +39,8 @@ def upgrade() -> None:
         sa.Column('password', sa.String, nullable=False),
         sa.Column('city_id', sa.Integer, sa.ForeignKey('cities.id'), index=True, nullable=True),
         sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
-        sa.Column('created', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
     )
 
 

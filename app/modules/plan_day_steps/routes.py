@@ -28,7 +28,7 @@ async def add_plan_day_step(
 
 
 @router.delete("/")
-async def delete_plan_day(
+async def delete_plan_day_step(
     request: Request, 
     plan_id: int,
     db: AsyncSession = Depends(get_db),

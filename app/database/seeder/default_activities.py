@@ -28,9 +28,8 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
         s3_key = f"activities/{slugify(name)}.webp"
         s3_service = StorageService()
         await s3_service.upload_file(key=s3_key, file_content=content, content_type="image/webp")
-        image_url = s3_service.get_file_url(s3_key)
 
-        image = Image(key=s3_key, url=image_url, category=ImageCategoryEnum.services)
+        image = Image(key=s3_key, category=ImageCategoryEnum.services)
         db.add(image)
         await db.flush()  # to get image.id
         activity = Activity(

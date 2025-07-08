@@ -82,9 +82,8 @@ async def seed_default_transport_services(db):
             content = validate_and_process_image(content, resize_to=(1080, 720))
             s3_service = StorageService()
             await s3_service.upload_file(key, content, "image/webp")
-            url = s3_service.get_file_url(key)
 
-            image = Image(key=key, url=url, category=ImageCategoryEnum.services)
+            image = Image(key=key, category=ImageCategoryEnum.services)
             db.add(image)
             await db.flush()
             transport_images.append(image)

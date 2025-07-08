@@ -41,8 +41,9 @@ def upgrade() -> None:
         sa.Column('vote_count', sa.Integer(), nullable=True),
         sa.Column('is_private', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.now()),
-        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now())
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), nullable=True),
+        sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now())
     )
 
     # plan_days table

@@ -37,4 +37,4 @@ async def seed_default_cities(db, graph_db):
 
             city_entered += 1
 
-    print(f"Seeder: Seeded {city_entered} cities.")
+    print(f"Seeder: Default cities seeded.")
