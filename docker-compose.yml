@@ -23,7 +23,7 @@ services:
       
   neo4j:
     build:
-      context: ./neo4j
+      context: ./neo4j-docker
       dockerfile: Dockerfile
     container_name: holidaynepal-neo4j
     ports:
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./localstack-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./scripts/init_localstack.sh:/etc/localstack/init/ready.d/init_localstack.sh
+      - ./docker-scripts/init_localstack.sh:/etc/localstack/init/ready.d/init_localstack.sh
   web:
     build: .
     volumes:
