@@ -4,5 +4,11 @@
         "username": "admin",
         "password": "admin",
         "city": "Gaindakot"
+    },
+    {
+        "email": "user@example.com",
+        "username": "user",
+        "password": "user",
+        "city": "Bharatpur"
     }
 ]

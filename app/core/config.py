@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD: str = "password"
     NEO4J_DATABASE: str = "neo4j"
 
-    ADMIN_EMAILS: List[EmailStr]
+    ADMIN_USERNAMES: List[str]
 
     DEV_TOKEN: str = ''
     class Config:
