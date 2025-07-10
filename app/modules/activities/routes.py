@@ -3,19 +3,22 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from app.database.graph_database import get_graph_db
 from fastapi_pagination import Params
 import traceback
+from app.core.role_check import require_admin
 from app.database.database import get_db
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
-
 from app.modules.activities.controller import ActivityController
 from app.modules.activities.schema import ActivityCreate
-
 
 router = APIRouter()
 
 @router.post("/")
-async def create_activity(activity: ActivityCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def create_activity(
+    activity: ActivityCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = ActivityController(db, graph_db)
         return await controller.create(activity)
@@ -32,7 +35,7 @@ async def index_activities(
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),
     db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession  =  Depends(get_graph_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         controller = ActivityController(db, graph_db)
@@ -49,7 +52,11 @@ async def index_activities(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{activity_id}")
-async def get_activity(activity_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def get_activity(
+    activity_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
     try:
         controller = ActivityController(db, graph_db)
         return await controller.get(activity_id)
@@ -60,7 +67,13 @@ async def get_activity(activity_id: int, db: AsyncSession = Depends(get_db), gra
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.put("/{activity_id}")
-async def update_activity(activity_id: int, activity: ActivityCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def update_activity(
+    activity_id: int, 
+    activity: ActivityCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = ActivityController(db, graph_db)
         return await controller.update(activity_id, activity)
@@ -71,7 +84,12 @@ async def update_activity(activity_id: int, activity: ActivityCreate, db: AsyncS
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.delete("/{activity_id}")
-async def delete_activity(activity_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def delete_activity(
+    activity_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = ActivityController(db, graph_db)
         return await controller.delete(activity_id)

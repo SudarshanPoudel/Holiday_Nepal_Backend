@@ -1,3 +1,5 @@
+from typing import List
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings
 import os
 
@@ -19,7 +21,9 @@ class Settings(BaseSettings):
     AWS_STORAGE_BUCKET_NAME:str = "holidaynepal"
     USE_LOCAL_STACK:bool = True
 
-    GOOGLE_CLIENT_SECRET_FILE:str = "credentials.json"
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    FRONTEND_GOOGLE_AUTH_REDIRECT_URL: str = "http://localhost:3000"
 
     MAIL_USERNAME:str
     MAIL_PASSWORD:str
@@ -29,7 +33,6 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "local"
     
-    FRONTEND_GOOGLE_AUTH_REDIRECT_URL: str = "http://localhost:3000"
     FRONTEND_FORGET_PASSWORD_URL:str = "http://localhost:3000/forget_password"
     DOMAIN: str = "http://127.0.0.1:8000"
 
@@ -37,6 +40,8 @@ class Settings(BaseSettings):
     NEO4J_USER: str = "neo4j"
     NEO4J_PASSWORD: str = "password"
     NEO4J_DATABASE: str = "neo4j"
+
+    ADMIN_EMAILS: List[EmailStr]
 
     DEV_TOKEN: str = ''
     class Config:

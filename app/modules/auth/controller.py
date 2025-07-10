@@ -1,3 +1,4 @@
+import random
 from fastapi import HTTPException , Request, Response
 from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,8 +93,11 @@ class AuthController:
         
         if user and AuthService.verify_password_hash(user_login.password, user.password):
             # Generate tokens
-            access_token = AuthService.create_access_token({"user_id":user.id})
-            raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id})
+            role = "user"
+            if user_login.email_or_username in settings.ADMIN_USERNAMES:
+                role = "admin"
+            access_token = AuthService.create_access_token({"user_id":user.id, "role": role})
+            raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id, "role": role})
 
             # Hash refresh token for DB
             hashed_token = AuthService.hash_refresh_token(raw_refresh_token)
@@ -120,7 +124,7 @@ class AuthController:
 
             return BaseResponse(
                 message="User logged in successfully",
-                data=Token(access_token=access_token, token_type="Bearer"),
+                data=Token(access_token=access_token, token_type="Bearer", role=role),
                 status_code=200
             )
 
@@ -166,6 +170,7 @@ class AuthController:
         user_info = await AuthService.handle_google_callback(code)
         email = user_info["email"]
         name = user_info["name"]
+        username = await self.generate_unique_username(name)
 
         # Check if user exists
         result = await db.execute(select(User).where(User.email == email))
@@ -175,14 +180,14 @@ class AuthController:
             # Create user
             random_password = secrets.token_urlsafe(32)
             hashed = AuthService.hash_password(random_password)
-            user = User(username=name, email=email, password=hashed)
+            user = User(username=username, email=email, password=hashed)
             db.add(user)
             await db.commit()
             await db.refresh(user)
 
         # Login logic
-        access_token = AuthService.create_access_token({"user_id":user.id})
-        raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id})
+        access_token = AuthService.create_access_token({"user_id":user.id, "role": "user"})
+        raw_refresh_token = AuthService.create_refresh_token({"user_id":user.id, "role": "user"})
         hashed_token = AuthService.hash_refresh_token(raw_refresh_token)
         expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
@@ -205,7 +210,7 @@ class AuthController:
 
         return BaseResponse(
             message="Google login successful",
-            data=Token(access_token=access_token, token_type="Bearer"),
+            data=Token(access_token=access_token, token_type="Bearer", role="user"),
             status_code=200
         )
     
@@ -219,15 +224,16 @@ class AuthController:
         if not payload:
             raise HTTPException(status_code=401, detail="Invalid refresh token")
         
-        user_id = int(payload.get("sub"))
+        user_id = int(payload.get("user_id"))
+        role = payload.get("role", "user")
 
         # Check if the refresh token exists in the database
         result = await db.execute(select(RefreshToken).where(RefreshToken.id == payload.get("token_id")))
         db_token = result.scalar_one_or_none()
 
         # Generate new access and refresh tokens
-        access_token = AuthService.create_access_token({"user_id":user_id})
-        new_raw_refresh_token = AuthService.create_refresh_token({"user_id":user_id})
+        access_token = AuthService.create_access_token({"user_id":user_id, "role": role})
+        new_raw_refresh_token = AuthService.create_refresh_token({"user_id":user_id, "role": role})
         new_hashed_token = AuthService.hash_refresh_token(new_raw_refresh_token)
         expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
@@ -247,7 +253,7 @@ class AuthController:
 
         return BaseResponse(
             message="Token refreshed successfully",
-            data=Token(access_token=access_token, token_type="Bearer"),
+            data=Token(access_token=access_token, token_type="Bearer", role=role),
             status_code=200
         )
     
@@ -289,3 +295,25 @@ class AuthController:
         new_hashed = self.hash_password(new_password)
         await user_repo.update_from_dict(record_id=user_id, data={"password": new_hashed})
         return BaseResponse(message="Password changed successfully.")
+
+
+    async def generate_unique_username(self, name: str) -> str:
+        base_username = re.sub(r"[^A-Za-z0-9_-]", "_", name).lower().strip("_")
+        if not base_username:
+            base_username = "user"
+
+        like_pattern = f"{base_username}%"
+        result = await self.db.execute(select(User.username).where(User.username.like(like_pattern)))
+        existing_usernames = set(row[0] for row in result.fetchall())
+
+        if base_username not in existing_usernames:
+            return base_username
+
+        attempts = 100
+        for _ in range(attempts):
+            rand_suffix = random.randint(1, 9999)
+            candidate = f"{base_username}_{rand_suffix}"
+            if candidate not in existing_usernames:
+                return candidate
+
+        return f"{base_username}_{secrets.token_hex(4)}"

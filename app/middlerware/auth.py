@@ -31,8 +31,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         
 
         load_dotenv()
-        token = os.getenv("DEV_TOKEN")
-        token = request.headers.get("Authorization") if not token else token
+        token = request.headers.get("Authorization") 
+        token = os.getenv("DEV_TOKEN") if not token else token
         if not token:
             response = HTTPException(status_code=401, detail="Token not found")
             return Response(content=str(response), status_code=401)
@@ -43,6 +43,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
             if user:
                 request.state.user_id = user.get("user_id")  # User ID from token
+                request.state.role = user.get("role", "user")
             else:
                 raise ValueError("Invalid token")
 

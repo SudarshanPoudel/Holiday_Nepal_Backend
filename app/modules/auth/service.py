@@ -18,7 +18,9 @@ serializer = URLSafeTimedSerializer(
     secret_key=settings.SECRET_KEY, salt="This is random salt hehehe"
 )
 
-CLIENT_SECRET_FILE = settings.GOOGLE_CLIENT_SECRET_FILE
+# Google OAuth configuration using environment variables
+GOOGLE_CLIENT_ID = settings.GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET = settings.GOOGLE_CLIENT_SECRET
 SCOPES = [
     "openid",
     "https://www.googleapis.com/auth/userinfo.email",
@@ -102,22 +104,22 @@ class AuthService:
         ALGORITHM = settings.ALGORITHM
        
         # Decode token
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub"))
-        
-        if not user_id:
-            return None
-
-        # Fetch all refresh tokens for the user
-        result = await db.execute(
-            select(RefreshToken).where(
-                RefreshToken.user_id == user_id,
-                RefreshToken.revoked == False
-            )
-        )
-        refresh_tokens = result.scalars().all()
-
         try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id = int(payload.get("user_id"))
+            
+            if not user_id:
+                return None
+
+            # Fetch all refresh tokens for the user
+            result = await db.execute(
+                select(RefreshToken).where(
+                    RefreshToken.user_id == user_id,
+                    RefreshToken.revoked == False
+                )
+            )
+            refresh_tokens = result.scalars().all()
+
             # Check if provided token matches any hashed one
             for rt in refresh_tokens:
                 if AuthService.verify_refresh_token_hash(token, rt.token):
@@ -137,8 +139,19 @@ class AuthService:
 
     @staticmethod
     async def get_google_login_url() -> str:
-        flow = Flow.from_client_secrets_file(
-            CLIENT_SECRET_FILE,
+        # Create client configuration from environment variables
+        client_config = {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [REDIRECT_URI]
+            }
+        }
+        
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             redirect_uri=REDIRECT_URI
         )
@@ -151,8 +164,19 @@ class AuthService:
 
     @staticmethod
     async def handle_google_callback(code: str) -> dict:
-        flow = Flow.from_client_secrets_file(
-            CLIENT_SECRET_FILE,
+        # Create client configuration from environment variables
+        client_config = {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [REDIRECT_URI]
+            }
+        }
+        
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             redirect_uri=REDIRECT_URI
         )
@@ -162,7 +186,7 @@ class AuthService:
         idinfo = id_token.verify_oauth2_token(
             credentials._id_token,
             requests.Request(),
-            flow.client_config["client_id"]
+            GOOGLE_CLIENT_ID
         )
         return {
             "email": idinfo.get("email"),
@@ -181,5 +205,3 @@ class AuthService:
             return token_data
         except Exception as e:
             return None
-        
-    
