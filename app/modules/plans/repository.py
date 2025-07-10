@@ -1,4 +1,5 @@
 from typing import Optional
+from fastapi import HTTPException
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload , joinedload
@@ -9,11 +10,13 @@ from app.modules.plan_day_steps.models import PlanDayStep
 from app.modules.plan_route_hops.models import PlanRouteHop
 from app.modules.plans.models import Plan, UserPlanRating, user_saved_plans
 from app.modules.plans.schema import PlanBase, PlanRead
+from app.modules.users.repository import UserRepository
 
 class PlanRepository(BaseRepository[Plan, PlanBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(Plan, db)
-   
+        self.user_repository = UserRepository(self.db)
+
     async def duplicate_plan(self, plan_id: int, new_user_id: int) -> Plan:
         original_plan = await self.get(
             plan_id,
@@ -224,7 +227,17 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                 step.cost = step.cost * self._find_cost_multiplier(plan.no_of_people)
                 cost += step.cost
         plan_data.estimated_cost = cost
-        await self.update_from_dict(plan_id, {"estimated_cost": cost})
+        image_id = plan_data.image.id if plan_data.image else None
+        if not image_id and len(plan_data.days) > 0:
+            for day in plan_data.days:
+                for step in day.steps:
+                    if step.category == "visit" and step.image:
+                        plan_data.image = step.image
+                        image_id = step.image.id
+                        break
+                if plan_data.image:
+                    break
+        await self.update_from_dict(plan_id, {"estimated_cost": cost, "image_id": image_id})
         return plan_data
 
 

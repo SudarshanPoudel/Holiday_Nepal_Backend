@@ -132,7 +132,7 @@ class BaseGraphRepository(Generic[NodeType]):
                         child_repo = BaseGraphRepository(self.session, child_model)
                         grandchildren = await child_repo.get_all_child_relationships(child_id, sequential)
                         child_relationships.extend(grandchildren)
-            print(f"DEBUG: child_relationships: {child_relationships} Found For Node {self.label} {node_id}")
+         
         # Handle sequential chains if specified
         if sequential and hasattr(self.model, 'sequential_child_relationships'):
             for rel_name, target_label in self.model.sequential_child_relationships.items():
@@ -149,7 +149,6 @@ class BaseGraphRepository(Generic[NodeType]):
                         child_relationships.append((next_id, target_label))
                     else:
                         break
-            print(f"DEBUG: after sequential_child_relationships: {child_relationships} Found For Node {self.label} {node_id}")
         return child_relationships
 
 
