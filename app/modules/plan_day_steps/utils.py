@@ -21,9 +21,10 @@ async def get_step_time_frame(db: AsyncSession, day: PlanDayRead, step_duration:
     """Calculate time frame for a step based on the day and duration"""
     BASE_START_HOUR = 8  # 8 AM
     step_count = len(day.steps)
-    total_existing_duration = sum(step.duration for step in day.steps)
+    total_existing_duration = sum(step.duration or 1 for step in day.steps if step.duration)
     total_gap_time = max(0, step_count)  # 1 hour gap between each existing step
     starting_hour = BASE_START_HOUR + total_existing_duration + total_gap_time
+    step_duration = step_duration or 1
     ending_hour = starting_hour + step_duration
     duration = ending_hour - starting_hour
     

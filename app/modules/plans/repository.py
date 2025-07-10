@@ -4,13 +4,84 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload , joinedload
 
 from app.core.repository import BaseRepository
+from app.modules.plan_day.models import PlanDay
+from app.modules.plan_day_steps.models import PlanDayStep
+from app.modules.plan_route_hops.models import PlanRouteHop
 from app.modules.plans.models import Plan, UserPlanRating, user_saved_plans
 from app.modules.plans.schema import PlanBase, PlanRead
 
 class PlanRepository(BaseRepository[Plan, PlanBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(Plan, db)
+   
+    async def duplicate_plan(self, plan_id: int, new_user_id: int) -> Plan:
+        original_plan = await self.get(
+            plan_id,
+            load_relations=[
+                "days.steps.route_hops",
+            ],
+        )
+        if not original_plan:
+            return None
 
+        # Create new plan instance
+        new_plan = Plan(
+            user_id=new_user_id,
+            title=original_plan.title + " (Copy)",
+            description=original_plan.description,
+            no_of_days=original_plan.no_of_days,
+            no_of_people=original_plan.no_of_people,
+            estimated_cost=original_plan.estimated_cost,
+            is_private=True,
+            image_id=original_plan.image_id,
+            start_city_id=original_plan.start_city_id,
+        )
+
+        new_plan.days = []
+        for old_day in original_plan.days:
+            new_day = PlanDay(
+                index=old_day.index,
+                title=old_day.title,
+                plan=new_plan  # Set parent relationship (plan_id will be auto set)
+            )
+
+            new_day.steps = []
+            for old_step in old_day.steps:
+                new_step = PlanDayStep(
+                    index=old_step.index,
+                    title=old_step.title,
+                    category=old_step.category,
+                    time_frame=old_step.time_frame,
+                    duration=old_step.duration,
+                    cost=old_step.cost,
+                    image_id=old_step.image_id,
+                    place_id=old_step.place_id,
+                    place_activity_id=old_step.place_activity_id,
+                    start_city_id=old_step.start_city_id,
+                    end_city_id=old_step.end_city_id,
+                    plan_day=new_day  # Set parent relationship (plan_day_id auto)
+                )
+
+                # Clone route hops
+                new_step.route_hops = [
+                    PlanRouteHop(
+                        route_id=hop.route_id,
+                        index=hop.index,
+                        destination_city_id=hop.destination_city_id,
+                        plan_day_step=new_step  # Set parent (plan_day_step_id auto)
+                    )
+                    for hop in old_step.route_hops
+                ]
+
+                new_day.steps.append(new_step)
+
+            new_plan.days.append(new_day)
+
+        self.db.add(new_plan)
+        await self.db.flush()  # Flush assigns IDs and persists relationships
+        return new_plan
+
+    
     async def rate_plan(self, user_id: int, plan_id: int, rating: int) -> bool:
         existing_rating_value = await self.get_rating(user_id, plan_id)
         plan = await self.get(plan_id)

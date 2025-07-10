@@ -6,7 +6,7 @@ from neo4j import AsyncSession as Neo4jSession
 from fastapi_pagination import Params
 
 from app.core.schemas import BaseResponse
-from app.modules.plans.graph import PlanGraphRepository, PlanNode
+from app.modules.plans.graph import PlanCityEdge, PlanGraphRepository, PlanNode
 from app.modules.plans.repository import PlanRepository
 from app.modules.plans.schema import PlanBase, PlanCreate, PlanFiltersInternal, PlanIndex, PlanRead
 
@@ -22,7 +22,8 @@ class PlanController():
     async def create(self, plan: PlanCreate):
         plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
         plan_db = await self.repository.create(plan_internal)
-        await self.graph_repository.create(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id)), 
+        await self.graph_repository.create(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people)), 
+        await self.graph_repository.add_edge(PlanCityEdge(source_id=plan_db.id, target_id=plan.start_city_id))
         plan_data = await self.repository.get_updated_plan(plan_db.id, user_id=self.user_id)
         return BaseResponse(message="Plan created successfully", data=plan_data)
 
@@ -52,9 +53,20 @@ class PlanController():
         plan_db = await self.repository.update(plan_id, plan_internal)
         if not plan_db:
             raise HTTPException(status_code=404, detail="Plan not found")
-        await self.graph_repository.update(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people, start_city_id=plan.start_city_id))
+        await self.graph_repository.update(PlanNode(id=plan_db.id, user_id=self.user_id, no_of_people=plan.no_of_people))
+        if past_data.start_city_id != plan.start_city_id:
+            await self.graph_repository.delete_edge(PlanCityEdge(source_id=plan_db.id, target_id=past_data.start_city_id))
+            await self.graph_repository.add_edge(PlanCityEdge(source_id=plan_db.id, target_id=plan.start_city_id))
         plan_data = await self.repository.get_updated_plan(plan_db.id, user_id=self.user_id)
         return BaseResponse(message="Plan updated successfully", data=plan_data)
+
+    async def duplicate(self, plan_id: int):
+        plan = await self.repository.duplicate_plan(plan_id, self.user_id)
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        await self.graph_repository.create_from_sql_model(plan, self.user_id, self.db)
+        plan_data = await self.repository.get_updated_plan(plan.id, user_id=self.user_id)
+        return BaseResponse(message="Plan duplicated successfully", data=plan_data)
 
     async def index(
         self,

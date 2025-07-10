@@ -27,3 +27,4 @@ class PlanDayStep(Base):
     city_start = relationship("City", foreign_keys=[start_city_id])
     city_end = relationship("City", foreign_keys=[end_city_id])
     route_hops = relationship("PlanRouteHop", back_populates="plan_day_step", uselist=True, cascade="all, delete-orphan")
+    plan_day = relationship("PlanDay", back_populates="steps")
