@@ -1,5 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.modules.transport_service.graph import TransportServiceGraphRepository
+from app.modules.transport_service.repository import TransportServiceRepository
+from app.modules.transport_service.schema import TransportServiceRead, TransportServiceReadAll
 from neo4j import AsyncSession as Neo4jSession
 
 from app.core.schemas import BaseResponse
@@ -15,9 +18,10 @@ class PlanDayStepController:
         self.user_id = user_id
         self.plan_repository = PlanRepository(db)
         self.service = PlanDayStepService(db, graph_db)
+        self.transport_service_repository = TransportServiceRepository(db)
+        self.transport_service_graph_repository = TransportServiceGraphRepository(graph_db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
-        """Add a new step to the plan, automatically adding transport if needed"""
         plan = await self.plan_repository.get(step.plan_id, load_relations=["days.steps"])
         if not plan:
             raise HTTPException(status_code=404, detail="Plan not found")
@@ -28,8 +32,6 @@ class PlanDayStepController:
         return BaseResponse(message="Step added successfully", data=plan_data)
 
     async def delete_day_step(self, plan_id: int):
-        """Delete the last step from the plan"""
-        # Validate plan access and get plan object
         plan = await self._validate_plan_access(plan_id)
         
         # Use service to delete step
@@ -38,3 +40,10 @@ class PlanDayStepController:
         # Return updated plan data
         plan_data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
         return BaseResponse(message="Day step deleted successfully", data=plan_data)
+    
+    async def get_transport_services(self, plan_day_step_id: int):
+        services = await self.transport_service_graph_repository.recommend_services_matching_plan_hops(plan_day_step_id)
+        if not services:
+            raise HTTPException(status_code=404, detail="No transport services found for this step")
+        data = await self.transport_service_repository.get_multiple(services, load_relations=["images", "start_city", "end_city"])
+        return BaseResponse(message="Transport services fetched successfully", data=[TransportServiceReadAll.model_validate(ts, from_attributes=True) for ts in data])

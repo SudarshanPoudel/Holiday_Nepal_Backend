@@ -23,6 +23,16 @@ async def seed_default_accomodation_services(db: AsyncSession):
             print(f"City {data['city']} not found. Skipping.")
             continue
 
+        # Check if the service already exists
+        existing_service = await db.scalar(
+            select(AccomodationService).where(
+                AccomodationService.name == data["name"],
+                AccomodationService.city_id == city.id
+            )
+        )
+        if existing_service:
+            continue
+
         # Upload images and create image records
         images = []
         for image_name in data["images"]:
@@ -34,15 +44,16 @@ async def seed_default_accomodation_services(db: AsyncSession):
             key = f"services/{StorageService.generate_unique_key('webp')}"
             content = local_path.read_bytes()
             content = validate_and_process_image(content)
-            # Upload to S3/localstack
+
             file_service = StorageService()
             await file_service.upload_file(key=key, file_content=content, content_type="image/webp")
+
             image = Image(
                 key=key,
                 category=ImageCategoryEnum.services
             )
             db.add(image)
-            await db.flush()  # to get image.id
+            await db.flush()
             images.append(image)
 
         # Create and add AccomodationService

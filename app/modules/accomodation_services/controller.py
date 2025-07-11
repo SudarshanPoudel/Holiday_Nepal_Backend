@@ -50,6 +50,6 @@ class AccomodationServiceController():
             search_query=search,
             sort_field=sort_by,
             sort_order=order,
-            load_relations=["images"]
+            load_relations=["images", "city"]
         )
         return BaseResponse(message="Transport services fetched successfully", data=[AccomodationServiceRead.model_validate(ts, from_attributes=True) for ts in data.items])

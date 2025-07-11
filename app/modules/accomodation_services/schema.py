@@ -44,6 +44,7 @@ class AccomodationServiceReadMinimal(BaseModel):
 class AccomodationServiceRead(AccomodationServiceReadMinimal):
     description: Optional[str] = None
     images: List[ImageRead]
+    city: CityRead
 
     class Config:
         from_attributes = True

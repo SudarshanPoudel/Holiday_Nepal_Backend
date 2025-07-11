@@ -1,5 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.modules.accomodation_services.repository import AccomodationServiceRepository
+from app.modules.accomodation_services.schema import AccomodationServiceRead
+from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum
 from neo4j import AsyncSession as Neo4jSession
 
 from app.core.schemas import BaseResponse
@@ -15,6 +18,7 @@ class PlanDayController:
         self.user_id = user_id
         self.repository = PlanDayRepository(db)
         self.graph_repository = PlanDayGraphRepository(graph_db)
+        self.accomodation_repository = AccomodationServiceRepository(db)
         self.plan_repository = PlanRepository(db)
 
     async def update(self, plan_day_id: int, title: str):
@@ -27,7 +31,7 @@ class PlanDayController:
         await self.graph_repository.update(PlanDayNode(id=plan_day_id, index=plan_day.index))
         plan_data = await self.plan_repository.get_updated_plan(plan_day.plan_id, user_id=self.user_id)
         return BaseResponse(message="Plan day updated successfully", data=plan_data)
-        
+    
 
     async def add_day(self, plan_id: int, title: str):
         plan = await self.plan_repository.get(plan_id, load_relations=["days"])
@@ -64,3 +68,34 @@ class PlanDayController:
         await self.plan_repository.update_from_dict(plan_id, {"no_of_days": len(plan.days)-1})
         plan_data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
         return BaseResponse(message="Day deleted successfully", data=plan_data)
+
+
+    async def recommand_accomodation_services(self, plan_day_id: int):
+        plan_day = await self.repository.get(plan_day_id, load_relations=["steps.place_activity.place"])
+        if not plan_day:
+            raise HTTPException(status_code=404, detail="Plan day not found")
+        if not plan_day.steps:
+            raise HTTPException(status_code=404, detail="No steps found for this plan day")
+        
+        last_city_id = None
+        for step in reversed(plan_day.steps):
+            if step.category == PlanDayStepCategoryEnum.transport:
+                last_city_id = step.end_city_id
+                break
+            elif step.category == PlanDayStepCategoryEnum.visit:
+                last_city_id = step.city_id
+                break
+            else:
+                last_city_id = step.place_activity.place.city_id
+                break
+
+        if not last_city_id:
+            raise HTTPException(status_code=404, detail="No city found for this plan day")
+        
+        services = await self.accomodation_repository.recommand(self.user_id, last_city_id, load_relations=["images", "city"])
+        if not services:
+            raise HTTPException(status_code=404, detail="No accomodation services found for this plan day")
+        return BaseResponse(message="Accomodation services fetched successfully", data=[AccomodationServiceRead.model_validate(service, from_attributes=True) for service in services])
+
+        
+        

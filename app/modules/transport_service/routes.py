@@ -5,6 +5,8 @@ import traceback
 from app.core.role_check import require_admin
 from app.database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.graph_database import get_graph_db
+from neo4j import AsyncSession as Neo4jSession
 from app.modules.transport_service.controller import TransportServiceController
 from app.modules.transport_service.schema import TransportServiceCreate, TransportServiceFilters
 
@@ -14,10 +16,11 @@ router = APIRouter()
 async def create_transport_service(
     transport_service: TransportServiceCreate, 
     db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db), 
     _: None = Depends(require_admin)
 ):
     try:
-        controller = TransportServiceController(db)
+        controller = TransportServiceController(db, graph_db)
         return await controller.create(transport_service)
     except HTTPException as e:
         raise e
@@ -32,10 +35,11 @@ async def index_transport_services(
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),
     filters: Optional[TransportServiceFilters] = Depends(TransportServiceFilters),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
-        controller = TransportServiceController(db)
+        controller = TransportServiceController(db, graph_db)
         return await controller.index(
             params=params,
             sort_by=sort_by,
@@ -51,10 +55,11 @@ async def index_transport_services(
 @router.get("/{transport_service_id}")
 async def get_transport_service(
     transport_service_id: int, 
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
-        controller = TransportServiceController(db)
+        controller = TransportServiceController(db, graph_db)
         return await controller.get(transport_service_id)
     except HTTPException as e:
         raise e
@@ -67,10 +72,11 @@ async def update_transport_service(
     transport_service_id: int, 
     transport_service: TransportServiceCreate, 
     db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = TransportServiceController(db)
+        controller = TransportServiceController(db, graph_db)
         return await controller.update(transport_service_id, transport_service)
     except HTTPException as e:
         raise e
@@ -82,13 +88,15 @@ async def update_transport_service(
 async def delete_transport_service(
     transport_service_id: int, 
     db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = TransportServiceController(db)
+        controller = TransportServiceController(db, graph_db)
         return await controller.delete(transport_service_id)
     except HTTPException as e:
         raise e
     except Exception as e:
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+    
