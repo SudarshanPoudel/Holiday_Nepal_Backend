@@ -41,7 +41,7 @@ def upgrade() -> None:
         sa.Column('vote_count', sa.Integer(), nullable=True),
         sa.Column('is_private', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=False),
-        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), nullable=True),
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now())
     )
@@ -50,7 +50,7 @@ def upgrade() -> None:
     op.create_table(
         'plan_days',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('plan_id', sa.Integer(), sa.ForeignKey('plans.id'), nullable=False),
+        sa.Column('plan_id', sa.Integer(), sa.ForeignKey('plans.id', ondelete="CASCADE"), nullable=False),
         sa.Column('index', sa.Integer(), nullable=False),  # was 'day' before
         sa.Column('title', sa.String(), nullable=False)
     )
@@ -60,13 +60,13 @@ def upgrade() -> None:
         'plan_day_steps',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('index', sa.Integer(), nullable=False),
-        sa.Column('plan_day_id', sa.Integer(), sa.ForeignKey('plan_days.id'), nullable=False),
+        sa.Column('plan_day_id', sa.Integer(), sa.ForeignKey('plan_days.id', ondelete="CASCADE"), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('category', plan_day_step_category_enum, nullable=True),
         sa.Column('time_frame', plan_day_time_frame_enum, nullable=False),
         sa.Column('duration', sa.Float(), nullable=False),
         sa.Column('cost', sa.Float(), nullable=False),
-        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id'), nullable=True),
+        sa.Column('image_id', sa.Integer(), sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
         sa.Column('place_id', sa.Integer(), sa.ForeignKey('places.id'), nullable=True),
         sa.Column('place_activity_id', sa.Integer(), sa.ForeignKey('place_activities.id'), nullable=True),
         sa.Column('start_city_id', sa.Integer(), sa.ForeignKey('cities.id'), nullable=True),

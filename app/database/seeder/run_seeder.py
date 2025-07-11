@@ -21,7 +21,7 @@ async def run_seeder():
             await seed_default_activities(db, graph_db)
             await seed_default_places(db, graph_db)
             await seed_default_transport_routes(db, graph_db)
-            await seed_default_transport_services(db)
+            await seed_default_transport_services(db, graph_db)
             await seed_default_accomodation_services(db)
             
     print("Seeder: Seeding completed.")

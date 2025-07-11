@@ -25,7 +25,7 @@ class UserPlanRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     
-    # image: Optional[ImageRead] 
+    image: Optional[ImageRead] 
     start_city: CityRead
 
 class UserPlanRatingRead(BaseModel):
@@ -68,10 +68,8 @@ class UserRead(BaseModel):
 
 # Schema for updating user data
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr]
-    password: Optional[str]
     username: Optional[str]
-
+    image_id: Optional[int]
     city_id: Optional[int]
 
     class Config:

@@ -9,7 +9,7 @@ class PlanDayStep(Base):
     __tablename__ = "plan_day_steps"
     id = Column(Integer, primary_key=True, index=True)
     index = Column(Integer, nullable=False)
-    plan_day_id = Column(Integer, ForeignKey("plan_days.id"), nullable=False)
+    plan_day_id = Column(Integer, ForeignKey("plan_days.id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=False)
     category = Column(Enum(PlanDayStepCategoryEnum, name="plandaystepcategoryenum"), nullable=True)
     time_frame = Column(Enum(PlanDayTimeFrameEnum, name="plandaytimeframeenum"), nullable=False)
@@ -27,3 +27,4 @@ class PlanDayStep(Base):
     city_start = relationship("City", foreign_keys=[start_city_id])
     city_end = relationship("City", foreign_keys=[end_city_id])
     route_hops = relationship("PlanRouteHop", back_populates="plan_day_step", uselist=True, cascade="all, delete-orphan")
+    plan_day = relationship("PlanDay", back_populates="steps")

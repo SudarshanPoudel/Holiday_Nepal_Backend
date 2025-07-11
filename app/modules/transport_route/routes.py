@@ -3,13 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from app.database.graph_database import get_graph_db
 from fastapi_pagination import Params
 import traceback
+from app.core.role_check import require_admin
 from app.database.database import get_db
-
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from neo4j import AsyncSession as Neo4jSession
 from app.modules.transport_route.controller import TransportRouteController
 from app.modules.transport_route.schema import RouteCategoryEnum, TransportRouteCreate
-
 
 router = APIRouter()
 
@@ -19,7 +18,7 @@ async def index_transport_route(
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),
     db: AsyncSession = Depends(get_db),
-    graph_db = Depends(get_graph_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         controller = TransportRouteController(db, graph_db)
@@ -35,7 +34,12 @@ async def index_transport_route(
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.post("/")
-async def create_transport_route(transport_route: TransportRouteCreate, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db)):
+async def create_transport_route(
+    transport_route: TransportRouteCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = TransportRouteController(db, graph_db)
         return await controller.create(transport_route)
@@ -46,7 +50,12 @@ async def create_transport_route(transport_route: TransportRouteCreate, db: Asyn
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/city/{city_id}")
-async def get_transport_routes_by_city(city_id: int, route_category:Optional[RouteCategoryEnum] = None, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db)):
+async def get_transport_routes_by_city(
+    city_id: int, 
+    route_category: Optional[RouteCategoryEnum] = None, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
     try:
         controller = TransportRouteController(db, graph_db)
         return await controller.get_from_city(city_id, route_category)
@@ -56,9 +65,12 @@ async def get_transport_routes_by_city(city_id: int, route_category:Optional[Rou
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
     
-
 @router.get("/{transport_route_id}")
-async def get_transport_route(transport_route_id: int, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db)):
+async def get_transport_route(
+    transport_route_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
     try:
         controller = TransportRouteController(db, graph_db)
         return await controller.get(transport_route_id)
@@ -68,9 +80,14 @@ async def get_transport_route(transport_route_id: int, db: AsyncSession = Depend
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
     
-
 @router.put("/{transport_route_id}")
-async def update_transport_route(transport_route_id: int, transport_route: TransportRouteCreate, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db),):
+async def update_transport_route(
+    transport_route_id: int, 
+    transport_route: TransportRouteCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = TransportRouteController(db, graph_db)
         return await controller.update(transport_route_id, transport_route)
@@ -81,7 +98,12 @@ async def update_transport_route(transport_route_id: int, transport_route: Trans
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.delete("/{transport_route_id}")
-async def delete_transport_route(transport_route_id: int, db: AsyncSession = Depends(get_db), graph_db = Depends(get_graph_db),):
+async def delete_transport_route(
+    transport_route_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = TransportRouteController(db, graph_db)
         return await controller.delete(transport_route_id)

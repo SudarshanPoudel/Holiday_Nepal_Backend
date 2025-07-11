@@ -14,7 +14,7 @@ class UserController:
         self.repository = UserRepository(db)
 
     async def get(self, user_id: int):
-        user = await self.repository.get(record_id=user_id, load_relations=["image", "city", "plans.start_city"])
+        user = await self.repository.get(record_id=user_id, load_relations=["image", "city", "plans.start_city", "plans.image"])
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         public_plans = []

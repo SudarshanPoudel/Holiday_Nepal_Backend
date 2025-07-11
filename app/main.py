@@ -21,6 +21,7 @@ from app.modules.accomodation_services.routes import router as accomodation_serv
 from app.modules.plans.routes import router as plans_router
 from app.modules.plan_day.routes import router as plan_day_router
 from app.modules.plan_day_steps.routes import router as plan_day_step_router
+from app.ai.routes import router as ai_router
 
 app = FastAPI()
 
@@ -36,6 +37,7 @@ app.include_router(image_router, prefix="/images", tags=["Images"])
 app.include_router(plans_router, prefix="/plans", tags=["Plans"])
 app.include_router(plan_day_router, prefix="/plan-days", tags=["Plan Day"])
 app.include_router(plan_day_step_router, prefix="/plan-day-steps", tags=["Plan Day Step"])
+app.include_router(ai_router, prefix="/ai", tags=["AI"])
 app.include_router(city_router, prefix="/cities", tags=["Cities"])
 app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])

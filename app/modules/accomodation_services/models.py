@@ -27,3 +27,4 @@ class AccomodationService(Base):
     cost_per_night = Column(Float, nullable=False)
 
     images = relationship("Image", secondary=accomodation_service_images, uselist=True)
+    city = relationship("City", foreign_keys=[city_id])

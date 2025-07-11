@@ -17,6 +17,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         route_repo = TransportRouteRepository(self.db)
 
         try:
+            segments = []
             for i, route_id in enumerate(route_ids):
                 route = await route_repo.get(route_id)
                 if not route:
@@ -38,8 +39,12 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                     index=i
                 )
                 self.db.add(segment)
+                await self.db.flush()  # Ensure segments are added before committing
+                segments.append(segment)
 
             await self.db.commit()
+
+            return segments
         except SQLAlchemyError as e:
             import traceback
             traceback.print_exc()

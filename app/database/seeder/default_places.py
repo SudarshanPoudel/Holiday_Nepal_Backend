@@ -62,7 +62,7 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         # Upload images to S3 and associate
         images = []
         for img_path in entry.get("images", []):
-            p = get_file_path(f"files/images/places/{img_path}")
+            p = get_file_path(f"../../../seeder-images/places/{img_path}")
             key = f"places/{slugify(place.name)}.webp"
 
             # Check if image already exists
@@ -72,18 +72,22 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
                 continue
 
             # Upload new image
-            with open(p, "rb") as f:
-                content = f.read()
-            content = validate_and_process_image(content, resize_to=(1080, 720))
-            s3_service = StorageService()
-            await s3_service.upload_file(key=key, file_content=content, content_type="image/webp")
-            img = Image(
-                key=key,
-                category=ImageCategoryEnum.place
-            )
-            db.add(img)
-            await db.flush()
-            images.append(img)
+            try:
+                with open(p, "rb") as f:
+                    content = f.read()
+                content = validate_and_process_image(content, resize_to=(1080, 720))
+                s3_service = StorageService()
+                await s3_service.upload_file(key=key, file_content=content, content_type="image/webp")
+                img = Image(
+                    key=key,
+                    category=ImageCategoryEnum.place
+                )
+                db.add(img)
+                await db.flush()
+                images.append(img)
+            except Exception as e:
+                print(f"Failed to upload image {p}: {e}")
+                continue
 
         # Link images
         for image in images:

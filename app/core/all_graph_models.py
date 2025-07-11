@@ -7,7 +7,8 @@ from app.modules.plans.graph import PlanNode
 from app.modules.cities.graph import CityNode
 
 from typing import Type, Optional, Dict
-from app.core.graph_schemas import BaseNode  # assuming all nodes inherit this
+from app.core.graph_schemas import BaseNode
+from app.modules.transport_service.graph import TransportServiceNode, TransportServiceRouteHopNode  
 
 # Create a registry
 NODE_CLASSES: Dict[str, Type[BaseNode]] = {
@@ -18,7 +19,9 @@ NODE_CLASSES: Dict[str, Type[BaseNode]] = {
         ActivityNode,
         PlanDayStepNode,
         PlanNode,
-        CityNode
+        CityNode,
+        TransportServiceNode,
+        TransportServiceRouteHopNode
     ]
 }
 

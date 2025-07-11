@@ -1,11 +1,12 @@
 from sqlite3 import IntegrityError
 from typing import List
+from fastapi_pagination import Params
 from sqlalchemy import insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository import BaseRepository
 from app.modules.accomodation_services.models import AccomodationService, accomodation_service_images
-from app.modules.accomodation_services.schema import AccomodationServiceBase
+from app.modules.accomodation_services.schema import AccomodationServiceBase, AccomodationServiceFilter
 
 class AccomodationServiceRepository(BaseRepository[AccomodationService, AccomodationServiceBase]):
     def __init__(self, db: AsyncSession):
@@ -32,3 +33,7 @@ class AccomodationServiceRepository(BaseRepository[AccomodationService, Accomoda
             await self.db.execute(insert(accomodation_service_images).values(values))
 
         await self.db.commit()
+
+    async def recommand(self, user_id: int, city_id: int, load_relations: List[str] = []):
+        data = await self.index(params = Params(page=1, size=10), filters=AccomodationServiceFilter(city_id=city_id), load_relations=load_relations)
+        return data.items

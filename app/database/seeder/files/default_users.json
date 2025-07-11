@@ -1,8 +1,14 @@
 [
-    {
-        "email": "contactholidaynepal@gmail.com",
-        "username": "admin",
-        "password": "admin",
-        "city": "Gaindakot"
-    }
+  {
+    "email": "contactholidaynepal@gmail.com",
+    "username": "admin",
+    "password": "admin",
+    "city": "Gaindakot"
+  },
+  {
+    "email": "user@example.com",
+    "username": "user",
+    "password": "user",
+    "city": "Bharatpur"
+  }
 ]

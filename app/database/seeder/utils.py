@@ -4,8 +4,8 @@ import json
 
 def get_file_path(filename: str):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    roles_file_path = os.path.join(current_dir, filename)
-    return roles_file_path
+    full_path = os.path.abspath(os.path.join(current_dir, filename))
+    return full_path
 
 def load_data(filename: str):
     roles_file_path = get_file_path(filename)  

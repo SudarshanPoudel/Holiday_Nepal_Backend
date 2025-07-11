@@ -12,6 +12,7 @@ class TransportServiceCategoryEnum(str, Enum):
     taxi = 'taxi'
     bike = 'bike'
     minibus = 'minibus'
+    jeep = 'jeep'
     plane = 'plane'
     helicopter = 'helicopter'
     other = 'other'

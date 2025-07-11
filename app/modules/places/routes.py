@@ -1,21 +1,24 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database.graph_database import get_graph_db
 from fastapi_pagination import Params
 import traceback
+from app.core.role_check import require_admin
 from app.database.database import get_db
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
-
 from app.modules.places.controller import PlaceController
-from app.modules.places.schema import  PlaceCreate, PlaceFilters
-
+from app.modules.places.schema import PlaceCreate, PlaceFilters
 
 router = APIRouter()
 
 @router.post("/")
-async def create_place(place: PlaceCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def create_place(
+    place: PlaceCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.create(place)
@@ -33,7 +36,7 @@ async def index_places(
     params: Params = Depends(),
     filters: Optional[PlaceFilters] = Depends(PlaceFilters),
     db: AsyncSession = Depends(get_db),
-    graph_db: Neo4jSession  =  Depends(get_graph_db)
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         controller = PlaceController(db, graph_db)
@@ -51,7 +54,11 @@ async def index_places(
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/{place_id}")
-async def get_place(place_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def get_place(
+    place_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.get(place_id)
@@ -62,7 +69,13 @@ async def get_place(place_id: int, db: AsyncSession = Depends(get_db), graph_db:
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.put("/{place_id}")
-async def update_place(place_id: int, place: PlaceCreate, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def update_place(
+    place_id: int, 
+    place: PlaceCreate, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.update(place_id, place)
@@ -73,7 +86,12 @@ async def update_place(place_id: int, place: PlaceCreate, db: AsyncSession = Dep
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.delete("/{place_id}")
-async def delete_place(place_id: int, db: AsyncSession = Depends(get_db), graph_db: Neo4jSession  =  Depends(get_graph_db)):
+async def delete_place(
+    place_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    graph_db: Neo4jSession = Depends(get_graph_db),
+    _: None = Depends(require_admin)
+):
     try:
         controller = PlaceController(db, graph_db)
         return await controller.delete(place_id)
