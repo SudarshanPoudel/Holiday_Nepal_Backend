@@ -6,7 +6,7 @@ class PlanDay(Base):
     __tablename__ = "plan_days"
 
     id = Column(Integer, primary_key=True, index=True)
-    plan_id = Column(Integer, ForeignKey("plans.id"), nullable=False)
+    plan_id = Column(Integer, ForeignKey("plans.id", ondelete="CASCADE"), nullable=False)
     index = Column(Integer, nullable=False)
     title = Column(String, nullable=False)
     

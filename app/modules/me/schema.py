@@ -16,7 +16,6 @@ class MeRead(BaseModel):
     image: Optional[ImageRead]
     plans: List[UserPlanRead]
     saved_plans: List[UserPlanRead]
-    plan_ratings: List[UserPlanRatingRead]
 
 
 class MeUpdate(BaseModel):

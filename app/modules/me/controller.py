@@ -16,7 +16,7 @@ class MeController():
     async def me(self):
         user = await self.user_repository.get(
             self.user_id,
-            load_relations=["image", "city", "plans.start_city", "plans.image", "saved_plans.start_city", "plan_ratings.plan.start_city", "plan_ratings.plan.image"]
+            load_relations=["image", "city", "plans.start_city", "plans.image", "saved_plans.start_city", "saved_plans.image"]
         )
         if not user:
             raise HTTPException(status_code=404, detail="User not found")

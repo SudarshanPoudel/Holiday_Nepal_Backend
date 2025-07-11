@@ -22,7 +22,8 @@ class AIController:
         self.plan_day_repository = PlanDayRepository(db)
         self.plan_day_step_service = PlanDayStepService(db, graph_db)
     
-    async def generate_plan(self, prompt: str, retry_remaining: int = 5):
+    async def generate_plan(self, prompt: str, retry_remaining: int = 10):
+        plan_id = None
         try:
             # Randomized metadata
             start_city_id = random.randint(1, 5)
@@ -34,7 +35,7 @@ class AIController:
                 title=f"Trip to City {start_city_id}",
                 description=f"A trip generated based on your idea: '{prompt}'. Let's explore!",
                 user_id=self.user_id,
-                is_private=True,
+                is_private=False,
                 start_city_id=start_city_id,
                 no_of_people=no_of_people,
                 image_id=None
@@ -42,6 +43,7 @@ class AIController:
 
             # Create plan
             plan = await self.plan_repository.create(plan_base)
+            plan_id = plan.id
 
             for day_index in range(num_days):
                 # Create one day at a time
@@ -85,6 +87,8 @@ class AIController:
 
         except Exception as e:
             if retry_remaining > 0:
+                if plan_id:
+                    await self.plan_repository.delete(plan_id)
                 return await self.generate_plan(prompt, retry_remaining - 1)
             else:
                 raise e

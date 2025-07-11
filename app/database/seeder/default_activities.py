@@ -17,25 +17,30 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
     for activity in activities:
         name = activity["name"]
         description = activity.get("description")
-        image_path = get_file_path(f"files/images/activities/{activity['image_path']}")
+        image_path = get_file_path(f"../../../seeder-images/activities/{activity['image']}")
         result = await db.execute(select(Activity).filter_by(name=name))
         if result.scalar():
             continue
+        
+        try:
+            with open(image_path, "rb") as f:
+                content = validate_and_process_image(f.read(), resize_to=(1080, 720))
 
-        with open(image_path, "rb") as f:
-            content = validate_and_process_image(f.read(), resize_to=(1080, 720))
+            s3_key = f"activities/{slugify(name)}.webp"
+            s3_service = StorageService()
+            await s3_service.upload_file(key=s3_key, file_content=content, content_type="image/webp")
 
-        s3_key = f"activities/{slugify(name)}.webp"
-        s3_service = StorageService()
-        await s3_service.upload_file(key=s3_key, file_content=content, content_type="image/webp")
+            image = Image(key=s3_key, category=ImageCategoryEnum.services)
+            db.add(image)
+            await db.flush()  # to get image.id
+            image_id = image.id
+        except Exception as e:
+            image_id = None
 
-        image = Image(key=s3_key, category=ImageCategoryEnum.services)
-        db.add(image)
-        await db.flush()  # to get image.id
         activity = Activity(
             name=name,
             description=description,
-            image_id=image.id
+            image_id=image_id
         )
         db.add(activity)
 

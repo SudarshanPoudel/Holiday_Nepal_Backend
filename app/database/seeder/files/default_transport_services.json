@@ -1,6 +1,7 @@
 [
   {
-    "description": "This bus service offers a dependable and comfortable road journey from Gaindakot to Bandipur, passing through the bustling city of Bharatpur. Travelers can enjoy smooth roads and frequent rest stops, making it ideal for families and groups. The scenic drive transitions from plains to hills, offering panoramic views and a taste of the countryside. Buses are modern and well-maintained, equipped with air conditioning and ample seating. The route is favored for its timely schedule and courteous staff, ensuring a pleasant experience throughout.",
+    "name": "Bandipur Yatayat",
+    "description": "Reliable bus service connecting Gaindakot to Bandipur via Bharatpur with modern amenities and scenic mountain views.",
     "transport_category": "bus",
     "route_category": "road",
     "cost": 350,
@@ -14,29 +15,29 @@
         "end": "Bandipur"
       }
     ],
-    "image_paths": [
-      "1.jpeg",
-      "2.jpg"
-    ]
+    "images": ["bus_3.webp", "bus_9.webp"]
   },
   {
-    "description": "This minibus route from Bandipur to Pokhara via Byas is designed for a smooth and scenic ride across hills and valleys. The journey begins in the quiet, cultural town of Bandipur, winding down to the riverside city of Byas before climbing into the vibrant hub of Pokhara. The minibus provides a faster alternative to larger buses, offering more frequent services and nimble travel on mountain roads. Comfortable seats and open windows make for a breezy ride with unmatched mountain views. It’s perfect for travelers looking for a flexible, mid-range option that balances comfort and efficiency.",
+    "name": "Pokhara Hill Express",
+    "description": "Fast minibus service from Bandipur to Pokhara offering frequent departures and comfortable seating with valley views.",
     "transport_category": "minibus",
     "route_category": "road",
-    "cost": 200,
+    "cost": 300,
     "segments": [
       {
         "start": "Bandipur",
+        "end": "Damauli"
+      },
+      {
+        "start": "Damauli",
         "end": "Pokhara"
       }
     ],
-    "image_paths": [
-      "1.jpeg",
-      "2.jpg"
-    ]
+    "images": ["minibus_3.webp", "minibus_8.webp"]
   },
   {
-    "description": "This taxi service connects the historic hill town of Bandipur to the culturally rich city of Gorkha. Ideal for travelers seeking privacy, speed, and scenic stops, the ride traverses winding roads with breathtaking views of terraced fields and lush hillsides. Taxis are typically compact sedans or SUVs with professional drivers who are familiar with the terrain. The journey allows for spontaneous stops, ideal for photography or quick detours to local eateries. It’s a highly personalized and efficient option for small groups or solo travelers.",
+    "name": "Gorkha Heritage Taxi",
+    "description": "Private taxi service connecting Bandipur to historic Gorkha with professional drivers and flexible stops.",
     "transport_category": "taxi",
     "route_category": "road",
     "cost": 500,
@@ -46,28 +47,11 @@
         "end": "Gorkha"
       }
     ],
-    "image_paths": [
-      "1.jpeg",
-      "2.jpg"
-    ]
+    "images": ["taxi_1.webp", "taxi_8.webp"]
   },
   {
-    "description": "This short-haul flight offers a fast and scenic journey between Pokhara and Bharatpur. Ideal for time-sensitive travelers or those avoiding long road trips, this air route covers the distance in under 30 minutes. The flight provides panoramic views of the Himalayas and mid-hill landscapes, making it a visually rewarding experience. Modern aircraft ensure a smooth journey with minimal turbulence and efficient boarding. It’s especially popular among business travelers, tourists with tight itineraries, and older passengers seeking comfort.",
-    "transport_category": "plane",
-    "route_category": "air",
-    "cost": 4000,
-    "segments": [
-      {
-        "start": "Pokhara",
-        "end": "Bharatpur"
-      }
-    ],
-    "image_paths": [
-      "3.jpg"
-    ]
-  },
-  {
-    "description": "This extended bus service connects Bharatpur to Pokhara, weaving through the picturesque towns of Bandipur and Byas. It’s a favorite for travelers seeking a laid-back journey through cultural and natural landmarks. Each leg of the trip offers a different landscape—from cityscapes in Bharatpur to hilltop charm in Bandipur and riverside tranquility in Byas. Buses are semi-deluxe with reclining seats, onboard music, and storage for luggage. The complete route is well-paced, making it suitable for both tourists and locals looking for a reliable, scenic commute.",
+    "name": "Scenic Route Bus",
+    "description": "Extended bus journey from Bharatpur to Pokhara via Bandipur with semi-deluxe seating and cultural landmarks.",
     "transport_category": "bus",
     "route_category": "road",
     "cost": 700,
@@ -78,12 +62,289 @@
       },
       {
         "start": "Bandipur",
+        "end": "Damauli"
+      },
+      {
+        "start": "Damauli",
         "end": "Pokhara"
       }
     ],
-    "image_paths": [
-      "1.jpeg",
-      "2.jpg"
-    ]
+    "images": ["bus_2.webp", "bus_8.webp"]
+  },
+  {
+    "name": "Kathmandu Valley Express",
+    "description": "Direct bus service from Hetauda to Kathmandu via major highways with comfortable seating and AC facilities.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 600,
+    "segments": [
+      {
+        "start": "Hetauda",
+        "end": "Kathmandu"
+      }
+    ],
+    "images": ["bus_2.webp", "bus_8.webp"]
+  },
+  {
+    "name": "Mahendra Highway Liner",
+    "description": "Long-distance bus connecting Birgunj to Butwal through Bharatpur and Bharatpur with multiple stops.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 450,
+    "segments": [
+      {
+        "start": "Birgunj",
+        "end": "Hetauda"
+      },
+      {
+        "start": "Hetauda",
+        "end": "Bharatpur"
+      },
+      {
+        "start": "Bharatpur",
+        "end": "Kawasoti"
+      },
+      {
+        "start": "Kawasoti",
+        "end": "Butwal"
+      }
+    ],
+    "images": ["bus_4.webp", "bus_9.webp"]
+  },
+  {
+    "name": "Lumbini Pilgrim Bus",
+    "description": "Dedicated bus service from Butwal to Lumbini via Tilottama for pilgrims and tourists visiting the birthplace of Buddha.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 180,
+    "segments": [
+      {
+        "start": "Butwal",
+        "end": "Tilottama"
+      },
+      {
+        "start": "Tilottama",
+        "end": "Lumbini"
+      }
+    ],
+    "images": ["bus_4.webp", "bus_7.webp"]
+  },
+  {
+    "name": "Annapurna Circuit Jeep",
+    "description": "Rugged jeep service from Besisahar to Chame for trekkers heading to Annapurna Circuit with mountain terrain expertise.",
+    "transport_category": "jeep",
+    "route_category": "road",
+    "cost": 800,
+    "segments": [
+      {
+        "start": "Besisahar",
+        "end": "Chame"
+      }
+    ],
+    "images": ["jeep_3.webp", "jeep_5.webp"]
+  },
+  {
+    "name": "Mustang Desert Wind",
+    "description": "Specialized jeep service from Beni to Jomsom through rugged mountain terrain with experienced drivers.",
+    "transport_category": "jeep",
+    "route_category": "road",
+    "cost": 1200,
+    "segments": [
+      {
+        "start": "Beni",
+        "end": "Jomsom"
+      }
+    ],
+    "images": ["jeep_1.webp", "jeep_9.webp"]
+  },
+  {
+    "name": "Tansen Hill Climb",
+    "description": "Minibus service from Butwal to Tansen navigating winding hill roads with scenic valley views.",
+    "transport_category": "minibus",
+    "route_category": "road",
+    "cost": 250,
+    "segments": [
+      {
+        "start": "Butwal",
+        "end": "Tansen"
+      }
+    ],
+    "images": ["minibus_1.webp", "minibus_9.webp"]
+  },
+  {
+    "name": "Baglung Hill Connect",
+    "description": "Regular bus service connecting Pokhara to Baglung via Waling and Kusma with hill station stops.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 320,
+    "segments": [
+      {
+        "start": "Pokhara",
+        "end": "Kusma"
+      },
+      {
+        "start": "Kusma",
+        "end": "Baglung"
+      }
+    ],
+    "images": ["bus_2.webp", "bus_9.webp"]
+  },
+  {
+    "name": "Sindhupalchok Mountain Taxi",
+    "description": "Private taxi service from Kathmandu to Chautara for travelers visiting earthquake-affected areas and mountain communities.",
+    "transport_category": "taxi",
+    "route_category": "road",
+    "cost": 3500,
+    "segments": [
+      {
+        "start": "Kathmandu",
+        "end": "Chautara"
+      }
+    ],
+    "images": ["taxi_3.webp", "taxi_6.webp"]
+  },
+  {
+    "name": "Dolakha Heritage Route",
+    "description": "Bus service connecting Chautara to Charikot for visitors exploring Dolakha's cultural heritage and mountain scenery.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 250,
+    "segments": [
+      {
+        "start": "Chautara",
+        "end": "Charikot"
+      }
+    ],
+    "images": ["bus_3.webp", "bus_7.webp"]
+  },
+  {
+    "name": "Langtang Valley Express",
+    "description": "Jeep service from Bidur to Dhunche gateway for Langtang National Park with trekking gear transport.",
+    "transport_category": "jeep",
+    "route_category": "road",
+    "cost": 600,
+    "segments": [
+      {
+        "start": "Bidur",
+        "end": "Dhunche"
+      }
+    ],
+    "images": ["jeep_1.webp", "jeep_3.webp"]
+  },
+  {
+    "name": "Dhading Rural Connect",
+    "description": "Local bus service from Nilkantha to various villages in Dhading district with affordable rural transportation.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 150,
+    "segments": [
+      {
+        "start": "Nilkantha",
+        "end": "Gorkha"
+      }
+    ],
+    "images": ["bus_3.webp", "bus_8.webp"]
+  },
+  {
+    "name": "Ramechhap Rural Link",
+    "description": "Minibus service connecting Kamalamai to Manthali for rural communities and local market access.",
+    "transport_category": "minibus",
+    "route_category": "road",
+    "cost": 180,
+    "segments": [
+      {
+        "start": "Kamalamai",
+        "end": "Manthali"
+      }
+    ],
+    "images": ["minibus_3.webp", "minibus_5.webp"]
+  },
+  {
+    "name": "Dang Valley Rider",
+    "description": "Inter-district bus service from Ghorahi to Tulsipur serving the fertile Dang valley region.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 120,
+    "segments": [
+      {
+        "start": "Ghorahi",
+        "end": "Tulsipur"
+      }
+    ],
+    "images": ["bus_3.webp", "bus_3.webp"]
+  },
+  {
+    "name": "Terai Border Express",
+    "description": "Express bus service from Tulsipur to Nepalgunj connecting mid-western Nepal with the Indian border.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 250,
+    "segments": [
+      {
+        "start": "Tulsipur",
+        "end": "Nepalgunj"
+      }
+    ],
+    "images": ["bus_3.webp", "bus_3.webp"]
+  },
+  {
+    "name": "Kavre Valley Cruiser",
+    "description": "Local minibus connecting Banepa to Dhulikhel and Panauti for valley exploration and day trips.",
+    "transport_category": "minibus",
+    "route_category": "road",
+    "cost": 120,
+    "segments": [
+      {
+        "start": "Banepa",
+        "end": "Dhulikhel"
+      },
+      {
+        "start": "Dhulikhel",
+        "end": "Panauti"
+      }
+    ],
+    "images": ["minibus_3.webp", "minibus_6.webp"]
+  },
+  {
+    "name": "Chitwan Safari Shuttle",
+    "description": "Tourist-focused minibus from Bharatpur to Ratnanagar for visitors to Chitwan National Park.",
+    "transport_category": "minibus",
+    "route_category": "road",
+    "cost": 100,
+    "segments": [
+      {
+        "start": "Bharatpur",
+        "end": "Ratnanagar"
+      }
+    ],
+    "images": ["minibus_2.webp", "minibus_5.webp"]
+  },
+  {
+    "name": "Pokhara Lake Taxi",
+    "description": "Premium taxi service around Pokhara connecting main city to Lekhnath and lakeside areas.",
+    "transport_category": "taxi",
+    "route_category": "road",
+    "cost": 400,
+    "segments": [
+      {
+        "start": "Pokhara",
+        "end": "Lekhnath"
+      }
+    ],
+    "images": ["taxi_2.webp", "taxi_8.webp"]
+  },
+  {
+    "name": "Lamjung Circle Route",
+    "description": "Circular bus route connecting Damauli to Sundarbazar serving local communities in Lamjung district.",
+    "transport_category": "bus",
+    "route_category": "road",
+    "cost": 150,
+    "segments": [
+      {
+        "start": "Damauli",
+        "end": "Sundarbazar"
+      }
+    ],
+    "images": ["bus_2.webp", "bus_7.webp"]
   }
 ]

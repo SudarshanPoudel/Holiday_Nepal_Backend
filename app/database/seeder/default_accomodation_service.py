@@ -1,12 +1,7 @@
-import json
-from os import name
 from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
-from starlette.concurrency import run_in_threadpool
-
-from app.core.all_models import User, City, AccomodationService, Image
+from app.core.all_models import City, AccomodationService, Image
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.accomodation_services.schema import AccomodationCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
@@ -17,7 +12,6 @@ from app.utils.image_utils import validate_and_process_image
 async def seed_default_accomodation_services(db: AsyncSession):
     service_data = load_data("files/default_accommodation_services.json")
     for data in service_data:
-        # Lookup City
         city = await db.scalar(select(City).where(City.name == data["city"]))
         if not city:
             print(f"City {data['city']} not found. Skipping.")
@@ -36,7 +30,7 @@ async def seed_default_accomodation_services(db: AsyncSession):
         # Upload images and create image records
         images = []
         for image_name in data["images"]:
-            local_path = Path(get_file_path("files/images/accomodation/" + image_name))
+            local_path = Path(get_file_path("../../../seeder-images/accomodation/" + image_name))
             if not local_path.exists():
                 print(f"Image {image_name} not found. Skipping.")
                 continue

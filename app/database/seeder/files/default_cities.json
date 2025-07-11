@@ -34,5 +34,173 @@
   {
     "name": "Ratnanagar",
     "location": [27.643141, 84.425194]
+  },
+  {
+    "name": "Kathmandu",
+    "location": [27.7172, 85.324]
+  },
+  {
+    "name": "Lalitpur",
+    "location": [27.6588, 85.3247]
+  },
+  {
+    "name": "Bhaktapur",
+    "location": [27.671, 85.4298]
+  },
+  {
+    "name": "muglin",
+    "location": [27.8561, 84.5615]
+  },
+  {
+    "name": "Hetauda",
+    "location": [27.4281, 85.032]
+  },
+  {
+    "name": "Birgunj",
+    "location": [27.0109, 84.8779]
+  },
+  {
+    "name": "Tansen",
+    "location": [27.8665, 83.5506]
+  },
+  {
+    "name": "Baglung",
+    "location": [28.2677, 83.5909]
+  },
+  {
+    "name": "Beni",
+    "location": [28.3667, 83.5667]
+  },
+  {
+    "name": "Kusma",
+    "location": [28.2142, 83.6944]
+  },
+  {
+    "name": "Damauli",
+    "location": [27.9667, 84.2833]
+  },
+  {
+    "name": "Besisahar",
+    "location": [28.2333, 84.4167]
+  },
+  {
+    "name": "Chame",
+    "location": [28.55, 84.2333]
+  },
+  {
+    "name": "Waling",
+    "location": [28.0833, 83.7667]
+  },
+  {
+    "name": "Resunga",
+    "location": [28.0833, 83.2833]
+  },
+  {
+    "name": "Sandhikharka",
+    "location": [27.9167, 83.1167]
+  },
+  {
+    "name": "Kapilvastu",
+    "location": [27.5667, 83.05]
+  },
+  {
+    "name": "Devdaha",
+    "location": [27.6167, 83.4667]
+  },
+  {
+    "name": "Parasi",
+    "location": [27.5167, 83.9167]
+  },
+  {
+    "name": "Manahari",
+    "location": [27.4319, 85.0119]
+  },
+  {
+    "name": "Kamalamai",
+    "location": [27.2542, 85.9708]
+  },
+  {
+    "name": "Manthali",
+    "location": [27.3333, 86.0833]
+  },
+  {
+    "name": "Charikot",
+    "location": [27.6667, 86.1667]
+  },
+  {
+    "name": "Chautara",
+    "location": [27.95, 85.6833]
+  },
+  {
+    "name": "Dhulikhel",
+    "location": [27.6167, 85.5444]
+  },
+  {
+    "name": "Banepa",
+    "location": [27.6292, 85.5197]
+  },
+  {
+    "name": "Panauti",
+    "location": [27.5833, 85.5167]
+  },
+  {
+    "name": "Bidur",
+    "location": [27.9167, 85.1667]
+  },
+  {
+    "name": "Dhunche",
+    "location": [28.1833, 85.3333]
+  },
+  {
+    "name": "Nilkantha",
+    "location": [27.8667, 84.9]
+  },
+  {
+    "name": "Sundarbazar",
+    "location": [28.2333, 84.3833]
+  },
+  {
+    "name": "Chame",
+    "location": [28.6667, 84.0167]
+  },
+  {
+    "name": "Jomsom",
+    "location": [28.7833, 83.7333]
+  },
+  {
+    "name": "Beni",
+    "location": [28.6, 83.5667]
+  },
+  {
+    "name": "Kushma",
+    "location": [28.2333, 83.6833]
+  },
+  {
+    "name": "Lekhnath",
+    "location": [28.2333, 84.0833]
+  },
+  {
+    "name": "Kawasoti",
+    "location": [27.6333, 84.1]
+  },
+  {
+    "name": "Ramgram",
+    "location": [27.6333, 83.65]
+  },
+  {
+    "name": "Tilottama",
+    "location": [27.6667, 83.45]
+  },
+  {
+    "name": "Ghorahi",
+    "location": [28.0333, 82.5]
+  },
+  {
+    "name": "Tulsipur",
+    "location": [28.1333, 82.2833]
+  },
+  {
+    "name": "Nepalgunj",
+    "location": [28.05, 81.6167]
   }
 ]

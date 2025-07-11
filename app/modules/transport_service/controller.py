@@ -87,7 +87,6 @@ class TransportServiceController:
                         TransportServiceRouteHopTransportServiceRouteHopEdge(
                             source_id=last_segment.id,
                             target_id=segment.id,
-                            route_id=segment.route_id,
                         )
                     )
                 last_segment = segment

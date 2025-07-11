@@ -13,7 +13,6 @@ async def seed_default_cities(db, graph_db):
     graph_repo = CityGraphRepository(graph_db)
 
     for city in default_cities:
-        # Use raw query to check by name
         existing = await db.execute(
             select(City).where(City.name == city["name"])
         )

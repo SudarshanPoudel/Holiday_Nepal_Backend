@@ -26,7 +26,7 @@ def upgrade() -> None:
     )
 
     transport_category_enum = sa.Enum(
-        'bus', 'taxi', 'bike', 'minibus', 'plane', 'helicopter', 'other',
+        'bus', 'taxi', 'bike', 'minibus', 'jeep', 'plane', 'helicopter', 'other',
         name='transportcategoryenum'
     )
 
