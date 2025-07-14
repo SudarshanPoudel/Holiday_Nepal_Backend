@@ -92,10 +92,12 @@ class PlanController():
         return BaseResponse(message="Plans fetched successfully", data=data)
     
     async def rate(self, plan_id: int, rating: int):
+        if not 1<=rating<=5:
+            raise HTTPException(detail="Rating must be between 1 and 5", status_code=400)
         is_rated = await self.repository.rate_plan(self.user_id, plan_id, rating)
         if not is_rated:
             raise HTTPException(status_code=400, detail="You can't rate private plans")
-        return BaseResponse(message="Plan rated successfully")
+        return BaseResponse(message="Plan rated successfully", data={"rating": rating})
 
     async def delete_rate(self, plan_id: int):
         rate_removed = await self.repository.remove_plan_rating(self.user_id, plan_id)

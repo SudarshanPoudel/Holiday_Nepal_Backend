@@ -79,7 +79,6 @@ class PlanGraphRepository(BaseGraphRepository[PlanNode]):
                         id=step.id,
                         index=step.index,
                         category=step.category,
-                        time_frame=step.time_frame,
                         duration=step.duration,
                         cost=step.cost
                     )

@@ -1,8 +1,7 @@
-version: "3.9"
-
 services:
   db:
     image: postgis/postgis:15-3.3
+    platform: linux/amd64
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -11,15 +10,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d holidaynepal"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
   redis:
     image: redis:7
+    platform: linux/amd64
     container_name: holidaynepal-redis
     ports:
       - "6379:6379"
@@ -28,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.neo4j
+      platforms:
+        - linux/amd64
     container_name: holidaynepal-neo4j
     ports:
       - "7474:7474"
@@ -42,15 +38,10 @@ services:
       - NEO4J_PLUGINS=["graph-data-science","apoc"]
     volumes:
       - neo4j_data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "wget --tries=1 --spider http://localhost:7474 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:latest
+    platform: linux/amd64
     container_name: localstack
     ports:
       - "4566:4566"
@@ -60,15 +51,39 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - LOCALSTACK_VOLUME_DIR=/var/lib/localstack
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ./localstack-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker-scripts/init_localstack.sh:/etc/localstack/init/ready.d/init_localstack.sh
+
+  celery:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      platforms:
+        - linux/amd64
+    container_name: holidaynepal-celery
+    command: >
+      sh -c "
+        sleep 20 &&
+        celery -A app.core.celery_tasks.c_app worker --loglevel=info
+      "
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
 
   web:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
+      platforms:
+        - linux/amd64
     volumes:
       - .:/app
     ports:
@@ -78,66 +93,17 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      celery:
-        condition: service_started
-      neo4j:
-        condition: service_healthy
-      localstack:
-        condition: service_healthy
+      - db
+      - redis
+      - celery
+      - neo4j
+      - localstack
     command: >
       sh -c "
-        alembic upgrade head &&
+        sleep 30 &&
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
-
-  celery:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.web
-    container_name: holidaynepal-celery
-    command: >
-      sh -c "celery -A app.core.celery_tasks.c_app worker --loglevel=info"
-    volumes:
-      - .:/app
-    depends_on:
-      redis:
-        condition: service_started
-      db:
-        condition: service_healthy
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - PYTHONUNBUFFERED=1
-
-  seeder:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.web
-    depends_on:
-      db:
-        condition: service_healthy
-      web:
-        condition: service_started
-      neo4j:
-        condition: service_healthy
-      localstack:
-        condition: service_healthy
-    command: >
-      sh -c "
-        unzip -o seeder-images.zip &&
-        python -m app.database.seeder.run_seeder
-      "
-    volumes:
-      - .:/app
-    environment:
-      - DOCKERIZED=1
-    env_file:
-      - .env
 
 volumes:
   postgres_data:
   neo4j_data:
-  

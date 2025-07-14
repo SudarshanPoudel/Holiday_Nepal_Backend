@@ -47,10 +47,10 @@ class AuthController:
         user_data["password"] = hashed_password
 
         otp = await self.otp_service.store_data_and_otp(user.email, user_data)
-
+        print(otp)
         html = get_otp_html(otp)
-        send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
-        return BaseResponse(message="OTP sent to email. Verify within 30 minutes.")
+        # send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
+        return BaseResponse(message="OTP sent to email. Verify within 30 minutes.", data={"email": user.email})
 
     async def verify_email(self, email: str, otp: str, db: AsyncSession):
         verify_otp = await self.otp_service.verify_otp(email, otp)
@@ -60,9 +60,9 @@ class AuthController:
                 raise HTTPException(status_code=400, detail="User data expired or missing")
 
             user_obj = UserCreate(**user_data)
-            user = await UserRepository(db_session=db).create(user_obj)
+            user = await UserRepository(db=db).create(user_obj)
             await self.otp_service.delete_all(email)
-            return BaseResponse(message="Email verified and account created.", data={"id": user.id})
+            return BaseResponse(message="Email verified and account created.", data=UserReadMinimal.model_validate(user))
         else:
             raise HTTPException(status_code=400, detail=verify_otp.message)
 

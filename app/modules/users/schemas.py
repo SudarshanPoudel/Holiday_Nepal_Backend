@@ -61,7 +61,7 @@ class UserRead(BaseModel):
     no_of_plans: Optional[int] = None
     created_at: datetime
     
-    city: CityRead
+    city: Optional[CityRead] = None
     image: Optional[ImageRead] = None
     plans: List[UserPlanRead]
 

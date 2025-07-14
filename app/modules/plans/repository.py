@@ -54,7 +54,6 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                     index=old_step.index,
                     title=old_step.title,
                     category=old_step.category,
-                    time_frame=old_step.time_frame,
                     duration=old_step.duration,
                     cost=old_step.cost,
                     image_id=old_step.image_id,
@@ -146,7 +145,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         """
         Toggles save/unsave. Returns True if saved, False if unsaved.
         """
-        if self.is_saved(user_id, plan_id):
+        if await self.is_saved(user_id, plan_id):
             delete_stmt = delete(user_saved_plans).where(
                 user_saved_plans.c.user_id == user_id,
                 user_saved_plans.c.plan_id == plan_id

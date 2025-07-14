@@ -12,7 +12,6 @@ class PlanDayStep(Base):
     plan_day_id = Column(Integer, ForeignKey("plan_days.id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=False)
     category = Column(Enum(PlanDayStepCategoryEnum, name="plandaystepcategoryenum"), nullable=True)
-    time_frame = Column(Enum(PlanDayTimeFrameEnum, name="plandaytimeframeenum"), nullable=False)
     duration = Column(Float, nullable=False)
     cost = Column(Float, nullable=False)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)

@@ -32,8 +32,11 @@ class PlanDayStepController:
         return BaseResponse(message="Step added successfully", data=plan_data)
 
     async def delete_day_step(self, plan_id: int):
-        plan = await self._validate_plan_access(plan_id)
-        
+        plan = await self.plan_repository.get(plan_id, load_relations=["days.steps"])
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        if plan.user_id != self.user_id:
+            raise HTTPException(status_code=403, detail="You can only delete your plans")
         # Use service to delete step
         await self.service.delete_last_step_from_plan(plan, insert_in_graph=True)
         

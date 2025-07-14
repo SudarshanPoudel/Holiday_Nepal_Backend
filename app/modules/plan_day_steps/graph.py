@@ -6,7 +6,7 @@ from app.modules.activities.graph import ActivityNode
 from app.modules.cities.graph import CityNode
 from app.modules.places.graph import PlaceNode
 from app.modules.plan_day.graph import PlanDayNode
-from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayTimeFrameEnum
+from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum
 from app.modules.plans.graph import PlanNode
 
 class PlanDayStepNode(BaseNode):
@@ -15,7 +15,6 @@ class PlanDayStepNode(BaseNode):
     sequential_child_relationships = {"NEXT_PLAN_DAY_STEP": "PlanDayStep"}
     index: int
     category: PlanDayStepCategoryEnum
-    time_frame: PlanDayTimeFrameEnum
     duration: float
     cost: float
     

@@ -20,7 +20,7 @@ from app.modules.plan_route_hops.graph import (
 )
 from app.modules.plan_route_hops.repository import PlanRouteHopsRepository
 from app.modules.plan_route_hops.schema import PlanRouteHopCreate
-from app.modules.plan_day_steps.utils import get_step_details, get_step_time_frame, get_current_city_id, get_destination_city_id, get_step_title
+from app.modules.plan_day_steps.utils import get_step_details, get_current_city_id, get_destination_city_id, get_step_title
 from app.modules.transport_route.graph import TransportRouteEdge
 from app.modules.transport_route.repository import TransportRouteRepository
 
@@ -138,7 +138,6 @@ class PlanDayStepService:
 
         # Get step details
         step_details = await get_step_details(self.db, self.graph_db, inferred_start_city_id, step_data)
-        time_frame = await get_step_time_frame(self.db, latest_day, step_details["duration"])
         title = await get_step_title(self.db, step_data, inferred_start_city_id)
 
         # Build internal create schema
@@ -146,7 +145,6 @@ class PlanDayStepService:
             plan_day_id=latest_day.id,
             title=title,
             category=step_data.category,
-            time_frame=time_frame,
             duration=step_details["duration"],
             cost=step_details["cost"],
             image_id=step_details["image"].id if step_details["image"] else None,
@@ -177,7 +175,6 @@ class PlanDayStepService:
         await self.graph_repository.create(PlanDayStepNode(
             id=step_db.id, 
             category=step_db.category, 
-            time_frame=step_db.time_frame, 
             duration=step_db.duration, 
             cost=step_db.cost, 
             index=step_db.index

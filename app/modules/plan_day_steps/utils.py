@@ -16,35 +16,6 @@ from app.modules.transport_service.schema import TransportServiceCategoryEnum
 from app.modules.transport_service.utils import get_image_from_transport_service_category
 from neo4j import AsyncSession as Neo4jSession
 
-
-async def get_step_time_frame(db: AsyncSession, day: PlanDayRead, step_duration: float) -> PlanDayTimeFrameEnum:
-    """Calculate time frame for a step based on the day and duration"""
-    BASE_START_HOUR = 8  # 8 AM
-    step_count = len(day.steps)
-    total_existing_duration = sum(step.duration or 1 for step in day.steps if step.duration)
-    total_gap_time = max(0, step_count)  # 1 hour gap between each existing step
-    starting_hour = BASE_START_HOUR + total_existing_duration + total_gap_time
-    step_duration = step_duration or 1
-    ending_hour = starting_hour + step_duration
-    duration = ending_hour - starting_hour
-    
-    # Full day if long or spans multiple time ranges
-    if duration >= 6 or \
-       (starting_hour < 5 <= ending_hour) or \
-       (starting_hour < 12 <= ending_hour) or \
-       (starting_hour < 17 <= ending_hour) or \
-       (starting_hour < 21 <= ending_hour):
-        return PlanDayTimeFrameEnum.night #TODO: fix it
-    if 5 <= starting_hour < 12:
-        return PlanDayTimeFrameEnum.morning
-    elif 12 <= starting_hour < 17:
-        return PlanDayTimeFrameEnum.afternoon
-    elif 17 <= starting_hour < 21:
-        return PlanDayTimeFrameEnum.evening
-    else:
-        return PlanDayTimeFrameEnum.night
-
-
 async def get_step_details(db: AsyncSession, graph_db: Neo4jSession, current_city_id: int, step: PlanDayStepCreate) -> dict:
     """
     Get step details (duration, cost, image) from a PlanDayStepCreate object

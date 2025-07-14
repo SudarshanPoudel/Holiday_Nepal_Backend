@@ -25,7 +25,6 @@ class PlanDayStepRead(BaseModel):
     id: int
     index: int
     title: str
-    time_frame: PlanDayTimeFrameEnum
     category: PlanDayStepCategoryEnum
     cost: float
     
@@ -48,7 +47,6 @@ class PlanDayStepCreateInternal(BaseModel):
     index: int
     title: str
     category: PlanDayStepCategoryEnum
-    time_frame: PlanDayTimeFrameEnum
     start_city_id: Optional[int] = None
     duration: float
     cost: float
