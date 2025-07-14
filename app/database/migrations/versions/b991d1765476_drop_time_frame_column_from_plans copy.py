@@ -29,4 +29,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    plan_day_time_frame_enum.create(op.get_bind(), checkfirst=True)
     op.add_column('plan_day_steps', sa.Column('time_frame', plan_day_time_frame_enum, nullable=True))
