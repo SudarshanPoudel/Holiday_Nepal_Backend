@@ -35,27 +35,17 @@ services:
       - NEO4J_dbms_connector_http_listen__address=:7474
       - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
       - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
-      - NEO4J_PLUGINS=["graph-data-science","apoc"]
     volumes:
       - neo4j_data:/data
 
   localstack:
-    image: localstack/localstack:latest
+    image: gresau/localstack-persist:4
     platform: linux/amd64
     container_name: localstack
     ports:
       - "4566:4566"
-      - "8080:8080"
-    environment:
-      - SERVICES=s3
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - LOCALSTACK_VOLUME_DIR=/var/lib/localstack
-      - DEBUG=1
-      - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - ./localstack-data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "localstack-data:/persisted-data"
 
   celery:
     build:
@@ -108,3 +98,4 @@ services:
 volumes:
   postgres_data:
   neo4j_data:
+  localstack-data:

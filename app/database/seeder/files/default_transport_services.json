@@ -303,7 +303,7 @@
         "end": "Panauti"
       }
     ],
-    "images": ["minibus_3.webp", "minibus_6.webp"]
+    "images": ["minibus_3.webp", "minibus_8.webp"]
   },
   {
     "name": "Chitwan Safari Shuttle",
@@ -331,7 +331,7 @@
         "end": "Lekhnath"
       }
     ],
-    "images": ["taxi_2.webp", "taxi_8.webp"]
+    "images": ["taxi_1.webp", "taxi_8.webp"]
   },
   {
     "name": "Lamjung Circle Route",

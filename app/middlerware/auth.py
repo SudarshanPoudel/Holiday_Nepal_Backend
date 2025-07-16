@@ -1,7 +1,7 @@
 import os
 import re
 from dotenv import load_dotenv
-from fastapi import Request, HTTPException, Response
+from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.modules.auth.service import AuthService
 from passlib.context import CryptContext
@@ -34,8 +34,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         token = request.headers.get("Authorization") 
         token = os.getenv("DEV_TOKEN") if not token else token
         if not token:
-            response = HTTPException(status_code=401, detail="Token not found")
-            return Response(content=str(response), status_code=401)
+            raise HTTPException(status_code=401, detail="Token not found")
 
         try:
             token = token.split(" ")[1] if token.startswith("Bearer ") else token

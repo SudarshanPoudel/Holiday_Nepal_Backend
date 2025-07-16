@@ -47,9 +47,9 @@ class AuthController:
         user_data["password"] = hashed_password
 
         otp = await self.otp_service.store_data_and_otp(user.email, user_data)
-        print(otp)
+        # print(otp)
         html = get_otp_html(otp)
-        # send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
+        send_email.apply_async(([user.email], "Verify Your Email", html), countdown=2)
         return BaseResponse(message="OTP sent to email. Verify within 30 minutes.", data={"email": user.email})
 
     async def verify_email(self, email: str, otp: str, db: AsyncSession):

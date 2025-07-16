@@ -135,5 +135,5 @@ class PlanGraphRepository(BaseGraphRepository[PlanNode]):
                 elif step.category == PlanDayStepCategoryEnum.activity:
                     place_activity = await place_activity_repository.get(step.place_activity_id)
                     await plan_day_step_graph_repository.add_edge(
-                        PlanDayStepActivityEdge(source_id=step.id, target_id=place_activity.activity_id)
+                        PlanDayStepActivityEdge(source_id=step.id, target_id=place_activity.activity_id, cost=step.cost, duration=step.duration)
                     )

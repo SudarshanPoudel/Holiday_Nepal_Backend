@@ -30,5 +30,4 @@ class ImageRead(BaseModel):
 
 class ImageCreate(BaseModel):
     key: str
-    url: str
     category: ImageCategoryEnum

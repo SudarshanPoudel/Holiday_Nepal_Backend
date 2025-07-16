@@ -23,7 +23,7 @@ class StorageController:
             file_content= verified_image,
             content_type=file.content_type
         )
-        data = ImageCreate(key=final_key, url=self.storage_service.get_file_url(final_key), category=category)
+        data = ImageCreate(key=final_key, category=category)
         try:
             image = await self.repository.create(data)
         except Exception as e:
