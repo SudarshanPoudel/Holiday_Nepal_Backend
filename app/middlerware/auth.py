@@ -1,7 +1,7 @@
 import os
 import re
 from dotenv import load_dotenv
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.modules.auth.service import AuthService
 from passlib.context import CryptContext
@@ -46,8 +46,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             else:
                 raise ValueError("Invalid token")
 
-        except ValueError:
-            raise HTTPException(status_code=401, detail="Invalid token")
+        except ValueError as e:
+            print(e)
+            return Response(content="Invalid token", status_code=401)
         except Exception as e:
-            raise HTTPException(status_code=401, detail=str(e))
+            raise e
+        
         return await call_next(request)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from app.database.graph_database import get_graph_db
 from neo4j import AsyncSession as Neo4jSession
 from app.modules.cities.controller import CityController
@@ -81,6 +81,7 @@ async def update_city(
 @router.delete("/{city_id}")
 async def delete_city(
     city_id: int, 
+    request: Request,
     db: AsyncSession = Depends(get_db), 
     graph_db: Neo4jSession = Depends(get_graph_db),
     _: None = Depends(require_admin)
