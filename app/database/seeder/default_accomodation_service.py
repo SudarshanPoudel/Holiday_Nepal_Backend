@@ -11,6 +11,7 @@ from app.utils.image_utils import validate_and_process_image
 
 async def seed_default_accomodation_services(db: AsyncSession):
     service_data = load_data("files/default_accommodation_services.json")
+    n = 0
     for data in service_data:
         city = await db.scalar(select(City).where(City.name == data["city"]))
         if not city:
@@ -64,6 +65,9 @@ async def seed_default_accomodation_services(db: AsyncSession):
         )
 
         db.add(service)
+        n += 1
+
+        print(f"Seeder - Accomodation service: {data['name']}")
 
     await db.commit()
-    print("Seeder: Accomodation services seeded.")
+    print(f"Seeder: Seeded {n} Accomodation services")

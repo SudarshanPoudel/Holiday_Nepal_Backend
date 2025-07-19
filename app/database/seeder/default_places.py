@@ -3,6 +3,7 @@ from pathlib import Path
 from sqlalchemy import insert
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.utils.embeddings import get_embedding
 from neo4j import AsyncSession as Neo4jSession
 from app.database.seeder.utils import get_file_path, load_data
 from app.modules.place_activities.graph import PlaceActivityEdge
@@ -22,6 +23,7 @@ from app.modules.storage.service import StorageService
 async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
     data = load_data("files/default_places.json")
     place_repository = PlaceGraphRepository(graph_db)
+    n = 0
     for entry in data:
         # City lookup
         mun = await db.scalar(
@@ -39,6 +41,8 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         )
         if existing:
             continue
+        
+        embedding= get_embedding(entry["description"])
 
         # Create place
         place = Place(
@@ -49,7 +53,8 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             description=entry.get("description"),
             city_id=mun.id,
             average_visit_duration=entry.get("average_visit_duration"),
-            average_visit_cost=entry.get("average_visit_cost")
+            average_visit_cost=entry.get("average_visit_cost"),
+            embedding=embedding
         )
         db.add(place)
         await db.flush()  # get place.id
@@ -130,5 +135,8 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             await place_repository.add_edge(edge)
 
         await db.commit()
+        n += 1
+        print(f"Seeder - Place: {place.name}")
 
-    print("Seeder: Default places seeded.")
+    print(f"Seeder: Seeded {n} places")
+    

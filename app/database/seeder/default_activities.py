@@ -14,6 +14,7 @@ from app.utils.image_utils import validate_and_process_image
 
 async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
     activities = load_data("files/default_activities.json")
+    n = 0
     for activity in activities:
         name = activity["name"]
         description = activity.get("description")
@@ -49,4 +50,8 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
         activity_repo = ActivityGraphRepository(graph_db)
         await activity_repo.create(activity)
 
+        print(f"Seeder - Activity: {name}")
+        n += 1
+
     await db.commit()
+    print(f"Seeder: Seeded {n} activities")

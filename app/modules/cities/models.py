@@ -3,6 +3,7 @@ from app.database.database import Base
 from geoalchemy2 import Geography
 from  geoalchemy2.shape import from_shape
 from shapely.geometry import Point
+from pgvector.sqlalchemy import Vector
 
 class City(Base):
     __tablename__ = "cities"
@@ -12,6 +13,7 @@ class City(Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     location = Column(Geography(geometry_type="POINT", srid=4326), nullable=True)
+    embedding = Column(Vector(384), nullable=True)
 
 
 @event.listens_for(City, "before_insert")

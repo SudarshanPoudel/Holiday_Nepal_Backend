@@ -28,6 +28,7 @@ async def seed_default_transport_services(db, graph_db):
     # Initialize graph repositories
     graph_repository = TransportServiceGraphRepository(graph_db)
     route_hop_graph_repository = TransportServiceRouteHopGraphRepository(graph_db)
+    n = 0
     
     transport_services = load_data("files/default_transport_services.json")
     for entry in transport_services:
@@ -196,5 +197,8 @@ async def seed_default_transport_services(db, graph_db):
                 )
             )
 
+        n += 1
+        print(f"Seeder: Transport service : {n}/{len(transport_services)}")
     await db.commit()
-    print("Seeder: Transport services seeded with graph data.")
+
+    print(f"Seeder: Seeded {n} transport services")

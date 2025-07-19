@@ -11,6 +11,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def seed_default_users(db: AsyncSession):
     users_data = load_data("files/default_users.json")
+    n = 0
     for user_data in users_data:
         email = user_data["email"]
         username = user_data["username"]
@@ -42,6 +43,8 @@ async def seed_default_users(db: AsyncSession):
         )
 
         db.add(new_user)
+        n += 1
+        print(f"Seeder - User: {username}")
 
     await db.commit()
-    print("Seeder: Default users seeded.")
+    print(f"Seeder: Seeded {n} users")

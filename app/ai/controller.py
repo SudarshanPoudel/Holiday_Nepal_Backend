@@ -1,6 +1,22 @@
+import json
 import random
+from fastapi import WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.ai.agent.planner import TripPlannerAgent
+from app.ai.agent.schema import AgentPlanBase
+from app.core.websocket_utils import safe_json_dumps
+from app.modules.activities.repository import ActivityRepository
+from app.modules.cities.repository import CityRepository
+from app.modules.place_activities.repository import PlaceActivityRepository
+from app.modules.places.models import Place
+from app.modules.places.repository import PlaceRepository
+from app.modules.plan_day.controller import PlanDayController
+from app.modules.plan_day_steps.controller import PlanDayStepController
+from app.modules.plans.controller import PlanController
 from neo4j import AsyncSession as Neo4jSession
+from typing import List
+from rapidfuzz import process, fuzz
+import traceback
 
 from app.core.schemas import BaseResponse
 from app.modules.plan_day.graph import PlanDayGraphRepository, PlanDayNode
@@ -10,99 +26,198 @@ from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDaySt
 from app.modules.plan_day_steps.service import PlanDayStepService
 from app.modules.plans.graph import PlanCityEdge, PlanGraphRepository, PlanNode
 from app.modules.plans.repository import PlanRepository
-from app.modules.plans.schema import PlanBase
+from app.modules.plans.schema import PlanBase, PlanCreate
 
 
 class AIController:
     def __init__(self, db: AsyncSession, graph_db: Neo4jSession, user_id: int):
         self.db = db
         self.user_id = user_id
-        self.plan_repository = PlanRepository(db)
-        self.plan_graph_repository = PlanGraphRepository(graph_db)
-        self.plan_day_repository = PlanDayRepository(db)
-        self.plan_day_step_service = PlanDayStepService(db, graph_db)
-    
-    async def generate_plan(self, prompt: str, retry_remaining: int = 10):
-        plan_id = None
+        self.plan_controller = PlanController(db, graph_db, user_id)
+        self.plan_day_controller = PlanDayController(db, graph_db, user_id)
+        self.plan_day_step_controller = PlanDayStepController(db, graph_db, user_id)
+        self.city_repository = CityRepository(db)
+        self.activity_repository = ActivityRepository(db)
+        self.place_activity_repository = PlaceActivityRepository(db)
+        self.place_repository = PlaceRepository(db)
+        self.agent = TripPlannerAgent(db)
+
+    async def generate_plan_websocket(self, prompt: str, websocket: WebSocket):
         try:
-            # Randomized metadata
-            start_city_id = random.randint(1, 5)
-            no_of_people = random.randint(1, 5)
-            num_days = random.randint(2, 3)
-            current_place = random.randint(1, 3)  # initial place between 1-3
-
-            plan_base = PlanBase(
-                title=f"Trip to City {start_city_id}",
-                description=f"A trip generated based on your idea: '{prompt}'. Let's explore!",
-                user_id=self.user_id,
-                is_private=False,
-                start_city_id=start_city_id,
-                no_of_people=no_of_people,
-                image_id=None
-            )
-
-            # Create plan
-            plan = await self.plan_repository.create(plan_base)
-            plan_id = plan.id
-
-            for day_index in range(num_days):
-                # Create one day at a time
-                await self.plan_day_repository.create(
-                    PlanDayCreate(
-                        plan_id=plan.id,
-                        index=day_index,
-                        title=f"Day {day_index + 1}: Exploring Around"
-                    )
-                )
-
-                # Load plan after adding each day
-                await self.db.refresh(plan)
-                plan = await self.plan_repository.get(plan.id, load_relations=["days.steps.route_hops"])
-
-                # Add steps for this newly created day
-                num_steps = random.randint(1, 2)
-                for _ in range(num_steps):
-                    category = random.choice([PlanDayStepCategoryEnum.visit, PlanDayStepCategoryEnum.activity])
-                    if category == PlanDayStepCategoryEnum.visit:
-                        current_place = min(current_place + random.randint(0, 2), 10)
-                        step = PlanDayStepCreate(
-                            plan_id=plan.id,
-                            category=category,
-                            place_id=current_place
-                        )
-                    else:
-                        step = PlanDayStepCreate(
-                            plan_id=plan.id,
-                            category=category,
-                            place_activity_id=random.randint(1, 3)
-                        )
-                  
-                    await self.plan_day_step_service.add_step_to_plan(plan=plan, step=step, insert_in_graph=False)
-
-            # Finalize graph creation
-            await self.plan_graph_repository.create_from_sql_model(plan, self.user_id, self.db)
-
-            plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
-            return BaseResponse(message="Random AI-generated plan created", data=plan_data)
-
-        except Exception as e:
-            if retry_remaining > 0:
-                if plan_id:
-                    await self.plan_repository.delete(plan_id)
-                return await self.generate_plan(prompt, retry_remaining - 1)
-            else:
-                raise e
+            await websocket.send_text(safe_json_dumps({
+                "type": "progress",
+                "message": "Improving prompt...",
+                "step": "prompt_improvement"
+            }))
             
-
-    async def edit_plan(self, plan_id: int, prompt: str):
-        # Fetch existing plan
-        plan = await self.plan_repository.get(plan_id, load_relations=["days.steps.route_hops"])
-        if not plan:
-            return BaseResponse(message="Plan not found", data=None)
-
-        # Update plan title and description based on prompt
-        plan_title = f"AI updated it: {plan.title}"
-        plan_description = f"AI updated it: {plan.description}. Based on your idea: '{prompt}'"
-        await self.plan_repository.update_from_dict(plan_id, {"title": plan_title, "description": plan_description})
-        data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
-        return BaseResponse(message="Plan updated successfully", data=data)
+            improved_prompt = await self.agent.improve_prompt(prompt)
+            
+            await websocket.send_text(safe_json_dumps({
+                "type": "progress",
+                "message": "Finding start city...",
+                "step": "city_lookup"
+            }))
+            
+            start_city = await self.city_repository.get_similar(improved_prompt.start_city, limit=1)
+            
+            await websocket.send_text(safe_json_dumps({
+                "type": "progress",
+                "message": "Generating overall plan...",
+                "step": "plan_generation"
+            }))
+            
+            overall_plan = await self.agent.generate_overall_plan(improved_prompt.refined_prompt)
+            
+            plan_create = PlanCreate(
+                title=overall_plan.title,
+                description=overall_plan.description,
+                start_city_id=start_city[0].id,
+                no_of_people=improved_prompt.no_of_people
+            )
+            
+            await websocket.send_text(safe_json_dumps({
+                "type": "progress",
+                "message": "Creating plan in database...",
+                "step": "plan_creation"
+            }))
+            
+            # CREATE PLAN
+            plan_created_response = await self.plan_controller.create(plan_create)
+            
+            # Send the complete plan_created_response
+            await websocket.send_text(safe_json_dumps({
+                "type": "plan_created",
+                "response": plan_created_response.data.model_dump()
+            }))
+            
+            plan_id = plan_created_response.data.id
+            already_done_tasks = {}
+            expanded_days = []
+            
+            total_days = len(overall_plan.days)
+            
+            for i, day in enumerate(overall_plan.days):
+                await websocket.send_text(safe_json_dumps({
+                    "type": "progress",
+                    "message": f"Processing day {i + 1} of {total_days}...",
+                    "step": "day_processing",
+                    "current_day": i + 1,
+                    "total_days": total_days
+                }))
+                
+                city_ids = []
+                for city in day.cities:
+                    c = await self.city_repository.get_similar(city, limit=1)
+                    city_ids.append(c[0].id)
+                    
+                day_index = i + 1
+                upcoming_days_description = [
+                    {j: d.description} for j, d in enumerate(overall_plan.days[i + 1:])
+                ]
+                
+                expanded_day = await self.agent.expand_single_day(
+                    day=day,
+                    day_index=day_index,
+                    already_done_tasks=already_done_tasks,
+                    upcoming_days_description=upcoming_days_description
+                )
+                
+                expanded_days.append(expanded_day)
+                
+                # CREATE DAY
+                day_created_response = await self.plan_day_controller.add_day(plan_id, expanded_day.title)
+                
+                # Send the complete day_created_response
+                await websocket.send_text(safe_json_dumps({
+                    "type": "day_created",
+                    "response": day_created_response.data.model_dump()
+                }))
+                
+                already_done_tasks[f"day_{day_index}"] = []
+                total_steps = len(expanded_day.steps)
+                
+                for step_idx, step in enumerate(expanded_day.steps):
+                    await websocket.send_text(safe_json_dumps({
+                        "type": "progress",
+                        "message": f"Adding step {step_idx + 1} of {total_steps} to day {day_index}...",
+                        "step": "step_processing",
+                        "current_step": step_idx + 1,
+                        "total_steps": total_steps,
+                        "current_day": day_index
+                    }))
+                    
+                    place_id = None
+                    place_activity_id = None
+                    end_city_id = None
+                    
+                    if step.category == "visit":
+                        category = PlanDayStepCategoryEnum.visit
+                        p = await self.place_repository.get_similar(step.place, limit=1, extra_conditions=[Place.city_id.in_(city_ids)])
+                        place_id = p[0].id
+                        already_done_tasks[f"day_{day_index}"].append(f"Visit - {step.place}")
+                        
+                    elif step.category == "activity":
+                        category = PlanDayStepCategoryEnum.activity
+                        place = p[0]
+                        activities = place.place_activities
+                        choices = {
+                            a: a.activity.name for a in activities if a.activity and a.activity.name
+                        }
+                        matches = process.extract(
+                            step.place_activity[1],
+                            choices,
+                            scorer=fuzz.ratio,
+                            limit=1
+                        )
+                        best_match_obj = matches[0][0]
+                        place_activity_id = best_match_obj.id
+                        matched_activity_name = best_match_obj.activity.name
+                        already_done_tasks[f"day_{day_index}"].append(
+                            f"Activity - {matched_activity_name} at {step.place_activity[0]}"
+                        )
+                        
+                    elif step.category == "travel":
+                        category = PlanDayStepCategoryEnum.transport
+                        ec = await self.city_repository.get_similar(step.end_city, limit=1)
+                        end_city_id = ec[0].id
+                        already_done_tasks[f"day_{day_index}"].append(f"Travel to {step.end_city}")
+                    
+                    # CREATE STEP
+                    step_added_response = await self.plan_day_step_controller.add_plan_day_step(
+                        PlanDayStepCreate(
+                            plan_id=plan_id,
+                            category=category,
+                            place_id=place_id,
+                            end_city_id=end_city_id,
+                            place_activity_id=place_activity_id
+                        )
+                    )
+                    
+                    # Send the complete step_added_response
+                    await websocket.send_text(safe_json_dumps({
+                        "type": "step_created",
+                        "response": step_added_response.dict() if hasattr(step_added_response, 'dict') else step_added_response.__dict__
+                    }))
+            
+            # Send final result
+            final_result = AgentPlanBase(
+                title=overall_plan.title,
+                description=overall_plan.description,
+                days=expanded_days
+            )
+            
+            await websocket.send_text(safe_json_dumps({
+                "type": "completed",
+                "data": {
+                    "title": final_result.title,
+                    "description": final_result.description,
+                    "days": [day.dict() if hasattr(day, 'dict') else day for day in final_result.days]
+                }
+            }))
+            
+        except Exception as e:
+            traceback.print_exc()
+            await websocket.send_text(safe_json_dumps({
+                "type": "error",
+                "message": str(e)
+            }))
