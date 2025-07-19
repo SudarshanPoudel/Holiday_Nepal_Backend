@@ -24,7 +24,7 @@ class AccomodationServiceController():
         return BaseResponse(message="Accomodation service updated successfully", data={'id':res.id, **accomodation_service.model_dump()})
     
     async def get(self, accomodation_service_id: int):
-        res = await self.repository.get(accomodation_service_id, load_relations=["images"])
+        res = await self.repository.get(accomodation_service_id, load_relations=["images", "city"])
         if not res:
             raise HTTPException(status_code=404, detail="Accomodation service not found")
         return BaseResponse(message="Accomodation service fetched successfully", data=AccomodationServiceRead.model_validate(res, from_attributes=True))
