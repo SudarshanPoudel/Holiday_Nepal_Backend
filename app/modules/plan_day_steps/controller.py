@@ -45,7 +45,7 @@ class PlanDayStepController:
         return BaseResponse(message="Day step deleted successfully", data=plan_data)
     
     async def get_transport_services(self, plan_day_step_id: int):
-        services = await self.transport_service_graph_repository.recommend_services_matching_plan_hops(plan_day_step_id)
+        services = await self.transport_service_repository.recommend_services_matching_plan_step(plan_day_step_id)
         if not services:
             raise HTTPException(status_code=404, detail="No transport services found for this step")
         data = await self.transport_service_repository.get_multiple(services, load_relations=["images", "start_city", "end_city"])

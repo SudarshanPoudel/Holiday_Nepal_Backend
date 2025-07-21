@@ -11,11 +11,11 @@ RUN pip install --upgrade pip setuptools
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Add retry + longer timeout to pip install (split torch)
-RUN grep -v torch requirements.txt > requirements.txt && \
-    pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt
+RUN pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt && \
+    rm requirements.txt
 
-# Copy rest of the code
 COPY . .
+
+EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

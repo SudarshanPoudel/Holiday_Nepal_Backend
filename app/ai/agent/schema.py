@@ -34,3 +34,12 @@ class AgentPlanBase(BaseModel):
     title: str
     description: str
     days: List[AgentPlanDayBase]
+
+class AgentEditDataSearchBase(BaseModel):
+    query: Optional[str] = None
+    top_n: Optional[int] = 0
+    cities: Optional[List[str]]
+
+class AgentEditResponseBase(BaseModel):
+    response: str
+    plan: dict

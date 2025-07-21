@@ -111,7 +111,10 @@ You will be provided:
   - `"activity"`: Performing a specific activity at a place if that place explicitly mentions it, otherwise just keep in visit category.
   - `"travel"`: Moving from one city to another.
 
-- Do **not** repeat anything from `already_done_tasks`.
+- **Do NOT repeat**:
+    - Visit places already visited.
+    - Do activities already done on same place.
+    
 - Do **not** include any place, activity, or city that is **not mentioned in the provided context**.
 - Ensure you **respect the description of upcoming days** and avoid visiting those locations or doing those activities prematurely.
 
@@ -147,4 +150,73 @@ Respond in a **strict JSON array**, where each element is a single step of the d
 
 Expand the plan for **Day {day_index}**, based on the following description:
 "{day_description}"
+"""
+
+PLAN_EDIT_EXTRACTION_PROMPT = """
+You are an assistant that analyzes a user's instruction to determine if any new information needs to be retrieved to update a trip plan.
+If required, you'll also be responsible for generating a structured search query to retrieve relevant information.
+
+You will be given:
+- A trip plan (title, description, and daily itinerary).
+- A user instruction describing what to add or change.
+
+Your task is to understand the instruction and generate a structured JSON:
+```json
+{
+  "query": "search string for retrieving relevant places",
+  "top_n": number of results to retrieve,
+  "cities": list of cities to narrow search within, or null
+}
+
+Focus on generating a meaningful, context-aware query that will be used to search for relevant places. Use information from both the instruction and the current trip plan to guide the phrasing, focus on generating a smart, context-aware query. Use the trip plan to understand what the user likely means and where they’re traveling. Set top_n to the number of results the user likely expects — or a reasonable estimate if unclear.
+
+Respond only with the JSON. No explanation.
+
+# Example output
+```json
+{
+    "query": "Historic places near kathmandu valley",
+    "top_n": 3,
+    "cities": null
+}
+
+# Context
+
+## Plan
+{plan}
+
+## User prompt
+{prompt}
+"""
+
+
+PLAN_EDIT_PROMPT = """
+You are an agent responsible for editing a trip plan based on user instructions.
+You'll be provided a trip plan, user_instruction and context about various places youre allowed to add into the plan according to user instructions.
+
+You should respond in valid JSON structure as:
+
+```json
+{
+    "response": "text response to user",
+    "plan": { 
+        // updated plan on same format as provided plan 
+    }
+}
+```
+
+If nothing need to be chaanged in any specific key (plan, day or step) use can use string "unchanged" like
+
+"day_1": "unchanged"
+
+
+# Context
+## Original Plan
+{plan}
+
+## Available Places
+{places}
+
+## User Instruction
+{prompt}
 """

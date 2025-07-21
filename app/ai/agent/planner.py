@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import List, Dict, Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -87,6 +88,7 @@ class TripPlannerAgent:
             upcoming_days=upcoming_days_description, 
             places=place_names_and_activities
         )
+        pprint(prompt)
         steps = LLM.get_structured_response(prompt, AgentPlanDayStepBase)
         
         # Create the expanded day
