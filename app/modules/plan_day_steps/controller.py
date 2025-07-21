@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.transport_service.graph import TransportServiceGraphRepository
 from app.modules.transport_service.repository import TransportServiceRepository
 from app.modules.transport_service.schema import TransportServiceRead, TransportServiceReadAll
 from neo4j import AsyncSession as Neo4jSession
@@ -19,7 +18,6 @@ class PlanDayStepController:
         self.plan_repository = PlanRepository(db)
         self.service = PlanDayStepService(db, graph_db)
         self.transport_service_repository = TransportServiceRepository(db)
-        self.transport_service_graph_repository = TransportServiceGraphRepository(graph_db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
         plan = await self.plan_repository.get(step.plan_id, load_relations=["days.steps"])
@@ -37,7 +35,6 @@ class PlanDayStepController:
             raise HTTPException(status_code=404, detail="Plan not found")
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only delete your plans")
-        # Use service to delete step
         await self.service.delete_last_step_from_plan(plan, insert_in_graph=True)
         
         # Return updated plan data

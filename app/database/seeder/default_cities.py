@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from app.modules.cities.graph import CityGraphRepository, CityNode
 from app.modules.cities.models import City
-from app.modules.cities.repository import CityRepository
 from app.database.seeder.utils import load_data
 from shapely.geometry import Point
 from app.modules.places.repository import PlaceRepository

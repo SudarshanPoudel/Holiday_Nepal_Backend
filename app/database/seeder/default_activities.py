@@ -1,18 +1,16 @@
 import json
 from pathlib import Path
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.activities.graph import ActivityGraphRepository, ActivityNode
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from neo4j import AsyncSession as Neo4jSession
 
 from app.modules.activities.models import Activity
 from app.modules.storage.models import Image, ImageCategoryEnum
-from app.modules.storage.service import StorageService  # Use your actual S3 service import
+from app.modules.storage.service import StorageService 
 from app.utils.helper import slugify
 from app.utils.image_utils import validate_and_process_image
 
-async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
+async def seed_default_activities(db: AsyncSession):
     activities = load_data("files/default_activities.json")
     n = 0
     for activity in activities:
@@ -46,10 +44,6 @@ async def seed_default_activities(db: AsyncSession, graph_db: Neo4jSession):
         db.add(activity)
 
         await db.flush()
-        activity = ActivityNode(id=activity.id, name=name)
-        activity_repo = ActivityGraphRepository(graph_db)
-        await activity_repo.create(activity)
-
         print(f"Seeder - Activity: {name}")
         n += 1
 

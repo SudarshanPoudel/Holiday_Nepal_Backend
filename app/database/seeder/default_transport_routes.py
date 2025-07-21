@@ -3,7 +3,6 @@ from pathlib import Path
 from sqlalchemy import select
 from neo4j import AsyncSession as Neo4jSession
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core import graph_repository
 from app.core.all_models import City, TransportRoute  # adjust import paths
 from app.database.seeder.utils import load_data
 from app.modules.cities.graph import CityGraphRepository

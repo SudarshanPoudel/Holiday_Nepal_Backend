@@ -6,11 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.utils.embeddings import get_embedding
 from neo4j import AsyncSession as Neo4jSession
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.place_activities.graph import PlaceActivityEdge
 from app.modules.places.graph import CityPlaceEdge, PlaceGraphRepository, PlaceNode
 from app.modules.places.schema import PlaceCategoryEnum
 from app.utils.image_utils import validate_and_process_image
-from app.utils.helper import slugify, symmetric_pair
+from app.utils.helper import slugify
 
 from app.modules.places.models import Place, place_images
 from app.modules.place_activities.models import PlaceActivity
@@ -22,7 +21,7 @@ from app.modules.storage.service import StorageService
 
 async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
     data = load_data("files/default_places.json")
-    place_repository = PlaceGraphRepository(graph_db)
+    place_graph_repo = PlaceGraphRepository(graph_db)
     n = 0
     for entry in data:
         # City lookup
@@ -60,9 +59,9 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         await db.flush()  # get place.id
 
         place_node = PlaceNode(id=place.id, name=entry['name'], category=entry['category'])
-        await place_repository.create(place_node)
+        await place_graph_repo.create(place_node)
         city_place = CityPlaceEdge(source_id=mun.id, target_id=place.id)
-        await place_repository.add_edge(city_place)
+        await place_graph_repo.add_edge(city_place)
         
         # Upload images to S3 and associate
         images = []
@@ -130,10 +129,6 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
             )
             db.add(pa)
             await db.flush()
-
-            edge = PlaceActivityEdge(id=pa.id, source_id=place.id, target_id=activity.id)
-            await place_repository.add_edge(edge)
-
         await db.commit()
         n += 1
         print(f"Seeder - Place: {place.name}")

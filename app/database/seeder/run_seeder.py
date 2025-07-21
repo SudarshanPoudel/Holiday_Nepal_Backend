@@ -18,10 +18,10 @@ async def run_seeder():
         async for graph_db in get_graph_db():
             await seed_default_cities(db, graph_db)
             await seed_default_users(db)
-            await seed_default_activities(db, graph_db)
+            await seed_default_activities(db)
             await seed_default_places(db, graph_db)
             await seed_default_transport_routes(db, graph_db)
-            await seed_default_transport_services(db, graph_db)
+            await seed_default_transport_services(db)
             await seed_default_accomodation_services(db)
             await update_city_embeddings(db)
             

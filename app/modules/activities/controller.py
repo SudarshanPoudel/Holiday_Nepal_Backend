@@ -1,23 +1,19 @@
 from typing import Dict, Optional
 from fastapi import HTTPException
-from app.modules.activities.graph import ActivityGraphRepository, ActivityNode
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
-from neo4j import AsyncSession as Neo4jSession
 
 from app.core.schemas import BaseResponse
 from app.modules.activities.repository import ActivityRepository
 from app.modules.activities.schema import ActivityCreate, ActivityRead, ActivityReadFull
 
 class ActivityController():
-    def __init__(self, db: AsyncSession, graph_db: Neo4jSession):
+    def __init__(self, db: AsyncSession):
         self.db = db
         self.repository = ActivityRepository(db)
-        self.graph_repository = ActivityGraphRepository(graph_db)
     
     async def create(self, activity: ActivityCreate):
         activity_db = await self.repository.create(activity)
-        await self.graph_repository.create(ActivityNode(id=activity_db.id, name=activity.name))
         return BaseResponse(message="Activity created successfully", data={"id": activity_db.id, **activity.model_dump()})   
     
     async def get(self, activity_id: int):
@@ -30,7 +26,6 @@ class ActivityController():
         activity_db = await self.repository.update(activity_id, activity)
         if not activity_db:
             raise HTTPException(status_code=404, detail="Activity not found")
-        await self.graph_repository.update(ActivityNode(id=activity_id, name=activity.name))
         return BaseResponse(message="Activity updated successfully", data={"id": activity_db.id, **activity.model_dump()})
 
     async def delete(self, activity_id: int):

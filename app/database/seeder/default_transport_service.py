@@ -9,25 +9,8 @@ from app.modules.storage.schema import ImageCategoryEnum
 from app.modules.storage.service import StorageService
 from app.utils.image_utils import validate_and_process_image
 
-# Import graph-related classes (adjust imports based on your actual structure)
-from app.modules.transport_service.graph import (
-    TransportServiceNode,
-    TransportServiceCityEdge,
-    TransportServiceTransportRouteHopEdge,
-    TransportServiceGraphRepository,
-    TransportServiceRouteHopGraphRepository
-)
-from app.modules.transport_service.graph import (
-    TransportServiceRouteHopNode,
-    TransportServiceRouteHopCityEdge,
-    TransportServiceRouteHopTransportServiceRouteHopEdge
-)
 
-
-async def seed_default_transport_services(db, graph_db):
-    # Initialize graph repositories
-    graph_repository = TransportServiceGraphRepository(graph_db)
-    route_hop_graph_repository = TransportServiceRouteHopGraphRepository(graph_db)
+async def seed_default_transport_services(db):
     n = 0
     
     transport_services = load_data("files/default_transport_services.json")
@@ -80,29 +63,6 @@ async def seed_default_transport_services(db, graph_db):
         db.add(new_service)
         await db.flush()
 
-        # Create graph node for transport service
-        await graph_repository.create(
-            TransportServiceNode(
-                id=new_service.id,
-                start_city_id=start_mun.id,
-                end_city_id=end_mun.id,
-                route_category=entry["route_category"],
-                transport_category=entry["transport_category"],
-                total_distance=total_distance,
-                average_duration=total_time,
-                cost=entry.get("cost")
-            )
-        )
-
-        # Create edge between transport service and start city
-        await graph_repository.add_edge(
-            TransportServiceCityEdge(
-                source_id=new_service.id,
-                target_id=start_mun.id
-            )
-        )
-
-        # Create route segments and their graph representations
         segments = []
         for idx, route_id in enumerate(route_ids):
             segment = TransportServiceRouteSegment(
@@ -114,46 +74,6 @@ async def seed_default_transport_services(db, graph_db):
             await db.flush()
             segments.append(segment)
 
-        # Create graph nodes and edges for route segments
-        last_segment = None
-        for i, segment in enumerate(segments):
-            route = await db.scalar(select(TransportRoute).where(TransportRoute.id == segment.route_id))
-            
-            # Create route hop node
-            await route_hop_graph_repository.create(
-                TransportServiceRouteHopNode(
-                    id=segment.id, 
-                    route_id=segment.route_id
-                )
-            )
-            
-            # Create edge from route hop to end city
-            await route_hop_graph_repository.add_edge(
-                TransportServiceRouteHopCityEdge(
-                    source_id=segment.id, 
-                    target_id=route.end_city_id
-                )
-            )
-            
-            # Create edges between segments
-            if last_segment is None:
-                # First segment - connect to transport service
-                await graph_repository.add_edge(
-                    TransportServiceTransportRouteHopEdge(
-                        source_id=new_service.id,
-                        target_id=segment.id,
-                    )
-                )
-            else:
-                # Connect to previous segment
-                await route_hop_graph_repository.add_edge(
-                    TransportServiceRouteHopTransportServiceRouteHopEdge(
-                        source_id=last_segment.id,
-                        target_id=segment.id,
-                    )
-                )
-            
-            last_segment = segment
 
         # Handle images
         transport_images = []
