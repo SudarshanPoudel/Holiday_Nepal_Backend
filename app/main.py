@@ -6,6 +6,7 @@ from fastapi.openapi.utils import get_openapi
 from app.core.all_models import *
 from app.middlerware.auth import AuthMiddleware
 from app.middlerware.cors import add_cors_middleware
+from app.database.redis_cache import redis_lifespan
 
 from app.utils.homeage_router import router as homeage_router
 from app.modules.auth.routes import router as auth_router
@@ -21,9 +22,9 @@ from app.modules.accomodation_services.routes import router as accomodation_serv
 from app.modules.plans.routes import router as plans_router
 from app.modules.plan_day.routes import router as plan_day_router
 from app.modules.plan_day_steps.routes import router as plan_day_step_router
-from app.ai.routes import router as ai_router
+from app.modules.ai.routes import router as ai_router
 
-app = FastAPI()
+app = FastAPI(lifespan=redis_lifespan)
 
 security = HTTPBearer()
 app.add_middleware(AuthMiddleware)

@@ -60,7 +60,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                     place_id=old_step.place_id,
                     place_activity_id=old_step.place_activity_id,
                     start_city_id=old_step.start_city_id,
-                    end_city_id=old_step.end_city_id,
+                    city_id=old_step.city_id,
                     plan_day=new_day  # Set parent relationship (plan_day_id auto)
                 )
 
@@ -186,8 +186,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
             "start_city",
             "days.steps.place",
             "days.steps.place_activity.activity.image",
-            "days.steps.city_start",
-            "days.steps.city_end",
+            "days.steps.city",
             "days.steps.image",
             "days.steps.route_hops.route.start_city",
             "days.steps.route_hops.route.end_city",
@@ -221,6 +220,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         plan_data.self_rating = await self.get_rating(user_id, plan_id)
         plan_data.is_saved = await self.is_saved(user_id, plan_id)
         cost = 0
+        n_days = len(plan_data.days)
         for day in plan_data.days:
             for step in day.steps:
                 step.cost = step.cost * self._find_cost_multiplier(plan.no_of_people)
@@ -236,7 +236,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                         break
                 if plan_data.image:
                     break
-        await self.update_from_dict(plan_id, {"estimated_cost": cost, "image_id": image_id})
+        await self.update_from_dict(plan_id, {"estimated_cost": cost, "no_of_days": n_days, "image_id": image_id})
         return plan_data
 
 

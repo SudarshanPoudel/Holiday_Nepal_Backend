@@ -1,7 +1,7 @@
 """Add vector columns
 
 Revision ID: d346661cdd33
-Revises: b991d1765476
+Revises: 82ee810c101c
 Create Date: 2025-07-19 09:07:37.934202
 """
 
@@ -14,7 +14,7 @@ from app.database.types import Vector
 
 # revision identifiers, used by Alembic.
 revision: str = 'd346661cdd33'
-down_revision: Union[str, None] = 'b991d1765476'
+down_revision: Union[str, None] = '82ee810c101c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -31,27 +31,25 @@ class PlanDayStepRead(BaseModel):
     image: ImageRead
     place_activity: Optional[PlaceActivityRead]
     place: Optional[PlaceReadBasic]
-    city_start: Optional[CityRead]
-    city_end: Optional[CityRead]
+    city: Optional[CityRead]
     route_hops: Optional[List[PlanRouteHopRead]]
     
 class PlanDayStepCreate(BaseModel):
-    plan_id: int
+    plan_day_id: int
     category: PlanDayStepCategoryEnum
+    index: Optional[int] = None
     place_id: Optional[int] = None
-    end_city_id: Optional[int] = None
     place_activity_id: Optional[int] = None
+    city_id: Optional[int] = None
 
 class PlanDayStepCreateInternal(BaseModel):
     plan_day_id: int
     index: int
     title: str
     category: PlanDayStepCategoryEnum
-    start_city_id: Optional[int] = None
     duration: float
     cost: float
     image_id: int
+    city_id: int
     place_id: Optional[int] = None
-    start_city_id: Optional[int] = None
-    end_city_id: Optional[int] = None
     place_activity_id: Optional[int] = None

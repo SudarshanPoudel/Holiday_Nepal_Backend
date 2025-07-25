@@ -5,22 +5,24 @@ import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
 
+from app.modules.ai.agent.prompts import RESPONSE_GENERATOR_AGENT_PROMPT, get_prompt
+from app.modules.ai.agent.schema import NaturalResponseBase
 from app.core.config import settings
 
 
 class LLM:
     @staticmethod
-    def get_response(prompt):
+    async def get_response(prompt):
         model = ChatGoogleGenerativeAI(
             model=settings.GEMINI_MODEL,
             api_key=settings.GEMINI_API_KEY
         )
-        resp =  model.invoke(prompt)
+        resp =  await model.ainvoke(prompt)
         return resp.content
 
     @staticmethod
-    def get_structured_response(prompt, schema: Type[BaseModel] = None):
-        resp = LLM.get_response(prompt)
+    async def get_structured_response(prompt, schema: Type[BaseModel] = None):
+        resp = await LLM.get_response(prompt)
         json_data = LLM.extract_json_blocks_from_response(resp)
 
         if schema:
@@ -30,6 +32,11 @@ class LLM:
 
         return json_data
 
+    @staticmethod
+    async def get_events_response(events_md: str, prompt: str):        
+        prompt = get_prompt(RESPONSE_GENERATOR_AGENT_PROMPT, events=events_md, prompt=prompt)
+        resp = await LLM.get_structured_response(prompt, NaturalResponseBase)
+        return resp.response
 
     @staticmethod
     def _extract_blocks_from_response(content: str, start_sep: str, end_sep: str, multiple: bool = False) -> Union[List[str], str]:

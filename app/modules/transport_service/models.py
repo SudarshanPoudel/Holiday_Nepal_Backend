@@ -20,7 +20,7 @@ class TransportService(Base):
 
     id = Column(Integer, primary_key=True)
     start_city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
-    end_city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
+    city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
     description = Column(String, nullable=True)
     route_category = Column(Enum(RouteCategoryEnum), nullable=False)
     transport_category = Column(Enum(TransportServiceCategoryEnum, name="transportcategoryenum"), nullable=False)
@@ -29,7 +29,7 @@ class TransportService(Base):
     cost = Column(Float, nullable=True)
 
     start_city = relationship("City", foreign_keys=[start_city_id])
-    end_city = relationship("City", foreign_keys=[end_city_id])
+    city = relationship("City", foreign_keys=[city_id])
     images = relationship("Image", secondary=transport_service_images)
 
     # Existing relationship

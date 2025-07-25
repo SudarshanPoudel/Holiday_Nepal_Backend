@@ -1,5 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.modules.plan_day.repository import PlanDayRepository
+from app.modules.plan_day_steps.repository import PlanDayStepRepositary
 from app.modules.transport_service.repository import TransportServiceRepository
 from app.modules.transport_service.schema import TransportServiceRead, TransportServiceReadAll
 from neo4j import AsyncSession as Neo4jSession
@@ -15,35 +17,49 @@ class PlanDayStepController:
         self.db = db
         self.graph_db = graph_db
         self.user_id = user_id
+        self.repository = PlanDayStepRepositary(db)
         self.plan_repository = PlanRepository(db)
+        self.plan_day_repository = PlanDayRepository(db)
         self.service = PlanDayStepService(db, graph_db)
         self.transport_service_repository = TransportServiceRepository(db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
-        plan = await self.plan_repository.get(step.plan_id, load_relations=["days.steps"])
-        if not plan:
-            raise HTTPException(status_code=404, detail="Plan not found")
-        if plan.user_id != self.user_id:
+        plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["plan"])
+        if not plan_day:
+            raise HTTPException(status_code=404, detail=f"Plan Day not found {step.plan_day_id}")
+        if plan_day.plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
-        created_steps = await self.service.add_step_to_plan(plan, step, insert_in_graph=True)
-        plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
+        created_steps = await self.service.add(step)
+        plan_data = await self.plan_repository.get_updated_plan(plan_day.plan.id, user_id=self.user_id)
         return BaseResponse(message="Step added successfully", data=plan_data)
 
-    async def delete_day_step(self, plan_id: int):
-        plan = await self.plan_repository.get(plan_id, load_relations=["days.steps"])
-        if not plan:
-            raise HTTPException(status_code=404, detail="Plan not found")
+    async def delete_day_step(self, plan_day_step_id: int):
+        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan"])
+        if not day_step:
+            raise HTTPException(status_code=404, detail="Plan Day Step not found")
+        plan = day_step.plan_day.plan
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only delete your plans")
-        await self.service.delete_last_step_from_plan(plan, insert_in_graph=True)
+        await self.service.delete(plan_day_step_id)
         
         # Return updated plan data
-        plan_data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
+        plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Day step deleted successfully", data=plan_data)
+    
+    async def reorder_day_step(self, plan_day_step_id: int, new_index: int):
+        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan"])
+        if not day_step:
+            raise HTTPException(status_code=404, detail="Plan Day Step not found")
+        plan = day_step.plan_day.plan
+        if plan.user_id != self.user_id:
+            raise HTTPException(status_code=403, detail="You can only delete your plans")
+        await self.service.reorder(plan_day_step_id, new_index)
+        plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
+        return BaseResponse(message="Day step re-ordered successfully", data=plan_data)
     
     async def get_transport_services(self, plan_day_step_id: int):
         services = await self.transport_service_repository.recommend_services_matching_plan_step(plan_day_step_id)
         if not services:
             raise HTTPException(status_code=404, detail="No transport services found for this step")
-        data = await self.transport_service_repository.get_multiple(services, load_relations=["images", "start_city", "end_city"])
+        data = await self.transport_service_repository.get_multiple(services, load_relations=["images", "start_city", "city"])
         return BaseResponse(message="Transport services fetched successfully", data=[TransportServiceReadAll.model_validate(ts, from_attributes=True) for ts in data])
