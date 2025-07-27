@@ -1,3 +1,4 @@
+from typing import Dict
 from fastapi import APIRouter, Depends, HTTPException, Request
 import traceback
 from app.database.database import get_db
@@ -39,6 +40,24 @@ async def update_plan_day(
         user_id = request.state.user_id
         controller = PlanDayController(db, graph_db, user_id)
         return await controller.update(plan_day_id, plan_day)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.patch("/{plan_day_id}")
+async def partial_update_plan_day(
+    request: Request, 
+    plan_day_id: int,
+    data: Dict,
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanDayController(db, graph_db, user_id)
+        return await controller.partial_update(plan_day_id, data)
     except HTTPException as e:
         raise e
     except Exception as e:        

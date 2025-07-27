@@ -9,6 +9,7 @@ from neo4j import AsyncSession as Neo4jSession
 from app.core.schemas import BaseResponse
 from app.modules.plan_day_steps.schema import PlanDayStepCreate
 from app.modules.plan_day_steps.service import PlanDayStepService
+from app.modules.plan_day.schema import PlanDayCreate
 from app.modules.plans.repository import PlanRepository
 
 
@@ -24,10 +25,17 @@ class PlanDayStepController:
         self.transport_service_repository = TransportServiceRepository(db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
-        plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["plan"])
+        plan = await self.plan_repository.get(step.plan_id, load_relations=["days"])
+        if not step.plan_day_id:
+            if not plan.days:
+                plan_day = await self.plan_day_repository.create(PlanDayCreate(plan_id=plan.id, index=0, title="Day 1 of " + plan.title))
+                step.plan_day_id = plan_day.id
+            else:
+                step.plan_day_id = plan.days[-1].id
+        plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["steps"])
         if not plan_day:
             raise HTTPException(status_code=404, detail=f"Plan Day not found {step.plan_day_id}")
-        if plan_day.plan.user_id != self.user_id:
+        if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
         created_steps = await self.service.add(step)
         plan_data = await self.plan_repository.get_updated_plan(plan_day.plan.id, user_id=self.user_id)

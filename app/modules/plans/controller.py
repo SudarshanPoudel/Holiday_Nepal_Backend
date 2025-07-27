@@ -41,6 +41,14 @@ class PlanController():
         await self.graph_repository.delete(plan_id)
         return BaseResponse(message="Plan deleted successfully")
     
+    async def partial_update(self, plan_id, data: Dict):
+        data['user_id'] = self.user_id
+        plan_db = await self.repository.update_from_dict(plan_id, data)
+        if not plan_db:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        plan_data = await self.repository.get_updated_plan(plan_db.id, user_id=self.user_id)
+        return BaseResponse(message="Plan updated successfully", data=plan_data)
+    
     async def update(self, plan_id: int, plan: PlanCreate):
         plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
         past_data = await self.repository.get(plan_id, load_relations=["days.steps"])
@@ -86,16 +94,16 @@ class PlanController():
     async def rate(self, plan_id: int, rating: int):
         if not 1<=rating<=5:
             raise HTTPException(detail="Rating must be between 1 and 5", status_code=400)
-        is_rated = await self.repository.rate_plan(self.user_id, plan_id, rating)
-        if not is_rated:
+        rating = await self.repository.rate_plan(self.user_id, plan_id, rating)
+        if not rating:
             raise HTTPException(status_code=400, detail="You can't rate private plans")
         return BaseResponse(message="Plan rated successfully", data={"rating": rating})
 
     async def delete_rate(self, plan_id: int):
-        rate_removed = await self.repository.remove_plan_rating(self.user_id, plan_id)
-        if not rate_removed:
+        rating = await self.repository.remove_plan_rating(self.user_id, plan_id)
+        if not rating:
             raise HTTPException(status_code=404, detail="No rating found")
-        return BaseResponse(message="Plan rating removed successfully")
+        return BaseResponse(message="Plan rating removed successfully", data={"rating": rating})
 
     async def toggle_save(self, plan_id: int):
         saved = await self.repository.toggle_save_plan(self.user_id, plan_id)

@@ -84,11 +84,11 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         return new_plan
 
     
-    async def rate_plan(self, user_id: int, plan_id: int, rating: int) -> bool:
+    async def rate_plan(self, user_id: int, plan_id: int, rating: int) -> Optional[float]:
         existing_rating_value = await self.get_rating(user_id, plan_id)
         plan = await self.get(plan_id)
         if plan.is_private:
-            return False
+            return None
 
         if existing_rating_value is not None:
             total_rating = plan.rating * plan.vote_count
@@ -112,12 +112,12 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
             self.db.add(new_rating)
 
         await self.db.commit()
-        return True
+        return round(total_rating / plan.vote_count, 2)
     
-    async def remove_plan_rating(self, user_id: int, plan_id: int) -> bool:
+    async def remove_plan_rating(self, user_id: int, plan_id: int) -> Optional[float]:
         existing_rating_value = await self.get_rating(user_id, plan_id)
         if existing_rating_value is None:
-            return False
+            return None
 
         stmt = select(UserPlanRating).where(
             UserPlanRating.user_id == user_id,
@@ -139,7 +139,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
 
         await self.db.delete(rating_row)
         await self.db.commit()
-        return True
+        return round(total_rating / plan.vote_count, 2)
         
     async def toggle_save_plan(self, user_id: int, plan_id: int) -> bool:
         """
@@ -181,6 +181,9 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
     
     
     async def get_updated_plan(self, plan_id: int, user_id: int) -> Optional[PlanRead]:
+        from app.modules.plan_day_steps.service import PlanDayStepService # To avoid circular import
+        plan_day_step_service = PlanDayStepService(self.db)
+
         load_relations = [
             "image",
             "start_city",
@@ -229,11 +232,16 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         image_id = plan_data.image.id if plan_data.image else None
         if not image_id and len(plan_data.days) > 0:
             for day in plan_data.days:
+                day_can_delete = True
                 for step in day.steps:
+                    step.can_delete = await plan_day_step_service.delete(step.id, just_check=True)
+                    if not step.can_delete:
+                        day_can_delete = False
                     if step.category == "visit" and step.image:
                         plan_data.image = step.image
                         image_id = step.image.id
                         break
+                day.can_delete = day_can_delete
                 if plan_data.image:
                     break
         await self.update_from_dict(plan_id, {"estimated_cost": cost, "no_of_days": n_days, "image_id": image_id})
@@ -242,7 +250,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
 
     def _find_cost_multiplier(self, no_of_people: int) -> float:
         if no_of_people <= 0:
-            raise ValueError("No of people must be greater than 0")
+            return 0.0
         if no_of_people == 1:
             return 1.0
         elif no_of_people<=5:

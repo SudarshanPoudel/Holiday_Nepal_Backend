@@ -53,7 +53,7 @@ class PlanDayStepService:
                 min_index = last_step.index + 1
                 break
         max_index = min_index + len(step_day.steps)
-
+        
         if step.index is not None:
             if not (min_index <= step.index <= max_index):
                 raise HTTPException(
@@ -91,6 +91,7 @@ class PlanDayStepService:
             
             if next_step_city_id and not add_single_transport:
                 steps_to_add.append(PlanDayStepCreate(
+                    plan_id = step.plan_id,
                     plan_day_id=step.plan_day_id,
                     category=PlanDayStepCategoryEnum.transport,
                     index=step.index + 1,
@@ -104,6 +105,7 @@ class PlanDayStepService:
             if next_step and next_step.category == PlanDayStepCategoryEnum.transport:
                 steps_to_remove.append(next_step)
             steps_to_add.append(PlanDayStepCreate(
+                plan_id = step.plan_id,
                 plan_day_id=step.plan_day_id,
                 category=PlanDayStepCategoryEnum.transport,
                 index=step.index,
@@ -116,6 +118,7 @@ class PlanDayStepService:
 
             if next_step_city_id and next_step_city_id != step.city_id:
                 steps_to_add.append(PlanDayStepCreate(
+                    plan_id = step.plan_id,
                     plan_day_id=step.plan_day_id,
                     category=PlanDayStepCategoryEnum.transport,
                     index=step.index + 2,
@@ -191,6 +194,7 @@ class PlanDayStepService:
                     await self.repository.delete(next_step.id)
                 else:
                     next_step_create = PlanDayStepCreate(
+                        plan_id = plan.id,
                         plan_day_id=step.plan_day_id,
                         category=PlanDayStepCategoryEnum.transport,
                         city_id=next_step.city_id
@@ -220,7 +224,9 @@ class PlanDayStepService:
 
     async def reorder(self, step_id: int, new_index: int):
         step = await self.repository.get(step_id)
+        day = await self.plan_day_repository.get(step.plan_day_id)
         step_create = PlanDayStepCreate(
+            plan_id = day.plan_id,
             plan_day_id=step.plan_day_id,
             category=step.category,
             place_id=step.place_id,

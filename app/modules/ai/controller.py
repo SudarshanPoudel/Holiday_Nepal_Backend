@@ -165,6 +165,7 @@ class AIController:
                         try:
                             step_added_response = await self.plan_day_step_service.add(
                                 PlanDayStepCreate(
+                                    plan_id=plan.id,
                                     plan_day_id=plan.days[addition.day_index].id,
                                     category=PlanDayStepCategoryEnum(step.category),
                                     place_id=place_id,
@@ -364,6 +365,7 @@ class AIController:
                     try:
                         await self.plan_day_step_service.add(
                             PlanDayStepCreate(
+                                plan_id=plan_id,
                                 plan_day_id=day_id,
                                 category=PlanDayStepCategoryEnum(step.category),
                                 place_id=place_id,

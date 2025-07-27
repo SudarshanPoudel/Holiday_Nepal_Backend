@@ -1,3 +1,4 @@
+from typing import Dict
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
@@ -21,13 +22,25 @@ class PlanDayController:
         self.plan_day_step_service = PlanDayStepService(db, graph_db)
 
     async def update(self, plan_day_id: int, plan_day: PlanDayUpdate):
+        plan_day_db = await self.repository.get(plan_day_id, load_relations=["plan"])
+        if not plan_day_db:
+            raise HTTPException(status_code=404, detail="Plan day not found")
+        if plan_day_db.plan.user_id != self.user_id:
+            raise HTTPException(status_code=403, detail="You can only update your plans")
+        await self.repository.update(plan_day_id, plan_day)
+        plan_data = await self.plan_repository.get_updated_plan(plan_day_db.plan_id, user_id=self.user_id)
+        return BaseResponse(message="Plan day updated successfully", data=plan_data)
+    
+    async def partial_update(self, plan_day_id: int, data: Dict):
         plan_day = await self.repository.get(plan_day_id, load_relations=["plan"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
         if plan_day.plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
-        await self.repository.update(plan_day_id, plan_day)
-        plan_data = await self.plan_repository.get_updated_plan(plan_day.plan_id, user_id=self.user_id)
+        plan_day_db = await self.repository.update_from_dict(plan_day_id, data)
+        if not plan_day_db:
+            raise HTTPException(status_code=404, detail="Plan day not found")
+        plan_data = await self.plan_repository.get_updated_plan(plan_day_db.plan_id, user_id=self.user_id)
         return BaseResponse(message="Plan day updated successfully", data=plan_data)
     
 

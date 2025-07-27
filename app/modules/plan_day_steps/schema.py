@@ -27,6 +27,8 @@ class PlanDayStepRead(BaseModel):
     title: str
     category: PlanDayStepCategoryEnum
     cost: float
+    duration: float
+    can_delete: Optional[float] = True
     
     image: ImageRead
     place_activity: Optional[PlaceActivityRead]
@@ -35,8 +37,9 @@ class PlanDayStepRead(BaseModel):
     route_hops: Optional[List[PlanRouteHopRead]]
     
 class PlanDayStepCreate(BaseModel):
-    plan_day_id: int
+    plan_id: int
     category: PlanDayStepCategoryEnum
+    plan_day_id: Optional[int] = None
     index: Optional[int] = None
     place_id: Optional[int] = None
     place_activity_id: Optional[int] = None

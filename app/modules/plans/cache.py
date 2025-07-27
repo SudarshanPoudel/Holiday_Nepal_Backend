@@ -3,7 +3,7 @@ from app.database.redis_cache import RedisCache
 from app.modules.plan_day.repository import PlanDayRepository
 from app.modules.plan_day.schema import PlanDayCreate
 from app.modules.plan_day_steps.repository import PlanDayStepRepositary
-from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreate, PlanDayStepCreateInternal
+from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreateInternal
 from app.modules.plan_route_hops.repository import PlanRouteHopsRepository
 from app.modules.plan_route_hops.schema import PlanRouteHopCreate
 from app.modules.plans.repository import PlanRepository

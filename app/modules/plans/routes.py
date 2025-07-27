@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 import traceback
 from app.database.database import get_db
@@ -97,6 +97,23 @@ async def update_plan(
         user_id = request.state.user_id
         controller = PlanController(db, user_id)
         return await controller.update(plan_id, plan)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.patch("/{plan_id}")
+async def partial_update_plan(
+    plan_id: int, 
+    data: Dict, 
+    request: Request, 
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanController(db, user_id)
+        return await controller.partial_update(plan_id, data)
     except HTTPException as e:
         raise e
     except Exception as e:        
