@@ -5,6 +5,7 @@ from app.database.database import get_db
 from fastapi_pagination import Params
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.graph_database import get_graph_db
 from app.database.redis_cache import RedisCache, get_redis_cache
 from neo4j import AsyncSession as Neo4jSession
 from app.modules.plans.controller import PlanController
@@ -91,12 +92,13 @@ async def update_plan(
     plan_id: int, 
     plan: PlanCreate, 
     request: Request, 
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         user_id = request.state.user_id
         controller = PlanController(db, user_id)
-        return await controller.update(plan_id, plan)
+        return await controller.update(plan_id, plan, graph_db)
     except HTTPException as e:
         raise e
     except Exception as e:        
@@ -108,12 +110,13 @@ async def partial_update_plan(
     plan_id: int, 
     data: Dict, 
     request: Request, 
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         user_id = request.state.user_id
         controller = PlanController(db, user_id)
-        return await controller.partial_update(plan_id, data)
+        return await controller.partial_update(plan_id, data, graph_db)
     except HTTPException as e:
         raise e
     except Exception as e:        

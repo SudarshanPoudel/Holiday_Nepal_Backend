@@ -38,30 +38,49 @@ class CityRepository(BaseRepository[City, CityRead]):
         stmt = stmt.order_by(City.embedding.cosine_distance(embedding)).limit(limit)
         result = await self.db.execute(stmt)
         return result.unique().scalars().all()
-
-
-    async def get_nearest(self, lat: float, lng: float, params: Params):
+    
+    async def get_nearest(self, lat: float, lng: float, params: Params, search: str = None):
         limit = params.size
         offset = (params.page - 1) * limit
-        query = text("""
+
+        base_query = """
             SELECT id, name, longitude, latitude,
                 ST_Distance(location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) AS distance
             FROM cities
             WHERE location IS NOT NULL
+                AND NOT (longitude = :lng AND latitude = :lat)
+                {search_clause}
             ORDER BY distance
             LIMIT :limit OFFSET :offset
-        """)
-        result = await self.db.execute(query, {
+        """
+
+        count_query = """
+            SELECT COUNT(*)
+            FROM cities
+            WHERE location IS NOT NULL
+                AND NOT (longitude = :lng AND latitude = :lat)
+                {search_clause}
+        """
+
+        params_dict = {
             "lng": lng,
             "lat": lat,
             "limit": limit,
-            "offset": offset
-        })
+            "offset": offset,
+        }
+
+        if search:
+            search_clause = "AND name ILIKE :search"
+            params_dict["search"] = f"%{search}%"
+        else:
+            search_clause = ""
+
+        query = text(base_query.format(search_clause=search_clause))
+        result = await self.db.execute(query, params_dict)
         rows = result.fetchall()
 
-        count_result = await self.db.execute(
-            text("SELECT COUNT(*) FROM cities WHERE location IS NOT NULL")
-        )
+        count_sql = text(count_query.format(search_clause=search_clause))
+        count_result = await self.db.execute(count_sql, params_dict if search else {"lng": lng, "lat": lat})
         total = count_result.scalar_one()
 
         return {"items": rows, "total": total}

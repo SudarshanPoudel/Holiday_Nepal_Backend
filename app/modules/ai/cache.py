@@ -5,7 +5,7 @@ from app.modules.ai.schema import AIChat
 class AICache:
     def __init__(self, redis: RedisCache):
         self.cache = redis
-        self.expiry = 60 * 20  
+        self.expiry = 60 * 60 * 24 * 30  
 
     async def push(self, user_id: int, plan_id: int, chat: AIChat):
         session_id = f"{user_id}:{plan_id}"

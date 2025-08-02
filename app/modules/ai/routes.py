@@ -51,9 +51,8 @@ async def generate_plan_websocket(
             }))
             return
             
-        data = await websocket.receive_text()
-        request_data = json.loads(data)
-        prompt = request_data.get("prompt")
+        data = await websocket.receive_json()
+        prompt = data.get("prompt")
         
         if not prompt:
             await websocket.send_text(safe_json_dumps({
@@ -93,9 +92,19 @@ async def edit_plan(
         if user_id is None:
             raise HTTPException(status_code=401, detail="Unauthorized")
         
-        data = await websocket.receive_text()
-        request_data = json.loads(data)
-        prompt = request_data.get("prompt")
+        data = await websocket.receive_json()
+        prompt = data.get("prompt")
+        if not prompt:
+            await websocket.send_text(safe_json_dumps({
+                "type": "error",
+                "message": "Missing prompt"
+            }))
+            return
+        
+        await websocket.send_text(safe_json_dumps({
+            "type": "prompt",
+            "response": prompt
+        }))
         
         controller = AIController(db, graph_db, redis, user_id)
         return await controller.edit_plan(plan_id, prompt, websocket)

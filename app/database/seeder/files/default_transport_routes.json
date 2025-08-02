@@ -1,7 +1,7 @@
 [
   {
     "start_city": "Gaindakot",
-    "city": "Bharatpur",
+    "end_city": "Bharatpur",
     "route_category": "road",
     "distance": 10,
     "average_duration": 0.5,
@@ -9,7 +9,7 @@
   },
   {
     "start_city": "Bharatpur",
-    "city": "Bandipur",
+    "end_city": "Bandipur",
     "route_category": "road",
     "distance": 60,
     "average_duration": 2,
@@ -17,7 +17,7 @@
   },
   {
     "start_city": "Bandipur",
-    "city": "Damauli",
+    "end_city": "Damauli",
     "route_category": "road",
     "distance": 30,
     "average_duration": 1,
@@ -25,7 +25,7 @@
   },
   {
     "start_city": "Damauli",
-    "city": "Pokhara",
+    "end_city": "Pokhara",
     "route_category": "road",
     "distance": 50,
     "average_duration": 1.5,
@@ -33,7 +33,7 @@
   },
   {
     "start_city": "Bandipur",
-    "city": "Gorkha",
+    "end_city": "Gorkha",
     "route_category": "road",
     "distance": 50,
     "average_duration": 1.5,
@@ -41,7 +41,7 @@
   },
   {
     "start_city": "Bharatpur",
-    "city": "Hetauda",
+    "end_city": "Hetauda",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.5,
@@ -49,7 +49,7 @@
   },
   {
     "start_city": "Hetauda",
-    "city": "Kathmandu",
+    "end_city": "Kathmandu",
     "route_category": "road",
     "distance": 120,
     "average_duration": 3.5,
@@ -57,7 +57,7 @@
   },
   {
     "start_city": "Muglin",
-    "city": "Kathmandu",
+    "end_city": "Kathmandu",
     "route_category": "road",
     "distance": 70,
     "average_duration": 2.5,
@@ -65,7 +65,7 @@
   },
   {
     "start_city": "Muglin",
-    "city": "Bharatpur",
+    "end_city": "Bharatpur",
     "route_category": "road",
     "distance": 36,
     "average_duration": 1,
@@ -73,7 +73,7 @@
   },
   {
     "start_city": "Muglin",
-    "city": "Bandipur",
+    "end_city": "Bandipur",
     "route_category": "road",
     "distance": 26,
     "average_duration": 0.8,
@@ -81,7 +81,7 @@
   },
   {
     "start_city": "Kathmandu",
-    "city": "Lalitpur",
+    "end_city": "Lalitpur",
     "route_category": "road",
     "distance": 8,
     "average_duration": 0.5,
@@ -89,7 +89,7 @@
   },
   {
     "start_city": "Kathmandu",
-    "city": "Bhaktapur",
+    "end_city": "Bhaktapur",
     "route_category": "road",
     "distance": 15,
     "average_duration": 0.7,
@@ -97,7 +97,7 @@
   },
   {
     "start_city": "Bhaktapur",
-    "city": "Banepa",
+    "end_city": "Banepa",
     "route_category": "road",
     "distance": 12,
     "average_duration": 0.5,
@@ -105,7 +105,7 @@
   },
   {
     "start_city": "Banepa",
-    "city": "Dhulikhel",
+    "end_city": "Dhulikhel",
     "route_category": "road",
     "distance": 8,
     "average_duration": 0.3,
@@ -113,7 +113,7 @@
   },
   {
     "start_city": "Dhulikhel",
-    "city": "Panauti",
+    "end_city": "Panauti",
     "route_category": "road",
     "distance": 6,
     "average_duration": 0.2,
@@ -121,7 +121,7 @@
   },
   {
     "start_city": "Kathmandu",
-    "city": "Bidur",
+    "end_city": "Bidur",
     "route_category": "road",
     "distance": 35,
     "average_duration": 1.2,
@@ -129,7 +129,7 @@
   },
   {
     "start_city": "Bidur",
-    "city": "Dhunche",
+    "end_city": "Dhunche",
     "route_category": "road",
     "distance": 40,
     "average_duration": 1.5,
@@ -137,7 +137,7 @@
   },
   {
     "start_city": "Kathmandu",
-    "city": "Chautara",
+    "end_city": "Chautara",
     "route_category": "road",
     "distance": 65,
     "average_duration": 2.5,
@@ -145,7 +145,7 @@
   },
   {
     "start_city": "Chautara",
-    "city": "Charikot",
+    "end_city": "Charikot",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.8,
@@ -153,7 +153,7 @@
   },
   {
     "start_city": "Hetauda",
-    "city": "Manahari",
+    "end_city": "Manahari",
     "route_category": "road",
     "distance": 25,
     "average_duration": 0.8,
@@ -161,7 +161,7 @@
   },
   {
     "start_city": "Hetauda",
-    "city": "Kamalamai",
+    "end_city": "Kamalamai",
     "route_category": "road",
     "distance": 80,
     "average_duration": 2.5,
@@ -169,7 +169,7 @@
   },
   {
     "start_city": "Kamalamai",
-    "city": "Manthali",
+    "end_city": "Manthali",
     "route_category": "road",
     "distance": 25,
     "average_duration": 1,
@@ -177,7 +177,7 @@
   },
   {
     "start_city": "Hetauda",
-    "city": "Birgunj",
+    "end_city": "Birgunj",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.5,
@@ -185,7 +185,7 @@
   },
   {
     "start_city": "Bharatpur",
-    "city": "Kawasoti",
+    "end_city": "Kawasoti",
     "route_category": "road",
     "distance": 15,
     "average_duration": 0.5,
@@ -193,7 +193,7 @@
   },
   {
     "start_city": "Kawasoti",
-    "city": "Butwal",
+    "end_city": "Butwal",
     "route_category": "road",
     "distance": 65,
     "average_duration": 2,
@@ -201,7 +201,7 @@
   },
   {
     "start_city": "Butwal",
-    "city": "Tilottama",
+    "end_city": "Tilottama",
     "route_category": "road",
     "distance": 8,
     "average_duration": 0.3,
@@ -209,7 +209,7 @@
   },
   {
     "start_city": "Tilottama",
-    "city": "Lumbini",
+    "end_city": "Lumbini",
     "route_category": "road",
     "distance": 25,
     "average_duration": 0.8,
@@ -217,7 +217,7 @@
   },
   {
     "start_city": "Butwal",
-    "city": "Tansen",
+    "end_city": "Tansen",
     "route_category": "road",
     "distance": 40,
     "average_duration": 1.5,
@@ -225,7 +225,7 @@
   },
   {
     "start_city": "Tansen",
-    "city": "Resunga",
+    "end_city": "Resunga",
     "route_category": "road",
     "distance": 35,
     "average_duration": 1.2,
@@ -233,7 +233,7 @@
   },
   {
     "start_city": "Resunga",
-    "city": "Sandhikharka",
+    "end_city": "Sandhikharka",
     "route_category": "road",
     "distance": 20,
     "average_duration": 0.7,
@@ -241,7 +241,7 @@
   },
   {
     "start_city": "Lumbini",
-    "city": "Kapilvastu",
+    "end_city": "Kapilvastu",
     "route_category": "road",
     "distance": 20,
     "average_duration": 0.7,
@@ -249,7 +249,7 @@
   },
   {
     "start_city": "Kapilvastu",
-    "city": "Devdaha",
+    "end_city": "Devdaha",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.5,
@@ -257,7 +257,7 @@
   },
   {
     "start_city": "Devdaha",
-    "city": "Ramgram",
+    "end_city": "Ramgram",
     "route_category": "road",
     "distance": 15,
     "average_duration": 0.5,
@@ -265,7 +265,7 @@
   },
   {
     "start_city": "Ramgram",
-    "city": "Parasi",
+    "end_city": "Parasi",
     "route_category": "road",
     "distance": 30,
     "average_duration": 1,
@@ -273,7 +273,7 @@
   },
   {
     "start_city": "Damauli",
-    "city": "Besisahar",
+    "end_city": "Besisahar",
     "route_category": "road",
     "distance": 40,
     "average_duration": 1.5,
@@ -281,7 +281,7 @@
   },
   {
     "start_city": "Besisahar",
-    "city": "Chame",
+    "end_city": "Chame",
     "route_category": "road",
     "distance": 55,
     "average_duration": 2.5,
@@ -289,7 +289,7 @@
   },
   {
     "start_city": "Damauli",
-    "city": "Sundarbazar",
+    "end_city": "Sundarbazar",
     "route_category": "road",
     "distance": 25,
     "average_duration": 0.8,
@@ -297,7 +297,7 @@
   },
   {
     "start_city": "Sundarbazar",
-    "city": "Pokhara",
+    "end_city": "Pokhara",
     "route_category": "road",
     "distance": 15,
     "average_duration": 0.5,
@@ -305,7 +305,7 @@
   },
   {
     "start_city": "Pokhara",
-    "city": "Waling",
+    "end_city": "Waling",
     "route_category": "road",
     "distance": 35,
     "average_duration": 1.2,
@@ -313,7 +313,7 @@
   },
   {
     "start_city": "Tansen",
-    "city": "Waling",
+    "end_city": "Waling",
     "route_category": "road",
     "distance": 35,
     "average_duration": 1.2,
@@ -321,7 +321,7 @@
   },
   {
     "start_city": "Pokhara",
-    "city": "Kusma",
+    "end_city": "Kusma",
     "route_category": "road",
     "distance": 25,
     "average_duration": 0.8,
@@ -329,7 +329,7 @@
   },
   {
     "start_city": "Kusma",
-    "city": "Baglung",
+    "end_city": "Baglung",
     "route_category": "road",
     "distance": 20,
     "average_duration": 0.7,
@@ -337,7 +337,7 @@
   },
   {
     "start_city": "Baglung",
-    "city": "Beni",
+    "end_city": "Beni",
     "route_category": "road",
     "distance": 30,
     "average_duration": 1,
@@ -345,7 +345,7 @@
   },
   {
     "start_city": "Beni",
-    "city": "Jomsom",
+    "end_city": "Jomsom",
     "route_category": "road",
     "distance": 85,
     "average_duration": 4,
@@ -353,7 +353,7 @@
   },
   {
     "start_city": "Gorkha",
-    "city": "Nilkantha",
+    "end_city": "Nilkantha",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.5,
@@ -361,7 +361,7 @@
   },
   {
     "start_city": "Nilkantha",
-    "city": "Kathmandu",
+    "end_city": "Kathmandu",
     "route_category": "road",
     "distance": 90,
     "average_duration": 3,
@@ -369,7 +369,7 @@
   },
   {
     "start_city": "Butwal",
-    "city": "Ghorahi",
+    "end_city": "Ghorahi",
     "route_category": "road",
     "distance": 95,
     "average_duration": 3,
@@ -377,7 +377,7 @@
   },
   {
     "start_city": "Ghorahi",
-    "city": "Tulsipur",
+    "end_city": "Tulsipur",
     "route_category": "road",
     "distance": 25,
     "average_duration": 0.8,
@@ -385,7 +385,7 @@
   },
   {
     "start_city": "Tulsipur",
-    "city": "Nepalgunj",
+    "end_city": "Nepalgunj",
     "route_category": "road",
     "distance": 45,
     "average_duration": 1.5,
@@ -393,7 +393,7 @@
   },
   {
     "start_city": "Ratnanagar",
-    "city": "Bharatpur",
+    "end_city": "Bharatpur",
     "route_category": "road",
     "distance": 12,
     "average_duration": 0.4,
@@ -401,7 +401,7 @@
   },
   {
     "start_city": "Ratnanagar",
-    "city": "Hetauda",
+    "end_city": "Hetauda",
     "route_category": "road",
     "distance": 55,
     "average_duration": 2,
@@ -409,7 +409,7 @@
   },
   {
     "start_city": "Bharatpur",
-    "city": "Gaindakot",
+    "end_city": "Gaindakot",
     "route_category": "road",
     "distance": 10,
     "average_duration": 0.5,
@@ -417,7 +417,7 @@
   },
   {
     "start_city": "Gorkha",
-    "city": "Bandipur",
+    "end_city": "Bandipur",
     "route_category": "road",
     "distance": 50,
     "average_duration": 1.5,
@@ -425,7 +425,7 @@
   },
   {
     "start_city": "Kathmandu",
-    "city": "Hetauda",
+    "end_city": "Hetauda",
     "route_category": "road",
     "distance": 120,
     "average_duration": 3.5,
@@ -433,7 +433,7 @@
   },
   {
     "start_city": "Lalitpur",
-    "city": "Kathmandu",
+    "end_city": "Kathmandu",
     "route_category": "road",
     "distance": 8,
     "average_duration": 0.5,
@@ -441,7 +441,7 @@
   },
   {
     "start_city": "Bhaktapur",
-    "city": "Kathmandu",
+    "end_city": "Kathmandu",
     "route_category": "road",
     "distance": 15,
     "average_duration": 0.7,
@@ -449,7 +449,7 @@
   },
   {
     "start_city": "Banepa",
-    "city": "Bhaktapur",
+    "end_city": "Bhaktapur",
     "route_category": "road",
     "distance": 12,
     "average_duration": 0.5,
@@ -457,7 +457,7 @@
   },
   {
     "start_city": "Dhulikhel",
-    "city": "Banepa",
+    "end_city": "Banepa",
     "route_category": "road",
     "distance": 8,
     "average_duration": 0.3,
@@ -465,7 +465,7 @@
   },
   {
     "start_city": "Panauti",
-    "city": "Dhulikhel",
+    "end_city": "Dhulikhel",
     "route_category": "road",
     "distance": 6,
     "average_duration": 0.2,

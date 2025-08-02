@@ -5,17 +5,17 @@ from sqlalchemy import insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository import BaseRepository
-from app.modules.accomodation_services.models import AccomodationService, accomodation_service_images
-from app.modules.accomodation_services.schema import AccomodationServiceBase, AccomodationServiceFilter
+from app.modules.accommodation_services.models import AccomodationService, accommodation_service_images
+from app.modules.accommodation_services.schema import AccomodationServiceBase, AccomodationServiceFilter
 
 class AccomodationServiceRepository(BaseRepository[AccomodationService, AccomodationServiceBase]):
     def __init__(self, db: AsyncSession):
         super().__init__(AccomodationService, db)
 
-    async def add_images(self, accomodation_service_id: int, image_ids: List[int]):
-        values = [{"accomodation_service_id": accomodation_service_id, "image_id": image_id} for image_id in image_ids]
+    async def add_images(self, accommodation_service_id: int, image_ids: List[int]):
+        values = [{"accommodation_service_id": accommodation_service_id, "image_id": image_id} for image_id in image_ids]
         
-        stmt = insert(accomodation_service_images).values(values)
+        stmt = insert(accommodation_service_images).values(values)
         try:
             await self.db.execute(stmt)
             await self.db.commit()
@@ -23,14 +23,14 @@ class AccomodationServiceRepository(BaseRepository[AccomodationService, Accomoda
             await self.db.rollback()
             raise
 
-    async def update_images(self, accomodation_service_id: int, image_ids: List[int]):
-        delete_stmt = delete(accomodation_service_images).where(accomodation_service_images.c.accomodation_service_id == accomodation_service_id)
+    async def update_images(self, accommodation_service_id: int, image_ids: List[int]):
+        delete_stmt = delete(accommodation_service_images).where(accommodation_service_images.c.accommodation_service_id == accommodation_service_id)
         await self.db.execute(delete_stmt)
 
         # Add new image mappings
         if image_ids:
-            values = [{"accomodation_service_id": accomodation_service_id, "image_id": image_id} for image_id in image_ids]
-            await self.db.execute(insert(accomodation_service_images).values(values))
+            values = [{"accommodation_service_id": accommodation_service_id, "image_id": image_id} for image_id in image_ids]
+            await self.db.execute(insert(accommodation_service_images).values(values))
 
         await self.db.commit()
 

@@ -182,7 +182,6 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
     
     async def get_updated_plan(self, plan_id: int, user_id: int) -> Optional[PlanRead]:
         from app.modules.plan_day_steps.service import PlanDayStepService # To avoid circular import
-        plan_day_step_service = PlanDayStepService(self.db)
 
         load_relations = [
             "image",
@@ -225,18 +224,19 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         cost = 0
         n_days = len(plan_data.days)
         for day in plan_data.days:
+            day_can_delete = True
             for step in day.steps:
+                step.can_delete = await PlanDayStepService._can_delete_step(plan, step)
                 step.cost = step.cost * self._find_cost_multiplier(plan.no_of_people)
                 cost += step.cost
+                if not step.can_delete:
+                    day_can_delete = False
+            day.can_delete = day_can_delete
         plan_data.estimated_cost = cost
         image_id = plan_data.image.id if plan_data.image else None
         if not image_id and len(plan_data.days) > 0:
             for day in plan_data.days:
-                day_can_delete = True
                 for step in day.steps:
-                    step.can_delete = await plan_day_step_service.delete(step.id, just_check=True)
-                    if not step.can_delete:
-                        day_can_delete = False
                     if step.category == "visit" and step.image:
                         plan_data.image = step.image
                         image_id = step.image.id

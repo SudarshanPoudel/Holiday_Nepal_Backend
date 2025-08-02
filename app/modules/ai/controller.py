@@ -45,6 +45,10 @@ class AIController:
         await self.ai_cache.push(self.user_id, plan_id, AIChat(sender="user", message=prompt))
         events_md = "# Plan Edit Request"
         try:
+            await websocket.send_json({
+                "type": "event",
+                "response": f"Prompt received {prompt}"
+            })
             plan = await self.plan_repository.get(plan_id, load_relations=["start_city", "days.steps.city", "days.steps.place_activity.place", "days.steps.place_activity.activity", "days.steps.place"])
             if plan.user_id != self.user_id:
                 raise HTTPException(status_code=403, detail="You can only edit your plans")
@@ -89,7 +93,7 @@ class AIController:
             if edit_structured_base.type == "unrelated":
                 await self.ai_cache.push(self.user_id, plan_id, AIChat(sender="ai", message=edit_structured_base.response))
                 await websocket.send_json({
-                    "type": "edit_structured",
+                    "type": "unrelated",
                     "response": edit_structured_base.response
                 })
                 return
@@ -103,6 +107,10 @@ class AIController:
                         events_md += f"\n# Removed step: `{title}`"
 
                         data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
+                        await websocket.send_json({
+                            "type": "step_removed",
+                            "response": jsonable_encoder(data)
+                        })
                         index_reduce += 1
                     except Exception as e:
                         events_md += f"\n# Failed to remove step: {title}"
@@ -177,7 +185,7 @@ class AIController:
                             events_md += f"\n# Added step: `{title}`"
 
                             data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
-                            websocket.send_json({
+                            await websocket.send_json({
                                 "type": "step_added",
                                 "response": jsonable_encoder(data)
                             })
@@ -188,16 +196,17 @@ class AIController:
                 final_response = await LLM.get_events_response(events_md, history)
                 await self.ai_cache.push(self.user_id, plan_id, AIChat(sender="ai", message=final_response))
                 await websocket.send_json({
-                    "type": "success",
+                    "type": "completed",
                     "response": final_response
                 })
 
             else:
                 for day in reversed(plan.days):
                     await self.plan_day_repository.delete(day.id)
+                data = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
                 await websocket.send_json({
                     "type": "days_removed",
-                    "response": jsonable_encoder(day)
+                    "response": jsonable_encoder(data)
                 })
                 if not edit_structured.no_of_people:
                     edit_structured.no_of_people = plan.no_of_people
@@ -206,6 +215,8 @@ class AIController:
                 await self.generate_plan_websocket(prompt=edit_structured.refined_prompt, websocket=websocket, improved_prompt=edit_structured, plan_id=plan_id)
 
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             plan = await self.plan_repository.get(plan_id, load_relations=["days.steps.route_hops"])
             await self.plan_cache.pop(plan)
             history = await self.ai_cache.get_history(self.user_id, plan_id)
@@ -225,6 +236,10 @@ class AIController:
 
 
     async def generate_plan_websocket(self, prompt: str, websocket: WebSocket, improved_prompt : Optional[AgentImprovedPromptBase]=None, plan_id: Optional[int] = None):
+        await websocket.send_json({
+            "type": "prompt",
+            "response": prompt
+        })
         debug_mode = True
         events_md = "- Removed existing plan steps to generate from scratch according to asked changes"
         try:

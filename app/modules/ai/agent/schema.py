@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class AgentImprovedPromptBase(BaseModel):
     refined_prompt: str
     no_of_people: Optional[int] = 1
-    start_city: str
+    start_city: Optional[str] = None
 
 class AgentOverallPlanDayBase(BaseModel):
     title: str
@@ -37,7 +37,7 @@ class AgentPlanDayBase(BaseModel):
 
 class AgentPlanBase(BaseModel):
     title: str
-    description: str
+    description: Optional[str] = None
     days: List[AgentPlanDayBase]
 
 class AgentToAddBase(BaseModel):
@@ -67,7 +67,7 @@ class AgentEditType(BaseModel):
     response: Optional[str] = None
 
 class AgentEditPromptRefine(BaseModel):
-    type: Literal["simple", "complex", "unrelated"]
+    type: Literal["simple", "complex", "unrelated", "none"]
     edit: Union[AgentSimpleEditRequestBase, AgentImprovedPromptBase]
     response: Optional[str] = None
 

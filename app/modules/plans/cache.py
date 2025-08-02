@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.redis_cache import RedisCache
 from app.modules.plan_day.repository import PlanDayRepository
 from app.modules.plan_day.schema import PlanDayCreate
-from app.modules.plan_day_steps.repository import PlanDayStepRepositary
+from app.modules.plan_day_steps.repository import PlanDayStepRepository
 from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreateInternal
 from app.modules.plan_route_hops.repository import PlanRouteHopsRepository
 from app.modules.plan_route_hops.schema import PlanRouteHopCreate
@@ -15,7 +15,7 @@ class PlanCache:
         self.db = db
         self.repository = PlanRepository(db)
         self.plan_day_repository = PlanDayRepository(db)
-        self.plan_day_step_repository = PlanDayStepRepositary(db)
+        self.plan_day_step_repository = PlanDayStepRepository(db)
         self.plan_route_hop_repository = PlanRouteHopsRepository(db)
 
     async def push(self, plan_id: int):

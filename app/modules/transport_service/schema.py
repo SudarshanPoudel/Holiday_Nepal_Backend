@@ -52,6 +52,7 @@ class TransportServiceReadAll(BaseModel):
     transport_category: TransportServiceCategoryEnum
     total_distance: float
     average_duration: Optional[float]
+    cost: Optional[float]
 
 
 class TransportServiceRead(TransportServiceReadAll):

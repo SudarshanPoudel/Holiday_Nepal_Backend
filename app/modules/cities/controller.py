@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.cities.graph import CityGraphRepository, CityNode
@@ -43,8 +44,11 @@ class CityController():
         return BaseResponse(message="Cities fetched successfully", data=[CityRead.model_validate(m, from_attributes=True) for m in res.items])
     
 
-    async def nearest(self, latitude: float, longitude: float, params: Params):
-        res = await self.city_repo.get_nearest(latitude, longitude, params)
+    async def nearest(self, city_id: int, params: Params, search: Optional[str] = None):
+        city = await self.city_repo.get(city_id)
+        if not city:
+            raise HTTPException(status_code=404, detail="City not found")
+        res = await self.city_repo.get_nearest(city.latitude, city.longitude, params, search)
         items = res["items"]
         if not items:
             raise HTTPException(status_code=404, detail="No nearby cities found")

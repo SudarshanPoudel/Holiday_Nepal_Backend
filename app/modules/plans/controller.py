@@ -3,7 +3,9 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_pagination import Params
-
+from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreate
+from app.modules.plan_day_steps.service import PlanDayStepService
+from neo4j import AsyncSession as Neo4jSession
 from app.core.schemas import BaseResponse
 from app.database.redis_cache import RedisCache
 from app.modules.plans.cache import PlanCache
@@ -41,22 +43,31 @@ class PlanController():
         await self.graph_repository.delete(plan_id)
         return BaseResponse(message="Plan deleted successfully")
     
-    async def partial_update(self, plan_id, data: Dict):
+    async def partial_update(self, plan_id, data: Dict, graph_db: Neo4jSession):
+        plan = await self.repository.get(plan_id, load_relations=["days.steps"])
+        old_start_city_id = plan.start_city_id
+        if plan.user_id != self.user_id:
+            raise HTTPException(status_code=403, detail="You can only update your plans")
         data['user_id'] = self.user_id
         plan_db = await self.repository.update_from_dict(plan_id, data)
-        if not plan_db:
-            raise HTTPException(status_code=404, detail="Plan not found")
+        service = PlanDayStepService(self.db, graph_db)
+        if data.get('start_city_id') and data.get('start_city_id') != old_start_city_id:
+            await service.handle_change_start_city(plan_id, data['start_city_id'])
+        
         plan_data = await self.repository.get_updated_plan(plan_db.id, user_id=self.user_id)
         return BaseResponse(message="Plan updated successfully", data=plan_data)
     
-    async def update(self, plan_id: int, plan: PlanCreate):
+    async def update(self, plan_id: int, plan: PlanCreate, graph_db: Neo4jSession):
         plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
         past_data = await self.repository.get(plan_id, load_relations=["days.steps"])
-        if past_data.start_city_id != plan.start_city_id and past_data.days and past_data.days[0].steps:
-            raise HTTPException(status_code=403, detail="You can't change start city after adding steps")
         plan_db = await self.repository.update(plan_id, plan_internal)
         if not plan_db:
             raise HTTPException(status_code=404, detail="Plan not found")
+        
+        if plan.start_city_id != past_data.start_city_id:
+            await PlanDayStepService(self.db, graph_db).add(PlanDayStepCreate(plan_id=plan_id, city_id=plan.start_city_id, index=0, category=PlanDayStepCategoryEnum.transport))
+            if past_data.days and past_data.days[0].steps:
+                await PlanDayStepService(self.db, graph_db).delete(past_data.days[0].steps[0].id)
         plan_data = await self.repository.get_updated_plan(plan_db.id, user_id=self.user_id)
         return BaseResponse(message="Plan updated successfully", data=plan_data)
 

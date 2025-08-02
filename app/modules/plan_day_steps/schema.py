@@ -28,7 +28,7 @@ class PlanDayStepRead(BaseModel):
     category: PlanDayStepCategoryEnum
     cost: float
     duration: float
-    can_delete: Optional[float] = True
+    can_delete: Optional[bool] = True
     
     image: ImageRead
     place_activity: Optional[PlaceActivityRead]

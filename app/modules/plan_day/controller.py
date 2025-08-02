@@ -2,8 +2,8 @@ from typing import Dict
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import AsyncSession as Neo4jSession
-from app.modules.accomodation_services.repository import AccomodationServiceRepository
-from app.modules.accomodation_services.schema import AccomodationServiceRead
+from app.modules.accommodation_services.repository import AccomodationServiceRepository
+from app.modules.accommodation_services.schema import AccomodationServiceRead
 from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum
 
 from app.core.schemas import BaseResponse
@@ -17,7 +17,7 @@ class PlanDayController:
         self.db = db
         self.user_id = user_id
         self.repository = PlanDayRepository(db)
-        self.accomodation_repository = AccomodationServiceRepository(db)
+        self.accommodation_repository = AccomodationServiceRepository(db)
         self.plan_repository = PlanRepository(db)
         self.plan_day_step_service = PlanDayStepService(db, graph_db)
 
@@ -58,7 +58,7 @@ class PlanDayController:
         return BaseResponse(message="Day added successfully", data=plan_data)
     
     async def delete_day(self, plan_day_id: int):
-        plan_day = await self.repository.get(plan_day_id, load_relations=["plan.days", "steps"])
+        plan_day = await self.repository.get(plan_day_id, load_relations=["plan.days.steps", "steps"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
         plan = plan_day.plan
@@ -68,7 +68,7 @@ class PlanDayController:
             raise HTTPException(status_code=403, detail="This plan doesn't contain any days.")
         
         for step in reversed(plan_day.steps):
-            is_deletable = await self.plan_day_step_service.delete(step.id, just_check=True)
+            is_deletable = await PlanDayStepService._can_delete_step(plan, step)
             if not is_deletable:
                 raise HTTPException(status_code=403, detail="You can't delete this day because it contains some steps that cannot be deleted.")
         
@@ -84,7 +84,7 @@ class PlanDayController:
         return BaseResponse(message="Day deleted successfully", data=plan_data)
 
 
-    async def recommand_accomodation_services(self, plan_day_id: int):
+    async def recommand_accommodation_services(self, plan_day_id: int):
         plan_day = await self.repository.get(plan_day_id, load_relations=["steps.place_activity.place"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
@@ -106,9 +106,9 @@ class PlanDayController:
         if not last_city_id:
             raise HTTPException(status_code=404, detail="No city found for this plan day")
         
-        services = await self.accomodation_repository.recommand(self.user_id, last_city_id, load_relations=["images", "city"])
+        services = await self.accommodation_repository.recommand(self.user_id, last_city_id, load_relations=["images", "city"])
         if not services:
-            raise HTTPException(status_code=404, detail="No accomodation services found for this plan day")
+            raise HTTPException(status_code=404, detail="No accommodation services found for this plan day")
         return BaseResponse(message="Accomodation services fetched successfully", data=[AccomodationServiceRead.model_validate(service, from_attributes=True) for service in services])
 
         

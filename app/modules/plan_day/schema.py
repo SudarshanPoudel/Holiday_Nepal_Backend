@@ -7,7 +7,7 @@ class PlanDayRead(BaseModel):
     id: int
     index: int
     title: str
-    can_delete: Optional[float] = True
+    can_delete: Optional[bool] = True
 
     steps: List[PlanDayStepRead]
 

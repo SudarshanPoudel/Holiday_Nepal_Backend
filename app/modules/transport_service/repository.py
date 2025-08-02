@@ -76,15 +76,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         await self.db.execute(delete(TransportServiceRouteSegment).where(TransportServiceRouteSegment.service_id == service_id))
         await self.db.commit()
                 
-    async def recommend_services_matching_plan_step(self, plan_day_step_id: int) -> List[int]:
-        # Step 1: Get the plan step
-        step = await self.db.get(PlanDayStep, plan_day_step_id)
-        if not step or not step.start_city_id or not step.end_city_id:
-            return []
-
-        start_city_id = step.start_city_id
-        end_city_id = step.end_city_id
-
+    async def recommend_services(self, start_city_id: int, end_city_id: int) -> List[int]:
         # Step 2: Get all route IDs that start or end at those cities
         route_query = select(TransportRoute.id, TransportRoute.start_city_id, TransportRoute.end_city_id)
         routes_result = await self.db.execute(route_query)

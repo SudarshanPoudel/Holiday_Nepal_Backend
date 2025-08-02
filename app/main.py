@@ -18,7 +18,7 @@ from app.modules.places.routes import router as places_router
 from app.modules.storage.routes import router as image_router
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
-from app.modules.accomodation_services.routes import router as accomodation_service_router
+from app.modules.accommodation_services.routes import router as accommodation_service_router
 from app.modules.plans.routes import router as plans_router
 from app.modules.plan_day.routes import router as plan_day_router
 from app.modules.plan_day_steps.routes import router as plan_day_step_router
@@ -44,7 +44,7 @@ app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])
 app.include_router(transport_route_router, prefix="/transport-routes", tags=["Transport Route"])
 app.include_router(transport_service_router, prefix="/transport-services", tags=["Transport Service"])
-app.include_router(accomodation_service_router, prefix="/accomodation-services", tags=["Accomodation Service"])
+app.include_router(accommodation_service_router, prefix="/accommodation-services", tags=["Accomodation Service"])
 
 def custom_openapi():
     if app.openapi_schema:

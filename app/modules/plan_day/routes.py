@@ -82,8 +82,8 @@ async def delete_plan_day(
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.get("/{plan_day_id}/accomodation-services")
-async def get_accomodation_services(
+@router.get("/{plan_day_id}/accommodation-services")
+async def get_accommodation_services(
     request: Request,
     plan_day_id: int,
     db: AsyncSession = Depends(get_db),
@@ -92,7 +92,7 @@ async def get_accomodation_services(
     try:
         user_id = request.state.user_id
         controller = PlanDayController(db, graph_db, user_id)
-        return await controller.recommand_accomodation_services(plan_day_id)
+        return await controller.recommand_accommodation_services(plan_day_id)
     except HTTPException as e:
         raise e
     except Exception as e:
