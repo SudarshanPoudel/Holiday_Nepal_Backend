@@ -75,7 +75,6 @@ class PlanController():
         plan = await self.repository.duplicate_plan(plan_id, self.user_id)
         if not plan:
             raise HTTPException(status_code=404, detail="Plan not found")
-        await self.graph_repository.create_from_sql_model(plan, self.user_id, self.db)
         plan_data = await self.repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Plan duplicated successfully", data=plan_data)
 

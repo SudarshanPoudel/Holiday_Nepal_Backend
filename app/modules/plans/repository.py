@@ -18,15 +18,10 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         self.user_repository = UserRepository(self.db)
 
     async def duplicate_plan(self, plan_id: int, new_user_id: int) -> Plan:
-        original_plan = await self.get(
-            plan_id,
-            load_relations=[
-                "days.steps.route_hops",
-            ],
-        )
+        original_plan = await self.get(plan_id, load_relations=["unordered_days.unordered_steps.route_hops"])
         if not original_plan:
             return None
-
+        
         # Create new plan instance
         new_plan = Plan(
             user_id=new_user_id,
@@ -39,19 +34,24 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
             image_id=original_plan.image_id,
             start_city_id=original_plan.start_city_id,
         )
+        
+        new_plan.unordered_days = []
+        prev_day = None
+        prev_step = None
 
-        new_plan.days = []
         for old_day in original_plan.days:
             new_day = PlanDay(
-                index=old_day.index,
                 title=old_day.title,
-                plan=new_plan  # Set parent relationship (plan_id will be auto set)
+                plan=new_plan 
             )
-
-            new_day.steps = []
+            
+            if prev_day:
+                prev_day.next_plan_day = new_day
+            
+            new_day.unordered_steps = []
+            
             for old_step in old_day.steps:
                 new_step = PlanDayStep(
-                    index=old_step.index,
                     title=old_step.title,
                     category=old_step.category,
                     duration=old_step.duration,
@@ -59,28 +59,31 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                     image_id=old_step.image_id,
                     place_id=old_step.place_id,
                     place_activity_id=old_step.place_activity_id,
-                    start_city_id=old_step.start_city_id,
                     city_id=old_step.city_id,
-                    plan_day=new_day  # Set parent relationship (plan_day_id auto)
+                    plan_day=new_day  
                 )
-
-                # Clone route hops
+                
+                if prev_step:
+                    prev_step.next_plan_day_step = new_step
+                
                 new_step.route_hops = [
                     PlanRouteHop(
                         route_id=hop.route_id,
                         index=hop.index,
                         destination_city_id=hop.destination_city_id,
-                        plan_day_step=new_step  # Set parent (plan_day_step_id auto)
+                        plan_day_step=new_step  
                     )
                     for hop in old_step.route_hops
                 ]
-
-                new_day.steps.append(new_step)
-
-            new_plan.days.append(new_day)
-
+                
+                new_day.unordered_steps.append(new_step)
+                prev_step = new_step
+            
+            new_plan.unordered_days.append(new_day)
+            prev_day = new_day
+        
         self.db.add(new_plan)
-        await self.db.flush()  # Flush assigns IDs and persists relationships
+        await self.db.flush()  
         return new_plan
 
     
@@ -186,12 +189,13 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         load_relations = [
             "image",
             "start_city",
-            "days.steps.place",
-            "days.steps.place_activity.activity.image",
-            "days.steps.city",
-            "days.steps.image",
-            "days.steps.route_hops.route.start_city",
-            "days.steps.route_hops.route.end_city",
+            "unordered_days.unordered_steps.place",
+            "unordered_days.unordered_steps.place_activity.activity.image",
+            "unordered_days.unordered_steps.city",
+            "unordered_days.unordered_steps.image",
+            "unordered_days.unordered_steps.next_plan_day_step",
+            "unordered_days.unordered_steps.route_hops.route.start_city",
+            "unordered_days.unordered_steps.route_hops.route.end_city",
             "user.image"
         ]
         self.db.expire_all()
@@ -218,20 +222,23 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         if not plan:
             return None
         
+        cost = 0
+
         plan_data = PlanRead.model_validate(plan, from_attributes=True)
         plan_data.self_rating = await self.get_rating(user_id, plan_id)
         plan_data.is_saved = await self.is_saved(user_id, plan_id)
-        cost = 0
-        n_days = len(plan_data.days)
+        
         for day in plan_data.days:
             day_can_delete = True
             for step in day.steps:
-                step.can_delete = await PlanDayStepService._can_delete_step(plan, step)
+                step.can_delete = await PlanDayStepService._can_delete_step(self.db, step.id)
                 step.cost = step.cost * self._find_cost_multiplier(plan.no_of_people)
                 cost += step.cost
                 if not step.can_delete:
                     day_can_delete = False
             day.can_delete = day_can_delete
+
+        n_days = len(plan_data.days)
         plan_data.estimated_cost = cost
         image_id = plan_data.image.id if plan_data.image else None
         if not image_id and len(plan_data.days) > 0:
@@ -244,6 +251,8 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                 day.can_delete = day_can_delete
                 if plan_data.image:
                     break
+
+        self.db.expunge(plan)
         await self.update_from_dict(plan_id, {"estimated_cost": cost, "no_of_days": n_days, "image_id": image_id})
         return plan_data
 

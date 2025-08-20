@@ -25,14 +25,14 @@ class PlanDayStepController:
         self.transport_service_repository = TransportServiceRepository(db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
-        plan = await self.plan_repository.get(step.plan_id, load_relations=["days"])
+        plan = await self.plan_repository.get(step.plan_id, load_relations=["unordered_days"])
         if not step.plan_day_id:
             if not plan.days:
                 plan_day = await self.plan_day_repository.create(PlanDayCreate(plan_id=plan.id, index=0, title="Day 1 of " + plan.title))
                 step.plan_day_id = plan_day.id
             else:
                 step.plan_day_id = plan.days[-1].id
-        plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["steps"])
+        plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["unordered_steps"])
         if not plan_day:
             raise HTTPException(status_code=404, detail=f"Plan Day not found {step.plan_day_id}")
         if plan.user_id != self.user_id:

@@ -40,14 +40,14 @@ class PlanDayStepCreate(BaseModel):
     plan_id: int
     category: PlanDayStepCategoryEnum
     plan_day_id: Optional[int] = None
-    index: Optional[int] = None
+    next_plan_day_step_id: Optional[int] = None
     place_id: Optional[int] = None
     place_activity_id: Optional[int] = None
     city_id: Optional[int] = None
 
 class PlanDayStepCreateInternal(BaseModel):
     plan_day_id: int
-    index: int
+    next_plan_day_step_id: Optional[int] = None
     title: str
     category: PlanDayStepCategoryEnum
     duration: float

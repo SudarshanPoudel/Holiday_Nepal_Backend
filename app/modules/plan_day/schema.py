@@ -9,12 +9,12 @@ class PlanDayRead(BaseModel):
     title: str
     can_delete: Optional[bool] = True
 
-    steps: List[PlanDayStepRead]
+    steps: List[PlanDayStepRead] = []
 
 class PlanDayCreate(BaseModel):
     plan_id: int
-    index: int
     title: str
+    next_plan_day_id: Optional[int] = None
 
 class PlanDayUpdate(BaseModel):
     title: Optional[str]

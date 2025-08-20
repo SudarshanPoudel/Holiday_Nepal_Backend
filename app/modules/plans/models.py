@@ -24,9 +24,25 @@ class Plan(Base):
     
     user = relationship("User")
     image = relationship("Image")
-    days = relationship("PlanDay", uselist=True, cascade="all, delete-orphan", order_by="PlanDay.index")
+    unordered_days = relationship("PlanDay", uselist=True, cascade="all, delete-orphan")
     start_city = relationship("City", foreign_keys=[start_city_id])
     saved_by_users = relationship("User", secondary="user_saved_plans", back_populates="saved_plans")
+
+    @property
+    def days(self):
+        days_map = {day.id: day for day in self.unordered_days}
+        next_ids = {day.next_plan_day_id for day in self.unordered_days if day.next_plan_day_id}
+        head = next((day for day in self.unordered_days if day.id not in next_ids), None)
+        ordered_days = []
+        current = head
+        idx = 0
+        while current:
+            current.index = idx
+            ordered_days.append(current)
+            current = days_map.get(current.next_plan_day_id)
+            idx += 1
+
+        return ordered_days
 
 
 user_saved_plans = Table(

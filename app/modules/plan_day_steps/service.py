@@ -1,11 +1,12 @@
+from typing import Optional
 from fastapi import HTTPException
 from httpx import delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.plan_day_steps.models import PlanDayStep
 from app.modules.plans.models import Plan
 from app.modules.plans.repository import PlanRepository
 from neo4j import AsyncSession as Neo4jSession
-from typing import List, Optional, Tuple
 
 from app.modules.cities.graph import CityGraphRepository
 from app.modules.cities.repository import CityRepository
@@ -36,58 +37,29 @@ class PlanDayStepService:
         if graph_db:
             self.city_graph_repository = CityGraphRepository(graph_db)
 
-    async def add(self, step: PlanDayStepCreate, add_single_transport: bool = False):
+    async def add(self, step: PlanDayStepCreate):
         step = await self._refactor_step(step)
-        step_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["plan.days.steps"])
-        if not step_day:
-            raise HTTPException(status_code=404, detail="Plan Day not found")
         
-        plan = step_day.plan
-        days = plan.days
-        current_day_index = step_day.index
-
-        min_index = 0
-        for i in range(current_day_index - 1, -1, -1):  # go backwards to find last step
-            prev_day = days[i]
-            if prev_day.steps:
-                last_step = prev_day.steps[-1] 
-                min_index = last_step.index + 1
-                break
-        max_index = min_index + len(step_day.steps)
+        plan = await self.plan_repository.get(step.plan_id, load_relations=["start_city", "unordered_days.unordered_steps"])   
         
-        if step.index is not None:
-            if not (min_index <= step.index <= max_index):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Step index must be between {min_index} and {max_index} for this day."
-                )
-        else:
-            step.index = max_index  
-        all_steps = []
-        for day in plan.days:
-            for s in day.steps:
-                all_steps.append(s)
+        previous_step = await self.repository.get_by_fields({"next_plan_day_step_id": step.next_plan_day_step_id})
+        next_step = await self.repository.get(step.next_plan_day_step_id)
 
-        if step.index is None:
-            step.index = len(all_steps)
-
-        prev_step: PlanDayStep = all_steps[step.index-1] if step.index > 0 else None
-        next_step: PlanDayStep = all_steps[step.index] if step.index < len(all_steps)    else None
-        prev_step_city_id = prev_step.city_id if prev_step else plan.start_city_id
+        # Get plan and city context
+        prev_step_city_id = previous_step.city_id if previous_step else plan.start_city_id
         next_step_city_id = next_step.city_id if next_step else None
 
         steps_to_add = []
-        steps_to_remove = []
 
-        # if it's a transport step
+        # Handle different step insertion scenarios
         if step.category == PlanDayStepCategoryEnum.transport:
-            if prev_step_city_id == step.city_id or (next_step_city_id and step.city_id == next_step_city_id): 
-                return
-            
-            if next_step_city_id and next_step_city_id != step.city_id and next_step.category == PlanDayStepCategoryEnum.transport:
-                steps_to_remove.append(next_step)
+            if prev_step_city_id == step.city_id or (next_step_city_id and step.city_id == next_step_city_id):
+                return  # No transport needed
 
-            
+            if next_step_city_id and next_step_city_id != step.city_id and next_step.category == PlanDayStepCategoryEnum.transport:
+                await self._remove_step_from_global_chain(next_step.id, next_step.next_plan_day_step_id)
+                next_step = await self.repository.get(next_step.next_plan_day_step_id)
+
             steps_to_add.append(step)
             
             if next_step_city_id:
@@ -95,7 +67,6 @@ class PlanDayStepService:
                     plan_id = step.plan_id,
                     plan_day_id=next_step.plan_day_id if (next_step and next_step.category == PlanDayStepCategoryEnum.transport) else step.plan_day_id,
                     category=PlanDayStepCategoryEnum.transport,
-                    index=step.index + 1,
                     city_id=next_step_city_id
                 ))
 
@@ -104,97 +75,98 @@ class PlanDayStepService:
         
         else:
             if next_step and next_step.category == PlanDayStepCategoryEnum.transport:
-                steps_to_remove.append(next_step)
+                await self._remove_step_from_global_chain(next_step.id, next_step.next_plan_day_step_id)
+                next_step = await self.repository.get(next_step.next_plan_day_step_id)
+            
             steps_to_add.append(PlanDayStepCreate(
                 plan_id = step.plan_id,
                 plan_day_id=step.plan_day_id,
                 category=PlanDayStepCategoryEnum.transport,
-                index=step.index,
                 city_id=step.city_id
             ))
-            steps_to_add.append(PlanDayStepCreate(
-                **step.model_dump(exclude="index"),
-                index=step.index + 1
-            ))
+            steps_to_add.append(step)
 
             if next_step_city_id and next_step_city_id != step.city_id:
                 steps_to_add.append(PlanDayStepCreate(
                     plan_id = step.plan_id,
                     plan_day_id=next_step.plan_day_id if (next_step and next_step.category == PlanDayStepCategoryEnum.transport) else step.plan_day_id,
                     category=PlanDayStepCategoryEnum.transport,
-                    index=step.index + 2,
                     city_id=next_step_city_id
                 ))
 
-        # Update index
-        for st in all_steps[step.index:]:
-            await self.repository.update_from_dict(st.id, {"index": st.index + len(steps_to_add)})
+        # Insert new steps into the global chain
+        current_prev_step = previous_step
+        current_prev_city_id = prev_step_city_id
+        created_steps = []
 
-        prev_id = prev_step_city_id
-        for s in steps_to_add:
-            step_details = await get_step_details(self.db, self.graph_db, prev_id, s)
-            step_title = await get_step_title(self.db, s, prev_id)
+        for i, step_to_add in enumerate(steps_to_add):
+            step_details = await get_step_details(self.db, self.graph_db, current_prev_city_id, step_to_add)
+            step_title = await get_step_title(self.db, step_to_add, current_prev_city_id)
+            
+            next_step_for_this = None
+            if i == len(steps_to_add) - 1:  
+                next_step_for_this = next_step
+            else:
+                next_step_for_this = None  
+            
             step_internal = PlanDayStepCreateInternal(
-                plan_day_id=s.plan_day_id,
+                plan_day_id=step_to_add.plan_day_id,
                 title=step_title,
-                category=s.category,
+                category=step_to_add.category,
                 duration=step_details["duration"],
                 cost=step_details["cost"],
                 image_id=step_details["image"].id if step_details["image"] else None,
-                place_id=s.place_id,
-                city_id=s.city_id,
-                index=s.index,
-                place_activity_id=s.place_activity_id
+                place_id=step_to_add.place_id,
+                city_id=step_to_add.city_id,
+                place_activity_id=step_to_add.place_activity_id,
+                next_plan_day_step_id=next_step_for_this.id if next_step_for_this else None
             )
+            
             step_db = await self.repository.create(step_internal)
-            if s.category == PlanDayStepCategoryEnum.transport:
-                await self._create_transport_route_hops(step_db, prev_id, s.city_id)
+            created_steps.append(step_db)
+            
+            if current_prev_step:
+                await self.repository.update_from_dict(current_prev_step.id, {"next_plan_day_step_id": step_db.id})
+            
+            if i > 0:
+                await self.repository.update_from_dict(created_steps[i-1].id, {"next_plan_day_step_id": step_db.id})
+            
+            if step_to_add.category == PlanDayStepCategoryEnum.transport:
+                await self._create_transport_route_hops(step_db, current_prev_city_id, step_to_add.city_id)
 
-            prev_id = s.city_id
+            current_prev_step = step_db
+            current_prev_city_id = step_to_add.city_id
 
-        for s in steps_to_remove:
-            for st in all_steps[s.index-len(steps_to_add):]:
-                await self.repository.update_from_dict(st.id, {"index": st.index - 1})
-            await self.repository.delete(s.id)
-
-        return step_db
-    
+        return created_steps[0] if created_steps else None
 
     async def delete(self, step_id: int, force=False):
-        step = await self.repository.get(step_id, load_relations=["plan_day.plan.days.steps"])
+        step = await self.repository.get(step_id, load_relations=["plan_day.plan", "next_plan_day_step"])
         if not step:
             raise HTTPException(status_code=404, detail="Step not found")
-        plan_day = step.plan_day
-        plan = plan_day.plan
-
         
-        can_delete = await PlanDayStepService._can_delete_step(plan, step) if not force else True
+        plan = step.plan_day.plan
+        can_delete = await PlanDayStepService._can_delete_step(self.db, step.id) if not force else True
         if not can_delete:
             raise HTTPException(status_code=400, detail="Can't delete this step.")
-    
-        all_steps = [s for day in plan.days for s in day.steps]
+
         if step.category != PlanDayStepCategoryEnum.transport:
-            for st in all_steps[step.index:]:
-                await self.repository.update_from_dict(st.id, {"index": st.index - 1})
-            await self.repository.delete(step_id)
+            await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
             return True
 
-        # Transport Step Deletion Logic
-        index = step.index
-        prev_step = all_steps[index - 1] if index > 0 else None
-        next_step = all_steps[index + 1] if index + 1 < len(all_steps) else None
+        # Transport step deletion logic
+        next_step = step.next_plan_day_step
 
         if not next_step:
-            await self.repository.delete(step_id)
+            await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
             return True
 
+        previous_step = await self.repository.get_by_fields({"next_plan_day_step_id": step.id})
         if next_step.category == PlanDayStepCategoryEnum.transport:
-            prev_step_city = prev_step.city_id if prev_step else plan.start_city_id
+            prev_step_city = previous_step.city_id if previous_step else plan.start_city_id
+            
             if prev_step_city == next_step.city_id:
-                for st in all_steps[step.index:]:
-                    await self.repository.update_from_dict(st.id, {"index": st.index - 1})
-                await self.repository.delete(next_step.id)
-                
+                await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
+                await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
             else:
                 next_step_create = PlanDayStepCreate(
                     plan_id=plan.id,
@@ -210,100 +182,110 @@ class PlanDayStepService:
                     "image_id": details["image"].id if details["image"] else None,
                     "title": title
                 })
-
+                await self.plan_route_hop_repository.clear_all(next_step.id)
+                await self._create_transport_route_hops(next_step, prev_step_city, next_step.city_id)
+                await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
         else:
             raise HTTPException(status_code=400, detail="Can't delete transport step that leads to visit or activity")
 
-        for st in all_steps[step.index:]:
-            await self.repository.update_from_dict(st.id, {"index": st.index - 1})
-        await self.repository.delete(step_id)
-
         return True
 
-    async def reorder(self, step_id: int, new_index: int):
-        step = await self.repository.get(step_id)
-        day = await self.plan_day_repository.get(step.plan_day_id)
+    async def reorder(self, step_id: int, next_step_id: Optional[int] = None):
+        step = await self.repository.get(step_id, load_relations=["plan_day.plan", "next_plan_day_step"])
+        if not step:
+            raise HTTPException(status_code=404, detail="Step not found")
+
+        target_day_id = None
+        if next_step_id:
+            next_step = await self.repository.get(next_step_id)
+            target_day_id = next_step.plan_day_id
+
+        can_delete = await PlanDayStepService._can_delete_step(self.db, step.id)
+        if not can_delete:
+            raise HTTPException(status_code=400, detail="Can't reorder this step.")
+                
         step_create = PlanDayStepCreate(
-            plan_id = day.plan_id,
-            plan_day_id=step.plan_day_id,
+            plan_id=step.plan_day.plan_id,
+            plan_day_id=target_day_id,
             category=step.category,
             place_id=step.place_id,
             place_activity_id=step.place_activity_id,
             city_id=step.city_id,
-            index=new_index
+            next_plan_day_step_id=next_step_id
         )
-        try:
-            await self.delete(step_id)
-            await self.add(step_create)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail="Failed to reorder step")
         
+
+        await self.delete(step_id)
+        return await self.add(step_create)
+    
+    
     async def handle_change_start_city(self, plan_id, start_city_id):
-        print(f"Plan {plan_id} start city changed to {start_city_id}")
+        """Handle when the plan's start city changes"""
         plan = await self.plan_repository.get(plan_id, load_relations=["days.steps"])
-        first_step = None
-        all_steps = []
-        for day in plan.days:
-            for step in day.steps:
-                all_steps.append(step)
-                if not first_step:
-                    first_step = step
+        
+        first_step = await self.repository.get_by_fields({"plan_id": plan_id, "previous_plan_day_step_id": None}, load_relations=["previous_plan_day_step", "next_plan_day_step"])
         
         if not first_step:
             return True
-        print(f"First step city {first_step.city_id}")
-        index_change = 0
+
         if first_step.city_id != start_city_id and first_step.category != PlanDayStepCategoryEnum.transport:
-            s = PlanDayStepCreate(
+            transport_step = PlanDayStepCreate(
                 plan_id=plan_id,
                 plan_day_id=first_step.plan_day_id,
                 category=PlanDayStepCategoryEnum.transport,
                 city_id=first_step.city_id,
-                index=0  
+                next_plan_day_id=first_step.id
             )
-            index_change += 1
-            step_details = await get_step_details(self.db, self.graph_db, start_city_id, s)
-            step_title = await get_step_title(self.db, s, start_city_id)
+            
+            step_details = await get_step_details(self.db, self.graph_db, start_city_id, transport_step)
+            step_title = await get_step_title(self.db, transport_step, start_city_id)
+            
             step_internal = PlanDayStepCreateInternal(
-                plan_day_id=s.plan_day_id,
+                plan_day_id=transport_step.plan_day_id,
                 title=step_title,
-                category=s.category,
+                category=transport_step.category,
                 duration=step_details["duration"],
                 cost=step_details["cost"],
                 image_id=step_details["image"].id if step_details["image"] else None,
-                place_id=s.place_id,
-                city_id=s.city_id,
-                index=s.index,
-                place_activity_id=s.place_activity_id
+                place_id=transport_step.place_id,
+                city_id=transport_step.city_id,
+                place_activity_id=transport_step.place_activity_id,
+                previous_plan_day_step_id=None,  
+                next_plan_day_step_id=first_step.id
             )
+            
             step_db = await self.repository.create(step_internal)
-            if s.category == PlanDayStepCategoryEnum.transport:
-                await self._create_transport_route_hops(step_db, start_city_id, s.city_id)
+            await self.repository.update_from_dict(first_step.id, {"previous_plan_day_step_id": step_db.id})
+            await self._create_transport_route_hops(step_db, start_city_id, transport_step.city_id)
 
-        elif first_step.city_id == start_city_id:
-            index_change -= 1
-            print(f"Removing first step {first_step.id}")
-            await self.repository.delete(first_step.id)
-            all_steps.pop(0)
+        elif first_step.city_id == start_city_id and first_step.category == PlanDayStepCategoryEnum.transport:
+            await self._remove_step_from_global_chain(first_step.id, first_step.next_plan_day_step_id)
 
         elif first_step.category == PlanDayStepCategoryEnum.transport:
-            step_db = await self.repository.get(first_step.id, load_relations=["route_hops"])
-            for hops in step_db.route_hops:
-                await self.plan_route_hop_repository.delete(hops.id)
+            step_db = await self.repository.get(first_step.id)
+            await self.plan_route_hop_repository.clear_all(step_db.id)
+            
             step_details = await get_step_details(self.db, self.graph_db, start_city_id, first_step)
             title = await get_step_title(self.db, first_step, start_city_id)
+            
             await self.repository.update_from_dict(step_db.id, {
                 "duration": step_details["duration"],
                 "cost": step_details["cost"],
                 "image_id": step_details["image"].id if step_details["image"] else None,
                 "title": title
             })
-            await self._create_transport_route_hops(step_db, start_city_id, first_step.city_id)
-        
-        for step in all_steps:
-            await self.repository.update_from_dict(step.id, {"index": step.index + index_change})
             
+            await self._create_transport_route_hops(step_db, start_city_id, first_step.city_id)
 
+    async def _remove_step_from_global_chain(self, step_id, next_step_id: int = None):
+        previous_step = await self.repository.get_by_fields({"next_plan_day_step_id": step_id})
+
+        if previous_step:
+            await self.repository.update_from_dict(
+                previous_step.id, 
+                {"next_plan_day_step_id": next_step_id}
+            )
+        await self.repository.delete(step_id)
 
     async def _refactor_step(self, step: PlanDayStepCreate):
         """Clean up step data based on category"""
@@ -354,20 +336,15 @@ class PlanDayStepService:
             )
         )
     
-    
     @staticmethod
-    async def _can_delete_step(plan: Plan, step: PlanDayStep):
-        all_steps = [s for day in plan.days for s in day.steps]
+    async def _can_delete_step(db, step_id: int):
+        """Check if a step can be deleted"""
+        repo = PlanDayStepRepository(db)
+        step = await repo.get(step_id, load_relations=["next_plan_day_step"])
         if step.category != PlanDayStepCategoryEnum.transport:
             return True
-        index = step.index
-        prev_index = None
-        next_step = None
-        for st in all_steps:
-            if st.index > index:
-                next_step = st
-                break
-
+        
+        next_step = step.next_plan_day_step
         if not next_step:
             return True
         

@@ -37,6 +37,7 @@ class PlanDayController:
             raise HTTPException(status_code=404, detail="Plan day not found")
         if plan_day.plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
+        data.pop('next_plan_day_id', None)
         plan_day_db = await self.repository.update_from_dict(plan_day_id, data)
         if not plan_day_db:
             raise HTTPException(status_code=404, detail="Plan day not found")
@@ -45,20 +46,17 @@ class PlanDayController:
     
 
     async def add_day(self, plan_day: PlanDayCreate):
-        plan = await self.plan_repository.get(plan_day.plan_id, load_relations=["days"])
+        plan = await self.plan_repository.get(plan_day.plan_id, load_relations=["unordered_days"])
         if not plan:
             raise HTTPException(status_code=404, detail="Plan not found")
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
-        day = len(plan.days)
-        for day in plan.days[plan_day.index:]:
-            await self.repository.update_from_dict(day.id, {"index": day.index+1})
         plan_day_db = await self.repository.create(plan_day)
         plan_data = await self.plan_repository.get_updated_plan(plan_day.plan_id, user_id=self.user_id)
         return BaseResponse(message="Day added successfully", data=plan_data)
     
     async def delete_day(self, plan_day_id: int):
-        plan_day = await self.repository.get(plan_day_id, load_relations=["plan.days.steps", "steps"])
+        plan_day = await self.repository.get(plan_day_id, load_relations=["plan.unordered_days.unordered_steps", "plan.unordered_days", "unordered_steps"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
         plan = plan_day.plan
@@ -75,9 +73,6 @@ class PlanDayController:
         for step in reversed(plan_day.steps):
             await self.plan_day_step_service.delete(step.id)
         await self.repository.delete(plan_day_id)
-
-        for day in plan.days[plan_day.index:]:
-            await self.repository.update_from_dict(day.id, {"index": day.index-1})
 
         await self.plan_repository.update_from_dict(plan.id, {"no_of_days": len(plan.days)-1})
         plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)

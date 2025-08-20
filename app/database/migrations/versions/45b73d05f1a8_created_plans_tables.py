@@ -1,7 +1,7 @@
 """Created plans tables
 
 Revision ID: 45b73d05f1a8
-Revises: 8820514ef02f
+Revises: d346661cdd33
 Create Date: 2025-06-14 12:22:17.809105
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '45b73d05f1a8'
-down_revision: Union[str, None] = '8820514ef02f'
+down_revision: Union[str, None] = 'd346661cdd33'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -46,7 +46,7 @@ def upgrade() -> None:
         'plan_days',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('plan_id', sa.Integer(), sa.ForeignKey('plans.id', ondelete="CASCADE"), nullable=False),
-        sa.Column('index', sa.Integer(), nullable=False),  # was 'day' before
+        sa.Column('next_plan_day_id', sa.ForeignKey('plan_days.id'), nullable=True), 
         sa.Column('title', sa.String(), nullable=False)
     )
 
@@ -54,7 +54,7 @@ def upgrade() -> None:
     op.create_table(
         'plan_day_steps',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('index', sa.Integer(), nullable=False),
+        sa.Column('next_plan_day_step_id', sa.ForeignKey('plan_day_steps.id'), nullable=True),
         sa.Column('plan_day_id', sa.Integer(), sa.ForeignKey('plan_days.id', ondelete="CASCADE"), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('category', plan_day_step_category_enum, nullable=True),

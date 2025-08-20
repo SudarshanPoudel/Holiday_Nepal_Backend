@@ -44,7 +44,7 @@ class PlanIndex(BaseModel):
         
 class PlanRead(PlanIndex):
     is_private: bool
-    days: List[PlanDayRead]
+    days: List[PlanDayRead] = []
 
     is_saved: Optional[bool] = None
     self_rating: Optional[int] = None
