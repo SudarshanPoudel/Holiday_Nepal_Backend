@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 import traceback
 from app.database.database import get_db
@@ -45,17 +46,36 @@ async def add_plan_day_step(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/")
+@router.delete("/{plan_day_step_id}")
 async def delete_plan_day_step(
     request: Request, 
-    plan_id: int,
+    plan_day_step_id: int,
     db: AsyncSession = Depends(get_db),
     graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         user_id = request.state.user_id
         controller = PlanDayStepController(db, graph_db, user_id)
-        return await controller.delete_day_step(plan_id)
+        return await controller.delete_day_step(plan_day_step_id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.put("/{plan_day_step_id}")
+async def reorder_plan_day_step(
+    request: Request, 
+    plan_day_step_id: int,
+    plan_day_id: int,
+    next_step_id: Optional[int] = None,
+    db: AsyncSession = Depends(get_db),
+    graph_db: Neo4jSession = Depends(get_graph_db)
+):
+    try:
+        user_id = request.state.user_id
+        controller = PlanDayStepController(db, graph_db, user_id)
+        return await controller.reorder_day_step(plan_day_step_id, plan_day_id, next_step_id)
     except HTTPException as e:
         raise e
     except Exception as e:        

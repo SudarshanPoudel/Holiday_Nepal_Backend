@@ -1,7 +1,7 @@
 from app.database.graph_database import get_graph_db
-from app.database.seeder.default_accomodation_service import seed_default_accomodation_services
+from app.database.seeder.default_accommodation_service import seed_default_accommodation_services
 from app.database.seeder.default_activities import seed_default_activities
-from app.database.seeder.default_cities import seed_default_cities
+from app.database.seeder.default_cities import seed_default_cities, update_city_embeddings
 from app.database.seeder.default_bucket import create_bucket_if_not_exists
 from app.database.seeder.default_places import seed_default_places
 from app.database.database import get_db 
@@ -18,11 +18,12 @@ async def run_seeder():
         async for graph_db in get_graph_db():
             await seed_default_cities(db, graph_db)
             await seed_default_users(db)
-            await seed_default_activities(db, graph_db)
+            await seed_default_activities(db)
             await seed_default_places(db, graph_db)
             await seed_default_transport_routes(db, graph_db)
-            await seed_default_transport_services(db, graph_db)
-            await seed_default_accomodation_services(db)
+            await seed_default_transport_services(db)
+            await seed_default_accommodation_services(db)
+            await update_city_embeddings(db)
             
     print("Seeder: Seeding completed.")
 

@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.repository import BaseRepository
 from app.modules.transport_route.models import TransportRoute
 from app.modules.transport_route.schema import TransportRouteCreate

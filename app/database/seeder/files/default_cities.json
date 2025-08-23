@@ -20,10 +20,6 @@
     "location": [28.26689, 83.96851]
   },
   {
-    "name": "Palpa",
-    "location": [27.8892, 83.4643]
-  },
-  {
     "name": "Butwal",
     "location": [27.686386, 83.432426]
   },
@@ -48,7 +44,7 @@
     "location": [27.671, 85.4298]
   },
   {
-    "name": "muglin",
+    "name": "Muglin",
     "location": [27.8561, 84.5615]
   },
   {
@@ -170,14 +166,6 @@
   {
     "name": "Beni",
     "location": [28.6, 83.5667]
-  },
-  {
-    "name": "Kushma",
-    "location": [28.2333, 83.6833]
-  },
-  {
-    "name": "Lekhnath",
-    "location": [28.2333, 84.0833]
   },
   {
     "name": "Kawasoti",

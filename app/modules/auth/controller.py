@@ -131,12 +131,12 @@ class AuthController:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     async def me(self, user_id: int, db: AsyncSession):
-        user_repo = UserRepository(db_session=db)
+        user_repo = UserRepository(db=db)
         user = await user_repo.get(record_id=user_id, load_relations=["image"])
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         user_read = UserReadMinimal.model_validate(user, from_attributes=True)
-        return BaseResponse(message="Profile fetched  success", data=user_read)
+        return BaseResponse(message="Profile fetched  success", data=user_read) 
 
 
     async def logout(self, request: Request, response: Response, db: AsyncSession):

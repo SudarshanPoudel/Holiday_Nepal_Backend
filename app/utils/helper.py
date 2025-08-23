@@ -14,7 +14,6 @@ def slugify(text: str) -> str:
     return text
 
 def symmetric_pair(a: int, b: int) -> int:
-    a, b = sorted((a, b))
     return (a + b) * (a + b + 1) // 2 + b
 
 

@@ -6,6 +6,7 @@ from fastapi.openapi.utils import get_openapi
 from app.core.all_models import *
 from app.middlerware.auth import AuthMiddleware
 from app.middlerware.cors import add_cors_middleware
+from app.database.redis_cache import redis_lifespan
 
 from app.utils.homeage_router import router as homeage_router
 from app.modules.auth.routes import router as auth_router
@@ -17,13 +18,13 @@ from app.modules.places.routes import router as places_router
 from app.modules.storage.routes import router as image_router
 from app.modules.transport_route.routes import router as transport_route_router
 from app.modules.transport_service.routes import router as transport_service_router
-from app.modules.accomodation_services.routes import router as accomodation_service_router
+from app.modules.accommodation_services.routes import router as accommodation_service_router
 from app.modules.plans.routes import router as plans_router
 from app.modules.plan_day.routes import router as plan_day_router
 from app.modules.plan_day_steps.routes import router as plan_day_step_router
-from app.ai.routes import router as ai_router
+from app.modules.ai.routes import router as ai_router
 
-app = FastAPI()
+app = FastAPI(lifespan=redis_lifespan)
 
 security = HTTPBearer()
 app.add_middleware(AuthMiddleware)
@@ -43,7 +44,7 @@ app.include_router(activities_router, prefix="/activities", tags=["Activities"])
 app.include_router(places_router, prefix="/places", tags=["Places"])
 app.include_router(transport_route_router, prefix="/transport-routes", tags=["Transport Route"])
 app.include_router(transport_service_router, prefix="/transport-services", tags=["Transport Service"])
-app.include_router(accomodation_service_router, prefix="/accomodation-services", tags=["Accomodation Service"])
+app.include_router(accommodation_service_router, prefix="/accommodation-services", tags=["Accomodation Service"])
 
 def custom_openapi():
     if app.openapi_schema:

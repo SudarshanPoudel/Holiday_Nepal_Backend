@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import DeclarativeMeta , selectinload , joinedload
 from fastapi_pagination import Params, Page
+from rapidfuzz import process, fuzz
 from sqlalchemy.sql.expression import or_
 from sqlalchemy import asc, desc
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -95,7 +96,7 @@ class BaseRepository(Generic[ModelType, SchemaType]):
         return record
 
 
-    async def get_all(self,load_relations: list[str] = None) -> list[ModelType]:
+    async def get_all(self,load_relations: list[str] = None, extra_conditions: Optional[List[Any]] = None) -> list[ModelType]:
         """Get all records."""
         query = select(self.model)
         if load_relations:
@@ -111,6 +112,10 @@ class BaseRepository(Generic[ModelType, SchemaType]):
                     query = query.options(option)
                 else:
                     query = query.options(selectinload(getattr(self.model, relation)))
+
+        if extra_conditions:
+            for condition in extra_conditions:
+                query = query.filter(condition)
         result = await self.db.execute(query)
 
         return result.scalars().unique().all()
@@ -226,3 +231,44 @@ class BaseRepository(Generic[ModelType, SchemaType]):
 
         result = await self.db.execute(query)
         return result.scalars().all()
+    
+
+    async def get_similar(
+        self,
+        query_string: str,
+        column_name: str = "name",
+        limit: int = 5,
+        min_score: int = 0,
+        extra_conditions: Optional[List[Any]] = None,
+        load_relations: list[str] = None
+    ) -> List[ModelType]:
+        all_data = await self.get_all(
+            load_relations=load_relations, 
+            extra_conditions=extra_conditions
+        )
+        
+        # Only include objects that have the specified column and it's a string
+        choices: Dict[str, ModelType] = {}
+        for obj in all_data:
+            column_value = getattr(obj, column_name, None)
+            if isinstance(column_value, str) and column_value.strip():  # Ensure non-empty string
+                choices[column_value] = obj
+        
+        if not choices:
+            return []
+        
+        # Perform fuzzy matching
+        matches = process.extract(
+            query_string,
+            choices.keys(),  # Pass the strings, not the choices dict
+            scorer=fuzz.ratio,
+            limit=limit
+        )
+        
+        # Extract objects in order of similarity score (highest first)
+        result = []
+        for match_string, score, _ in matches:
+            if score >= min_score and match_string in choices:  # Filter by minimum score
+                result.append(choices[match_string])
+        
+        return result

@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgis/postgis:15-3.3
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.pg
     platform: linux/amd64
     environment:
       POSTGRES_USER: postgres
@@ -91,8 +93,6 @@ services:
       - localstack
     command: >
       sh -c "
-        sleep 10 &&
-        alembic upgrade head &&
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
 

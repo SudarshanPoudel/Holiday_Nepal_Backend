@@ -1,4 +1,4 @@
-from app.modules.accomodation_services.models import AccomodationService
+from app.modules.accommodation_services.models import AccomodationService
 from app.modules.activities.models import Activity
 from app.modules.cities.models import City
 from app.modules.auth.models import RefreshToken

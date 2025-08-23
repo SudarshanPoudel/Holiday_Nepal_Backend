@@ -46,15 +46,15 @@ async def index_city(
 
 @router.get("/nearest")
 async def get_nearest_cities(
-    latitude: float,
-    longitude: float,
+    city_id: int,
     params: Params = Depends(),
+    search: Optional[str] = Query(None, description="Search query for city name"),
     db: AsyncSession = Depends(get_db),
     graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     controller = CityController(db, graph_db)
     try:
-        return await controller.nearest(latitude=latitude, longitude=longitude, params=params)
+        return await controller.nearest(city_id, params=params, search=search)
     except HTTPException as e:
         raise e
     except Exception as e:

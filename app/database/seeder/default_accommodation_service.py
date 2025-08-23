@@ -3,14 +3,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.all_models import City, AccomodationService, Image
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.accomodation_services.schema import AccomodationCategoryEnum
+from app.modules.accommodation_services.schema import AccomodationCategoryEnum
 from app.modules.storage.schema import ImageCategoryEnum
 
 from app.modules.storage.service import StorageService
 from app.utils.image_utils import validate_and_process_image
 
-async def seed_default_accomodation_services(db: AsyncSession):
+async def seed_default_accommodation_services(db: AsyncSession):
     service_data = load_data("files/default_accommodation_services.json")
+    n = 0
     for data in service_data:
         city = await db.scalar(select(City).where(City.name == data["city"]))
         if not city:
@@ -30,7 +31,7 @@ async def seed_default_accomodation_services(db: AsyncSession):
         # Upload images and create image records
         images = []
         for image_name in data["images"]:
-            local_path = Path(get_file_path("../../../seeder-images/accomodation/" + image_name))
+            local_path = Path(get_file_path("../../../seeder-images/accommodation/" + image_name))
             if not local_path.exists():
                 print(f"Image {image_name} not found. Skipping.")
                 continue
@@ -56,7 +57,7 @@ async def seed_default_accomodation_services(db: AsyncSession):
             description=data["description"],
             city_id=city.id,
             full_address=data["full_address"],
-            accomodation_category=AccomodationCategoryEnum(data["accomodation_category"]),
+            accommodation_category=AccomodationCategoryEnum(data["accommodation_category"]),
             longitude=data["longitude"],
             latitude=data["latitude"],
             cost_per_night=data["cost_per_night"],
@@ -64,6 +65,9 @@ async def seed_default_accomodation_services(db: AsyncSession):
         )
 
         db.add(service)
+        n += 1
+
+        print(f"Seeder - Accomodation service: {data['name']}")
 
     await db.commit()
-    print("Seeder: Accomodation services seeded.")
+    print(f"Seeder: Seeded {n} Accomodation services")

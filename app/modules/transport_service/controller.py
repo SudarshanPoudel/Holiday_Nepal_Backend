@@ -3,8 +3,6 @@ from typing import Dict, Optional
 from fastapi import HTTPException
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.transport_service.graph import TransportServiceCityEdge, TransportServiceGraphRepository, TransportServiceNode, TransportServiceRouteHopCityEdge, TransportServiceRouteHopGraphRepository, TransportServiceRouteHopNode, TransportServiceRouteHopTransportServiceRouteHopEdge, TransportServiceTransportRouteHopEdge
-from neo4j import AsyncSession as Neo4jSession
 
 from app.core.schemas import BaseResponse
 from app.modules.transport_route.repository import TransportRouteRepository
@@ -13,13 +11,10 @@ from app.modules.transport_service.schema import TransportServiceBase, Transport
 
 
 class TransportServiceController:
-    def __init__(self, db: AsyncSession, graph_db: Neo4jSession):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.graph_db = graph_db
         self.repository = TransportServiceRepository(db)
         self.route_repository = TransportRouteRepository(db)
-        self.graph_repository = TransportServiceGraphRepository(graph_db)
-        self.route_hop_graph_repository = TransportServiceRouteHopGraphRepository(graph_db)
 
     async def create(self, transport_service: TransportServiceCreate):
         start_route = await self.route_repository.get(transport_service.route_ids[0])
@@ -46,52 +41,10 @@ class TransportServiceController:
         )
 
         res = await self.repository.create(service)
-        await self.graph_repository.create(
-            TransportServiceNode(
-                id=res.id,
-                start_city_id=start_route.start_city_id,
-                end_city_id=end_route.end_city_id,
-                route_category=transport_service.route_category,
-                transport_category=transport_service.transport_category,
-                total_distance=total_distance,
-                average_duration=transport_service.average_duration,
-                cost=transport_service.cost
-            ))
-        await self.graph_repository.add_edge(
-            TransportServiceCityEdge(
-                source_id=res.id,
-                target_id=start_route.start_city_id
-            ))
+        
 
         try:
-            segments = await self.repository.add_route_segment(res.id, transport_service.route_ids)
-            last_segment = None
-            
-            for (i, segment) in enumerate(segments):
-                route = await self.route_repository.get(segment.route_id)
-                await self.route_hop_graph_repository.create(
-                    TransportServiceRouteHopNode(id=segment.id, route_id=segment.route_id)
-                )
-                await self.route_hop_graph_repository.add_edge(
-                    TransportServiceRouteHopCityEdge(source_id=segment.id, target_id=route.end_city_id)
-                )
-                if last_segment is None:
-                    await self.graph_repository.add_edge(
-                        TransportServiceTransportRouteHopEdge(
-                            source_id=res.id,
-                            target_id=segment.id,
-                        )
-                    )
-                else:
-                    await self.route_hop_graph_repository.add_edge(
-                        TransportServiceRouteHopTransportServiceRouteHopEdge(
-                            source_id=last_segment.id,
-                            target_id=segment.id,
-                        )
-                    )
-                last_segment = segment
-
-
+            await self.repository.add_route_segment(res.id, transport_service.route_ids)
             if transport_service.image_ids:
                 await self.repository.attach_images(res.id, transport_service.image_ids)
         except Exception as e:
@@ -160,56 +113,7 @@ class TransportServiceController:
 
         res = await self.repository.update(transport_service_id, service)
         
-        try:
-            await self.graph_repository.delete(transport_service_id)
-        except Exception as e:
-            print(f"Error deleting from graph database: {e}")
-        
-        await self.graph_repository.create(
-            TransportServiceNode(
-                id=transport_service_id,
-                start_city_id=start,
-                end_city_id=end,
-                route_category=transport_service.route_category or existing.route_category,
-                transport_category=transport_service.transport_category or existing.transport_category,
-                total_distance=total_distance,
-                average_duration=transport_service.average_duration or existing.average_duration,
-                cost=transport_service.cost or existing.cost
-            )
-        )
-        await self.graph_repository.add_edge(
-            TransportServiceCityEdge(
-                source_id=res.id,
-                target_id=start_route.start_city_id
-            ))
-        
-        # Recreate all route hop relationships
-        last_segment = None
-        
-        for (i, segment) in enumerate(segments):
-            route = await self.route_repository.get(segment.route_id)
-            await self.route_hop_graph_repository.create(
-                TransportServiceRouteHopNode(id=segment.id, route_id=segment.route_id)
-            )
-            await self.route_hop_graph_repository.add_edge(
-                TransportServiceRouteHopCityEdge(source_id=segment.id, target_id=route.end_city_id)
-            )
-            if last_segment is None:
-                await self.graph_repository.add_edge(
-                    TransportServiceTransportRouteHopEdge(
-                        source_id=transport_service_id,
-                        target_id=segment.id,
-                    )
-                )
-            else:
-                await self.route_hop_graph_repository.add_edge(
-                    TransportServiceRouteHopTransportServiceRouteHopEdge(
-                        source_id=last_segment.id,
-                        target_id=segment.id,
-                    )
-                )
-            last_segment = segment
-        
+
         await self.repository.replace_images(transport_service_id, transport_service.image_ids)
         service = await self.repository.get(res.id, load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"])
         return BaseResponse(message="Transport service updated successfully", data=TransportServiceRead.model_validate(service, from_attributes=True))
@@ -218,7 +122,6 @@ class TransportServiceController:
         deleted = await self.repository.delete(transport_service_id)
         if not deleted:
             raise HTTPException(status_code=404, detail="Transport service not found")
-        await self.graph_repository.delete(transport_service_id)
         return BaseResponse(message="Transport service deleted successfully")
     
     async def index(

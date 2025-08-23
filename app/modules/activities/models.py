@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, ForeignKey
+from pgvector.sqlalchemy import Vector
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -10,6 +11,7 @@ class Activity(Base):
     name = Column(String, unique=True, index=True)
     description = Column(String, nullable=True)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
+    embedding = Column(Vector(384), nullable=True)
 
     place_activities = relationship("PlaceActivity", back_populates="activity", cascade="all, delete-orphan")
     image = relationship("Image")

@@ -43,6 +43,9 @@ class Settings(BaseSettings):
 
     ADMIN_USERNAMES: List[str]
 
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_API_KEY: str
+
     DEV_TOKEN: str = ''
     class Config:
         env_file = ".env" if os.getenv("DOCKERIZED") != "1" else None

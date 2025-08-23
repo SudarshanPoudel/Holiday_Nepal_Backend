@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Enum, Integer, String, ForeignKey, Float, Table
+from pgvector.sqlalchemy import Vector
 from sqlalchemy.orm import relationship
 from app.database.database import Base
 from app.modules.places.schema import PlaceCategoryEnum
@@ -22,6 +23,7 @@ class Place(Base):
     city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
     average_visit_duration = Column(Float, nullable=True)
     average_visit_cost = Column(Float, nullable=True)
+    embedding = Column(Vector(384), nullable=True)
 
     place_activities = relationship("PlaceActivity", back_populates="place", cascade="all, delete-orphan", uselist=True)
     images = relationship("Image", secondary=place_images, uselist=True)

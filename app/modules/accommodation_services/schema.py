@@ -18,7 +18,7 @@ class AccomodationServiceBase(BaseModel):
     description: Optional[str] = None
     city_id: int
     full_address: str
-    accomodation_category: AccomodationCategoryEnum
+    accommodation_category: AccomodationCategoryEnum
     longitude: float
     latitude: float
     cost_per_night: float
@@ -32,7 +32,7 @@ class AccomodationServiceReadMinimal(BaseModel):
     name: str
     full_address: str
     city_id: int
-    accomodation_category: AccomodationCategoryEnum
+    accommodation_category: AccomodationCategoryEnum
     longitude: float
     latitude: float
     cost_per_night: float
@@ -51,4 +51,4 @@ class AccomodationServiceRead(AccomodationServiceReadMinimal):
 
 class AccomodationServiceFilter(BaseModel):
     city_id: Optional[int] = None
-    accomodation_category: Optional[AccomodationCategoryEnum] = None
+    accommodation_category: Optional[AccomodationCategoryEnum] = None

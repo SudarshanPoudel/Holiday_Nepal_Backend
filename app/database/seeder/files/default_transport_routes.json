@@ -1,13 +1,5 @@
 [
   {
-    "start_city": "Gaindakot",
-    "end_city": "Bharatpur",
-    "route_category": "road",
-    "distance": 10,
-    "average_duration": 0.5,
-    "average_cost": 1000
-  },
-  {
     "start_city": "Bharatpur",
     "end_city": "Bandipur",
     "route_category": "road",
