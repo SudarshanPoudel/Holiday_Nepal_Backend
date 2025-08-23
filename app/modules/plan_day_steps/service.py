@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import HTTPException
 from httpx import delete
 from sqlalchemy import select
@@ -14,9 +14,9 @@ from app.modules.place_activities.repository import PlaceActivityRepository
 from app.modules.places.repository import PlaceRepository
 from app.modules.plan_day.repository import PlanDayRepository
 from app.modules.plan_day_steps.repository import PlanDayStepRepository
-from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreate, PlanDayStepCreateInternal
+from app.modules.plan_day_steps.schema import LatLongRead, PlanDayStepCategoryEnum, PlanDayStepCreate, PlanDayStepCreateInternal, PlanDayStepRouteRead
 from app.modules.plan_route_hops.repository import PlanRouteHopsRepository
-from app.modules.plan_route_hops.schema import PlanRouteHopCreate
+from app.modules.plan_route_hops.schema import PlanRouteHopCreate, PlanRouteHopRead
 from app.modules.plan_day_steps.utils import get_step_details, get_step_title
 from app.modules.transport_route.graph import TransportRouteEdge
 from app.modules.transport_route.repository import TransportRouteRepository
@@ -38,17 +38,53 @@ class PlanDayStepService:
             self.city_graph_repository = CityGraphRepository(graph_db)
 
     async def add(self, step: PlanDayStepCreate):
-        step = await self._refactor_step(step)
-        
+        step = await self._refactor_step(step)        
         plan = await self.plan_repository.get(step.plan_id, load_relations=["start_city", "unordered_days.unordered_steps"])   
+        day_ids = [s.id for s in plan.days]
         
-        previous_step = await self.repository.get_by_fields({"next_plan_day_step_id": step.next_plan_day_step_id})
+        previous_steps = await self.repository.get_all(extra_conditions=[
+            PlanDayStep.next_plan_day_step_id == step.next_plan_day_step_id,
+            PlanDayStep.plan_day_id.in_(day_ids)
+        ])
+        previous_step = previous_steps[0] if previous_steps else None
         next_step = await self.repository.get(step.next_plan_day_step_id)
 
         # Get plan and city context
         prev_step_city_id = previous_step.city_id if previous_step else plan.start_city_id
         next_step_city_id = next_step.city_id if next_step else None
 
+        # Validate day id
+        
+        is_valid_day = False
+        if not step.next_plan_day_step_id:
+            allowed_last_days = []
+            for d in reversed(plan.days):
+                allowed_last_days.append(d)
+                if d.steps:
+                    break
+            print(f"Allowed last days: {[d.id for d in allowed_last_days]}, step day id: {step.plan_day_id}")
+            if step.plan_day_id not in [d.id for d in allowed_last_days]:
+                step.plan_day_id = plan.days[-1].id
+
+            is_valid_day = True
+
+        start_check = False
+        if not is_valid_day:
+            for (i, day) in enumerate(plan.days):
+                if day.id == step.plan_day_id:
+                    start_check = True
+                    for s in day.steps:
+                        if step.next_plan_day_step_id == s.id:
+                            is_valid_day = True
+                            break
+                    
+                elif start_check:
+                    if day.steps and day.steps[0].id != step.next_plan_day_step_id:
+                        print(f"Day {day.id} steps: {[s.id for s in day.steps]}, step id: {step.next_plan_day_step_id}")
+                        raise HTTPException(status_code=400, detail="Invalid next step")
+                    else:
+                        break
+        
         steps_to_add = []
 
         # Handle different step insertion scenarios
@@ -166,7 +202,7 @@ class PlanDayStepService:
             
             if prev_step_city == next_step.city_id:
                 await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
-                await self._remove_step_from_global_chain(step.id, step.next_plan_day_step_id)
+                await self._remove_step_from_global_chain(next_step.id, step.next_plan_day_step_id)
             else:
                 next_step_create = PlanDayStepCreate(
                     plan_id=plan.id,
@@ -190,20 +226,28 @@ class PlanDayStepService:
 
         return True
 
-    async def reorder(self, step_id: int, next_step_id: Optional[int] = None):
+    async def reorder(self, step_id: int, plan_day_id: int, next_step_id: Optional[int] = None):
         step = await self.repository.get(step_id, load_relations=["plan_day.plan", "next_plan_day_step"])
         if not step:
             raise HTTPException(status_code=404, detail="Step not found")
 
+        plan_day = await self.plan_day_repository.get(plan_day_id, load_relations=["plan"])
+        if not plan_day or plan_day.plan_id != step.plan_day.plan_id:
+            raise HTTPException(status_code=400, detail="Invalid plan day")
+
         target_day_id = None
         if next_step_id:
-            next_step = await self.repository.get(next_step_id)
-            target_day_id = next_step.plan_day_id
-
-        can_delete = await PlanDayStepService._can_delete_step(self.db, step.id)
-        if not can_delete:
-            raise HTTPException(status_code=400, detail="Can't reorder this step.")
-                
+            next_step = await self.repository.get(next_step_id, load_relations=["plan_day.plan"])
+            if not next_step:
+                raise HTTPException(status_code=404, detail="Next Step not found")
+            if next_step.plan_day.plan_id != step.plan_day.plan_id:
+                raise HTTPException(status_code=400, detail="Next Step must be in the same plan")
+            
+            if next_step.plan_day.id == plan_day_id or plan_day.next_plan_day_id == next_step.plan_day.id:
+                target_day_id = plan_day_id
+            else:
+                raise HTTPException(status_code=400, detail="Next Step and Given day id didn't match")
+            
         step_create = PlanDayStepCreate(
             plan_id=step.plan_day.plan_id,
             plan_day_id=target_day_id,
@@ -214,16 +258,20 @@ class PlanDayStepService:
             next_plan_day_step_id=next_step_id
         )
         
-
         await self.delete(step_id)
         return await self.add(step_create)
     
-    
     async def handle_change_start_city(self, plan_id, start_city_id):
         """Handle when the plan's start city changes"""
-        plan = await self.plan_repository.get(plan_id, load_relations=["days.steps"])
+        plan = await self.plan_repository.get(plan_id, load_relations=["unordered_days.unordered_steps"])
         
-        first_step = await self.repository.get_by_fields({"plan_id": plan_id, "previous_plan_day_step_id": None}, load_relations=["previous_plan_day_step", "next_plan_day_step"])
+        first_step = None
+        for day in plan.days:
+            for step in day.steps:
+                first_step = step
+                break
+            if first_step:
+                break
         
         if not first_step:
             return True
@@ -234,7 +282,7 @@ class PlanDayStepService:
                 plan_day_id=first_step.plan_day_id,
                 category=PlanDayStepCategoryEnum.transport,
                 city_id=first_step.city_id,
-                next_plan_day_id=first_step.id
+                next_plan_day_step_id=first_step.id
             )
             
             step_details = await get_step_details(self.db, self.graph_db, start_city_id, transport_step)
@@ -250,32 +298,29 @@ class PlanDayStepService:
                 place_id=transport_step.place_id,
                 city_id=transport_step.city_id,
                 place_activity_id=transport_step.place_activity_id,
-                previous_plan_day_step_id=None,  
                 next_plan_day_step_id=first_step.id
             )
             
             step_db = await self.repository.create(step_internal)
-            await self.repository.update_from_dict(first_step.id, {"previous_plan_day_step_id": step_db.id})
             await self._create_transport_route_hops(step_db, start_city_id, transport_step.city_id)
 
         elif first_step.city_id == start_city_id and first_step.category == PlanDayStepCategoryEnum.transport:
             await self._remove_step_from_global_chain(first_step.id, first_step.next_plan_day_step_id)
 
         elif first_step.category == PlanDayStepCategoryEnum.transport:
-            step_db = await self.repository.get(first_step.id)
-            await self.plan_route_hop_repository.clear_all(step_db.id)
+            await self.plan_route_hop_repository.clear_all(first_step.id)
             
             step_details = await get_step_details(self.db, self.graph_db, start_city_id, first_step)
             title = await get_step_title(self.db, first_step, start_city_id)
             
-            await self.repository.update_from_dict(step_db.id, {
+            await self.repository.update_from_dict(first_step.id, {
                 "duration": step_details["duration"],
                 "cost": step_details["cost"],
                 "image_id": step_details["image"].id if step_details["image"] else None,
                 "title": title
             })
             
-            await self._create_transport_route_hops(step_db, start_city_id, first_step.city_id)
+            await self._create_transport_route_hops(first_step, start_city_id, first_step.city_id)
 
     async def _remove_step_from_global_chain(self, step_id, next_step_id: int = None):
         previous_step = await self.repository.get_by_fields({"next_plan_day_step_id": step_id})
@@ -352,3 +397,46 @@ class PlanDayStepService:
             return True
         else:
             return False  # transport → non-transport: can't delete
+        
+    @staticmethod
+    async def build_simplified_route(route_hops: List[PlanRouteHopRead]) -> PlanDayStepRouteRead | None:
+        if not route_hops:
+            return None
+
+        # Ensure correct order
+        sorted_hops = sorted(route_hops, key=lambda h: h.index)
+
+        # Totals
+        total_distance = sum(hop.route.distance for hop in sorted_hops)
+        total_cost = sum(hop.route.average_cost or 0 for hop in sorted_hops)
+        total_duration = sum(hop.route.average_duration or 0 for hop in sorted_hops)
+
+        # Build flattened list of lat/long
+        route_coords: List[LatLongRead] = []
+
+        for i, hop in enumerate(sorted_hops):
+            start_path = hop.route.start_city
+            end_path = hop.route.end_city
+            if hop.destination_city_id != end_path.id:
+                start_path, end_path = end_path, start_path
+
+            if i == 0:
+                route_coords.append(LatLongRead(
+                    latitude=start_path.latitude,
+                    longitude=start_path.longitude
+                ))
+                start_city = start_path
+
+            route_coords.append(LatLongRead(
+                latitude=end_path.latitude,
+                longitude=end_path.longitude
+            ))
+
+        return PlanDayStepRouteRead(
+            start_city=start_city,
+            end_city=end_path,
+            distance=total_distance,
+            cost=total_cost,
+            duration=total_duration,
+            path=route_coords
+        )

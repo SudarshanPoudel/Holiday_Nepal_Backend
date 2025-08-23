@@ -139,9 +139,12 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         else:
             plan.vote_count = 0
             plan.rating = None
+            total_rating = 0
 
         await self.db.delete(rating_row)
         await self.db.commit()
+        if plan.vote_count == 0:
+            return 0
         return round(total_rating / plan.vote_count, 2)
         
     async def toggle_save_plan(self, user_id: int, plan_id: int) -> bool:
@@ -228,6 +231,8 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         plan_data.self_rating = await self.get_rating(user_id, plan_id)
         plan_data.is_saved = await self.is_saved(user_id, plan_id)
         
+        step_index = 0
+
         for day in plan_data.days:
             day_can_delete = True
             for step in day.steps:
@@ -236,6 +241,13 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                 cost += step.cost
                 if not step.can_delete:
                     day_can_delete = False
+                step.index = step_index
+                
+                step_index += 1
+                if step.route_hops:
+                    step.route = await PlanDayStepService.build_simplified_route(step.route_hops)
+                    step.route_hops = None
+                
             day.can_delete = day_can_delete
 
         n_days = len(plan_data.days)
@@ -251,6 +263,7 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                 day.can_delete = day_can_delete
                 if plan_data.image:
                     break
+
 
         self.db.expunge(plan)
         await self.update_from_dict(plan_id, {"estimated_cost": cost, "no_of_days": n_days, "image_id": image_id})

@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.plan_day.repository import PlanDayRepository
@@ -25,18 +26,21 @@ class PlanDayStepController:
         self.transport_service_repository = TransportServiceRepository(db)
 
     async def add_plan_day_step(self, step: PlanDayStepCreate):
-        plan = await self.plan_repository.get(step.plan_id, load_relations=["unordered_days"])
+        plan = await self.plan_repository.get(step.plan_id, load_relations=["unordered_days.unordered_steps"])
+        if plan.user_id != self.user_id:
+            raise HTTPException(status_code=403, detail="You can only update your plans")
+        
         if not step.plan_day_id:
             if not plan.days:
                 plan_day = await self.plan_day_repository.create(PlanDayCreate(plan_id=plan.id, index=0, title="Day 1 of " + plan.title))
                 step.plan_day_id = plan_day.id
             else:
                 step.plan_day_id = plan.days[-1].id
+            
         plan_day = await self.plan_day_repository.get(step.plan_day_id, load_relations=["unordered_steps"])
         if not plan_day:
             raise HTTPException(status_code=404, detail=f"Plan Day not found {step.plan_day_id}")
-        if plan.user_id != self.user_id:
-            raise HTTPException(status_code=403, detail="You can only update your plans")
+
         created_steps = await self.service.add(step)
         plan_data = await self.plan_repository.get_updated_plan(plan_day.plan.id, user_id=self.user_id)
         return BaseResponse(message="Step added successfully", data=plan_data)
@@ -54,19 +58,19 @@ class PlanDayStepController:
         plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Day step deleted successfully", data=plan_data)
     
-    async def reorder_day_step(self, plan_day_step_id: int, new_index: int):
+    async def reorder_day_step(self, plan_day_step_id: int, plan_day_id: int, next_step_id: int = None):
         day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan"])
         if not day_step:
             raise HTTPException(status_code=404, detail="Plan Day Step not found")
         plan = day_step.plan_day.plan
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only delete your plans")
-        await self.service.reorder(plan_day_step_id, new_index)
+        await self.service.reorder(plan_day_step_id, plan_day_id, next_step_id)
         plan_data = await self.plan_repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Day step re-ordered successfully", data=plan_data)
     
     async def get_transport_services(self, plan_day_step_id: int):
-        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan.days.steps"])
+        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan.unordered_days.unordered_steps"])
         if not day_step:
             raise HTTPException(status_code=404, detail="Plan Day Step not found")
         if day_step.category != PlanDayStepCategoryEnum.transport:

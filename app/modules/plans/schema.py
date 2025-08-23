@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Literal, Optional, List
 from pydantic import BaseModel
+from sympy import Union
 
 from app.modules.cities.schema import CityRead
 from app.modules.plan_day.schema import PlanDayRead
@@ -41,7 +42,8 @@ class PlanIndex(BaseModel):
 
     class Config:
         from_attributes = True
-        
+
+
 class PlanRead(PlanIndex):
     is_private: bool
     days: List[PlanDayRead] = []

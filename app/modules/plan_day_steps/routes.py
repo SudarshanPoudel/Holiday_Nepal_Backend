@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 import traceback
 from app.database.database import get_db
@@ -66,14 +67,15 @@ async def delete_plan_day_step(
 async def reorder_plan_day_step(
     request: Request, 
     plan_day_step_id: int,
-    new_index: int,
+    plan_day_id: int,
+    next_step_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
     graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
         user_id = request.state.user_id
         controller = PlanDayStepController(db, graph_db, user_id)
-        return await controller.reorder_day_step(plan_day_step_id, new_index)
+        return await controller.reorder_day_step(plan_day_step_id, plan_day_id, next_step_id)
     except HTTPException as e:
         raise e
     except Exception as e:        

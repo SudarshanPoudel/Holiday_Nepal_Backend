@@ -21,6 +21,18 @@ class PlanDayStepCategoryEnum(str, Enum):
     activity = "activity"
     transport = "transport"
 
+class LatLongRead(BaseModel):
+    latitude: float
+    longitude: float
+
+class PlanDayStepRouteRead(BaseModel):
+    start_city: CityRead
+    end_city: CityRead
+    distance: float
+    cost: float
+    duration: float
+    path: List[LatLongRead]
+
 class PlanDayStepRead(BaseModel):
     id: int
     index: int
@@ -29,12 +41,14 @@ class PlanDayStepRead(BaseModel):
     cost: float
     duration: float
     can_delete: Optional[bool] = True
-    
+    next_plan_day_step_id: Optional[int] = None
+
     image: ImageRead
     place_activity: Optional[PlaceActivityRead]
     place: Optional[PlaceReadBasic]
     city: Optional[CityRead]
     route_hops: Optional[List[PlanRouteHopRead]]
+    route: Optional[PlanDayStepRouteRead] = None
     
 class PlanDayStepCreate(BaseModel):
     plan_id: int

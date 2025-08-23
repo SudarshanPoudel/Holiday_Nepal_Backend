@@ -66,7 +66,7 @@ class PlanDayController:
             raise HTTPException(status_code=403, detail="This plan doesn't contain any days.")
         
         for step in reversed(plan_day.steps):
-            is_deletable = await PlanDayStepService._can_delete_step(plan, step)
+            is_deletable = await PlanDayStepService._can_delete_step(self.db, step.id)
             if not is_deletable:
                 raise HTTPException(status_code=403, detail="You can't delete this day because it contains some steps that cannot be deleted.")
         
@@ -80,7 +80,7 @@ class PlanDayController:
 
 
     async def recommand_accommodation_services(self, plan_day_id: int):
-        plan_day = await self.repository.get(plan_day_id, load_relations=["steps.place_activity.place"])
+        plan_day = await self.repository.get(plan_day_id, load_relations=["unordered_steps.place_activity.place"])
         if not plan_day:
             raise HTTPException(status_code=404, detail="Plan day not found")
         if not plan_day.steps:

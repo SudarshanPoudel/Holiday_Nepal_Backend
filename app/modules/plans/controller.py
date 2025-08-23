@@ -44,7 +44,7 @@ class PlanController():
         return BaseResponse(message="Plan deleted successfully")
     
     async def partial_update(self, plan_id, data: Dict, graph_db: Neo4jSession):
-        plan = await self.repository.get(plan_id, load_relations=["days.steps"])
+        plan = await self.repository.get(plan_id, load_relations=["unordered_days.unordered_steps"])
         old_start_city_id = plan.start_city_id
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only update your plans")
@@ -59,7 +59,7 @@ class PlanController():
     
     async def update(self, plan_id: int, plan: PlanCreate, graph_db: Neo4jSession):
         plan_internal = PlanBase(user_id=self.user_id, **plan.model_dump())
-        past_data = await self.repository.get(plan_id, load_relations=["days.steps"])
+        past_data = await self.repository.get(plan_id, load_relations=["unordered_days.unordered_steps"])
         plan_db = await self.repository.update(plan_id, plan_internal)
         if not plan_db:
             raise HTTPException(status_code=404, detail="Plan not found")
@@ -111,7 +111,7 @@ class PlanController():
 
     async def delete_rate(self, plan_id: int):
         rating = await self.repository.remove_plan_rating(self.user_id, plan_id)
-        if not rating:
+        if rating is None:
             raise HTTPException(status_code=404, detail="No rating found")
         return BaseResponse(message="Plan rating removed successfully", data={"rating": rating})
 
