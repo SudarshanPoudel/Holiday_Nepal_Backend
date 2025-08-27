@@ -11,9 +11,7 @@ RUN pip install --upgrade pip setuptools
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-RUN pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt && \
-    rm requirements.txt
-
+RUN pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 8000
