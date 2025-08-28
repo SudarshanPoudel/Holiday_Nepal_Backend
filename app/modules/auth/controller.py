@@ -258,7 +258,7 @@ class AuthController:
         )
     
     async def forget_password(self, email:str, db: AsyncSession):
-        user = await UserRepository(db_session=db).get_by_fields({"email": email})
+        user = await UserRepository(db=db).get_by_fields({"email": email})
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         else:
@@ -273,7 +273,7 @@ class AuthController:
             raise HTTPException(status_code=400, detail="Invalid or expired token.")
 
         user_id = url_data["user_id"]
-        user_repo = UserRepository(db_session=db)
+        user_repo = UserRepository(db=db)
         user = await user_repo.get(record_id=user_id)
 
         if not user:
@@ -285,7 +285,7 @@ class AuthController:
 
 
     async def change_password(self, user_id: int, old_password: str, new_password: str, db: AsyncSession):
-        user_repo = UserRepository(db_session=db)
+        user_repo = UserRepository(db=db)
         user = await user_repo.get(record_id=user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")
