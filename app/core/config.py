@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
-    FRONTEND_GOOGLE_AUTH_REDIRECT_URL: str = "http://localhost:3000"
+    FRONTEND_GOOGLE_AUTH_REDIRECT_URL: str = "http://localhost:5173"
 
     MAIL_USERNAME:str
     MAIL_PASSWORD:str
@@ -43,8 +43,9 @@ class Settings(BaseSettings):
 
     ADMIN_USERNAMES: List[str]
 
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = "gemini-2.0-flash"
     GEMINI_API_KEY: str
+    GROQ_API_KEY: str
 
     DEV_TOKEN: str = ''
     class Config:

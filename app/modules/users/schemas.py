@@ -1,17 +1,22 @@
 from datetime import datetime
+from enum import Enum
 from pydantic import BaseModel, EmailStr, model_validator
 from typing import List, Optional
 
 from app.modules.cities.schema import CityRead
+from app.modules.places.schema import PlaceCategoryEnum
 from app.modules.storage.schema import ImageRead
+
+class DistancePreferenceEnum(Enum):
+    short = "short"
+    medium = "medium"
+    long = "long"
 
 # Schema for creating a new user
 class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
-    city_id: Optional[int]
-
 
 class UserPlanRead(BaseModel):
     id: int
@@ -65,12 +70,3 @@ class UserRead(BaseModel):
     image: Optional[ImageRead] = None
     plans: List[UserPlanRead]
 
-
-# Schema for updating user data
-class UserUpdate(BaseModel):
-    username: Optional[str]
-    image_id: Optional[int]
-    city_id: Optional[int]
-
-    class Config:
-        from_attributes = True

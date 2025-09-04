@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.utils.embeddings import get_embedding
 from neo4j import AsyncSession as Neo4jSession
 from app.database.seeder.utils import get_file_path, load_data
-from app.modules.places.graph import CityPlaceEdge, PlaceGraphRepository, PlaceNode
 from app.modules.places.schema import PlaceCategoryEnum
 from app.utils.image_utils import validate_and_process_image
 from app.utils.helper import slugify
@@ -21,7 +20,6 @@ from app.modules.storage.service import StorageService
 
 async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
     data = load_data("files/default_places.json")
-    place_graph_repo = PlaceGraphRepository(graph_db)
     n = 0
     for entry in data:
         # City lookup
@@ -46,7 +44,7 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         # Create place
         place = Place(
             name=entry["name"],
-            category=PlaceCategoryEnum(entry.get("category")),
+            categories=[PlaceCategoryEnum(v) for v in entry["categories"]],
             latitude=entry["latitude"],
             longitude=entry["longitude"],
             description=entry.get("description"),
@@ -57,11 +55,6 @@ async def seed_default_places(db: AsyncSession, graph_db: Neo4jSession):
         )
         db.add(place)
         await db.flush()  # get place.id
-
-        place_node = PlaceNode(id=place.id, name=entry['name'], category=entry['category'])
-        await place_graph_repo.create(place_node)
-        city_place = CityPlaceEdge(source_id=mun.id, target_id=place.id)
-        await place_graph_repo.add_edge(city_place)
         
         # Upload images to S3 and associate
         images = []

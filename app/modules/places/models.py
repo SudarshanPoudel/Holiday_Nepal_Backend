@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Enum, Integer, String, ForeignKey, Float, Table
+from app.database.types import EnumList
 from pgvector.sqlalchemy import Vector
 from sqlalchemy.orm import relationship
 from app.database.database import Base
@@ -16,7 +17,7 @@ class Place(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
-    category= Column(Enum(PlaceCategoryEnum, name="placecategoryenum"), nullable=False)
+    categories= Column(EnumList(PlaceCategoryEnum), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     description = Column(String, nullable=True)

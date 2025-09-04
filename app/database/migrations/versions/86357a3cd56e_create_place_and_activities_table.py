@@ -8,6 +8,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 # revision identifiers, used by Alembic.
@@ -19,11 +20,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    place_category_enum = sa.Enum(
-        'natural', 'cultural', 'historic', 'religious', 'adventure', 'wildlife', 'educational', 'architectural', 'other',
-        name='placecategoryenum'
-    )
-
     op.create_table(
         'activities',
         sa.Column('id', sa.Integer(), primary_key=True),
@@ -37,7 +33,7 @@ def upgrade() -> None:
         'places',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('name', sa.String(), index=True, nullable=False),
-        sa.Column('category', place_category_enum, nullable=True),
+        sa.Column('categories', JSONB(), nullable=True),
         sa.Column('longitude', sa.Float(), nullable=False),
         sa.Column('latitude', sa.Float(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
@@ -66,7 +62,16 @@ def upgrade() -> None:
     )
 
 
+    # association table: user_prefer_place_activities
+    op.create_table(
+        "user_prefer_place_activities",
+        sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id"), primary_key=True),
+        sa.Column("activities_id", sa.Integer(), sa.ForeignKey("activities.id"), primary_key=True),
+    )
+
+
 def downgrade() -> None:
+    op.drop_table('user_prefer_place_activities')
     op.drop_table('place_images')
     op.drop_table('place_activities')
     op.drop_table('places')

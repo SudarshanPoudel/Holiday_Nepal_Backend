@@ -37,7 +37,6 @@ async def index_users(
 @router.get("/{user_id}")
 async def get_user(user_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     try:
-        is_admin = True
         controller = UserController(db)
         return await controller.get(user_id)
     except HTTPException as e:

@@ -37,3 +37,14 @@ class AccomodationServiceRepository(BaseRepository[AccomodationService, Accomoda
     async def recommand(self, user_id: int, city_id: int, load_relations: List[str] = []):
         data = await self.index(params = Params(page=1, size=10), filters=AccomodationServiceFilter(city_id=city_id), load_relations=load_relations)
         return data.items
+    
+    async def get_city_average(self, city_id, use_default=True):
+        data = await self.get_all_filtered(filters={"city_id": city_id}, use_default=use_default)
+        total = 0
+        for d in data:
+            total += d.cost_per_night
+
+        if len(data) > 0:
+            return total / len(data)
+        else:
+            return 1000 if use_default else None

@@ -1,7 +1,7 @@
 import os
 import re
 import json
-from typing import List, Type, Union, Optional, Literal, TypedDict
+from typing import AsyncGenerator, List, Type, Union, Optional, Literal, TypedDict
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -22,7 +22,7 @@ class LLM:
         },
         "groq": {
             "class": ChatGroq,
-            "model": "llama3-70b-8192",
+            "model": "llama-3.3-70b-versatile",
             "key_env": "GROQ_API_KEY"
         }
     }
@@ -38,6 +38,15 @@ class LLM:
         model = LLM._get_model_instance(llm)
         resp = await model.ainvoke(prompt)
         return resp.content
+    
+        
+    @staticmethod
+    async def get_stream(prompt: str, llm="groq"):
+        model = LLM._get_model_instance(llm)
+        async for chunk in model.astream([prompt]):
+            if chunk.content:
+                yield chunk.content
+    
 
     @staticmethod
     async def get_structured_response(
@@ -54,6 +63,100 @@ class LLM:
             return schema.model_validate(json_data)
 
         return json_data
+    
+    @staticmethod
+    async def get_structured_stream(
+        prompt: str,
+        schema: Optional[Type[BaseModel]] = None,
+        llm: LLMType = "groq",
+    ) -> AsyncGenerator[dict, None]:
+        """
+        Stream structured JSON progressively.
+        Instead of token-by-token, yield partial valid dicts/lists.
+        """
+
+        model = LLM._get_model_instance(llm)
+        buffer = ""
+        last_yielded = None
+
+        async for chunk in model.astream([prompt]):
+            if not chunk.content:
+                continue
+            buffer += chunk.content
+
+            # Try to close brackets/quotes and parse progressively
+            partial_json = LLM._try_make_valid_json(buffer)
+
+            if partial_json is not None and partial_json != last_yielded:
+                # Validate with schema if given
+                if schema:
+                    try:
+                        if isinstance(partial_json, list):
+                            parsed = [
+                                schema.model_validate(item) for item in partial_json
+                            ]
+                        else:
+                            parsed = schema.model_validate(partial_json)
+                    except Exception:
+                        continue
+                    yield parsed
+                else:
+                    yield partial_json
+
+                last_yielded = partial_json
+
+
+    @staticmethod
+    def _try_make_valid_json(buffer: str):
+        """
+        Coerce incomplete/midstream LLM output into valid JSON.
+        Steps:
+        1. Strip junk fences/explanations
+        2. Auto-close unbalanced braces/brackets
+        3. Trim dangling quotes/colons
+        4. Extract largest JSON-like block
+        5. Parse
+        """
+        if not buffer:
+            return None
+
+        # 1. Strip markdown fences
+        buffer = re.sub(r"^```(?:json)?", "", buffer, flags=re.IGNORECASE|re.MULTILINE)
+        buffer = re.sub(r"```$", "", buffer, flags=re.MULTILINE)
+        buffer = buffer.strip()
+
+        if not buffer:
+            return None
+
+        # 2. Auto-close braces/brackets
+        stack = []
+        open_to_close = {"{": "}", "[": "]"}
+        for ch in buffer:
+            if ch in open_to_close:
+                stack.append(open_to_close[ch])
+            elif stack and ch == stack[-1]:
+                stack.pop()
+        if stack:
+            buffer += "".join(reversed(stack))
+
+        # 3. Patch dangling colon (`{"a":`)
+        buffer = re.sub(r':\s*$', ': null', buffer)
+
+        # 3b. Trim unfinished string (dangling quote at end)
+        buffer = re.sub(r'"\s*$', '""', buffer)
+
+        # 4. Extract largest JSON-like block
+        blocks = LLM._extract_json_like_blocks(buffer)
+        if not blocks:
+            return None
+        candidate = blocks[-1]
+
+        # 5. Parse
+        try:
+            return json.loads(candidate)
+        except Exception:
+            return None
+
 
     @staticmethod
     def _extract_blocks_from_response(
@@ -97,8 +200,8 @@ class LLM:
 
         # 2. Try to extract all {...} or [...] using greedy matching
         if not blocks:
-            raw_matches = re.findall(r'(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])', content, re.DOTALL)
-            blocks = raw_matches
+            blocks = LLM._extract_json_like_blocks(content)
+
 
         # 3. Try finding escaped stringified JSON
         if not blocks:
@@ -115,3 +218,19 @@ class LLM:
 
         parsed = try_parse_all_blocks(blocks)
         return parsed if multiple else (parsed[0] if parsed else {})
+
+    @staticmethod
+    def _extract_json_like_blocks(text: str) -> list[str]:
+        blocks, stack, start = [], [], None
+        for i, ch in enumerate(text):
+            if ch in "{[":
+                if not stack:
+                    start = i
+                stack.append(ch)
+            elif ch in "}]":
+                if stack:
+                    stack.pop()
+                    if not stack and start is not None:
+                        blocks.append(text[start:i+1])
+                        start = None
+        return blocks

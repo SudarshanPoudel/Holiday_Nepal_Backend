@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 
 revision: str = '123456789abc'
 down_revision: Union[str, None] = 'a9ba372271f7'
@@ -32,19 +33,23 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        'users',
-        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
-        sa.Column('email', sa.String, unique=True, index=True, nullable=False),
-        sa.Column('username', sa.String, unique=True, index=True, nullable=False),
-        sa.Column('password', sa.String, nullable=False),
-        sa.Column('city_id', sa.Integer, sa.ForeignKey('cities.id'), index=True, nullable=True),
-        sa.Column('image_id', sa.Integer, sa.ForeignKey('images.id', ondelete="CASCADE"), nullable=True),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
+        "users",
+        sa.Column("id", sa.Integer(), primary_key=True, nullable=False),
+        sa.Column("email", sa.String(), nullable=False, unique=True, index=True),
+        sa.Column("username", sa.String(), nullable=False, unique=True, index=True),
+        sa.Column("password", sa.String(), nullable=False),
+        sa.Column("city_id", sa.Integer(), sa.ForeignKey("cities.id"), nullable=True, index=True),
+        sa.Column("prefer_place_categories", JSONB(), nullable=True),  # EnumList stored as JSON
+        sa.Column("prefer_travel_distance", sa.Enum("short", "medium", "long", name="distancepreferenceenum"), nullable=True),
+        sa.Column("additional_preferences", sa.String(), nullable=True),
+        sa.Column("image_id", sa.Integer(), sa.ForeignKey("images.id"), nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
     )
 
 
+
 def downgrade() -> None:
-    op.drop_table('users')
-    op.drop_table('images')
-    op.execute('DROP TYPE imagecategoryenum')
+    op.drop_table("users")
+    op.execute("DROP TYPE IF EXISTS distancepreferenceenum")
+

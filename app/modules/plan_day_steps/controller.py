@@ -70,21 +70,13 @@ class PlanDayStepController:
         return BaseResponse(message="Day step re-ordered successfully", data=plan_data)
     
     async def get_transport_services(self, plan_day_step_id: int):
-        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan.unordered_days.unordered_steps"])
+        day_step = await self.repository.get(plan_day_step_id, load_relations=["plan_day.plan"])
         if not day_step:
             raise HTTPException(status_code=404, detail="Plan Day Step not found")
         if day_step.category != PlanDayStepCategoryEnum.transport:
             raise HTTPException(status_code=400, detail="This step is not a transport step")
-        last_city = None
-        if day_step.index > 0:
-            for day in day_step.plan_day.plan.days:
-                if not last_city:
-                    for steps in day.steps:
-                        if steps.index == day_step.index - 1:
-                            last_city = steps.city_id
-                            break
-                else:
-                    break
+        last_step = await self.repository.get_by_fields({"next_plan_day_step_id": plan_day_step_id})
+        last_city = last_step.city_id if last_step else None
         if not last_city:
             last_city = day_step.plan_day.plan.start_city_id
 

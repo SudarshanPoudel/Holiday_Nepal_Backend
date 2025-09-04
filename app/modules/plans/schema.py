@@ -11,7 +11,7 @@ from app.modules.users.schemas import UserReadMinimal
 class PlanCreate(BaseModel):
     title: str
     description: Optional[str]
-    start_city_id: int
+    start_city_id: Optional[int] = None
     no_of_people: int = 1
     image_id: Optional[int] = None
     is_private: bool = False
@@ -33,11 +33,11 @@ class PlanIndex(BaseModel):
     is_saved: Optional[bool] = None
     self_rating: Optional[int] = None
 
-    created_at: datetime
-    updated_at: datetime
+    # created_at: datetime
+    # updated_at: datetime
     
     image: Optional[ImageRead] 
-    start_city: CityRead
+    start_city: Optional[CityRead]
     user: UserReadMinimal
 
     class Config:

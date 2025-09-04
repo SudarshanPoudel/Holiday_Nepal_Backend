@@ -77,6 +77,8 @@ class PlanDayStepService:
                         if step.next_plan_day_step_id == s.id:
                             is_valid_day = True
                             break
+                    if is_valid_day:
+                        break
                     
                 elif start_check:
                     if day.steps and day.steps[0].id != step.next_plan_day_step_id:
