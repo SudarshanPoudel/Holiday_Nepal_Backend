@@ -1,14 +1,16 @@
 from pprint import pprint
-from typing import List, Dict, Any
+from typing import AsyncIterator, List, Dict, Any
 from sqlalchemy import and_, func, not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.ai.agent.llm import LLM
-from app.modules.ai.agent.schema import AgentAlreadyDoneTaskBase, AgentImprovedPromptBase, AgentOverallPlanBase, AgentOverallPlanDayBase, AgentPlanBase, AgentPlanDayBase, AgentPlanDayStepBase
-from app.modules.ai.agent.prompts import get_prompt, OVERALL_PLAN_GENERATION_PROMPT, PROMPT_IMPROVEMENT_PROMPT, SINGLE_DAY_EXPANDING_PROMPT
+from app.modules.ai.agent.prompts import get_prompt, PLAN_JSON_GENERATION_PROMPT, PLAN_OVERVIEW_GENERATION_PROMPT, CITY_ITINERARY_PROMPT
+from app.modules.ai.agent.schema import AgentOverallTrip, AgentOverallTripItineraryItem, AgentPlanDay, AgentRetrievedPlace
+from app.modules.ai.agent.utils import combine_user_pref_and_prompt_json
 from app.modules.cities.models import City
 from app.modules.cities.repository import CityRepository
 from app.modules.places.models import Place
 from app.modules.places.repository import PlaceRepository
+from app.modules.users.repository import UserRepository
 
 class TripPlannerAgent:
     def __init__(self, db: AsyncSession):  
@@ -16,99 +18,63 @@ class TripPlannerAgent:
         self.city_repository = CityRepository(db)
         self.place_repository = PlaceRepository(db)
 
-    async def generate_plan(self, prompt: str) -> AgentPlanBase:
-        improved_prompt = await self.improve_prompt(prompt)
-        overall_plan = await self.generate_overall_plan(improved_prompt.refined_prompt)
-        expanded_plan = await self.expand_overall_plan(overall_plan)
-        return expanded_plan
+  
+    async def generate_overall_plan(self, prompt:str, user_id: int)-> AsyncIterator[AgentOverallTrip]:
+        prompt = get_prompt(PLAN_JSON_GENERATION_PROMPT, user_prompt=prompt)
+        prompt_dict = await LLM.get_structured_response(prompt)
 
-    # Step 1
-    async def improve_prompt(self, chat_history: str) -> AgentImprovedPromptBase:
-        user_pref = {"lives_in": "Bharatpur"}  # TODO: track and use real user pref
-        prompt = get_prompt(PROMPT_IMPROVEMENT_PROMPT, chat_history=chat_history, user_pref=user_pref, start_city=user_pref["lives_in"])
-        resp = await LLM.get_structured_response(prompt, AgentImprovedPromptBase)
-        return resp
+        user_repo = UserRepository(self.db)
+        user_info = await user_repo.get(record_id=user_id, load_relations=["prefer_activities","city"])
+        user_pref_dict = { 
+            "places": [c.value for c in user_info.prefer_place_categories],
+            "activties": [act.name for act in user_info.prefer_activities],
+            "distance": user_info.prefer_travel_distance,
+            "city": user_info.city.name if user_info.city else None,
+            "additional_preferences": user_info.additional_preferences
+        }
 
-    # Step 2
-    async def generate_overall_plan(self, prompt: str, no_of_days: int = 5) -> AgentOverallPlanBase:
-        similar_cities = await self.city_repository.vector_search(prompt, limit=no_of_days*2)
-        cities = [s.name for s in similar_cities]
-        prompt = get_prompt(OVERALL_PLAN_GENERATION_PROMPT, prompt=prompt, no_of_days=no_of_days, cities=cities)
-        resp = await LLM.get_structured_response(prompt, AgentOverallPlanBase)
-        return resp
+        final_user_preference = combine_user_pref_and_prompt_json(user_pref_dict, prompt_dict, False, True)
 
-    # Step 3 - New method to expand a single day
-    async def expand_single_day(
-        self, 
-        day: AgentOverallPlanDayBase, 
-        already_done_tasks: List[AgentAlreadyDoneTaskBase], 
-        upcoming_days: List[AgentOverallPlanDayBase]
-    ) -> AgentPlanDayBase:
-        already_done_task_md = ""
-        already_included_places = []
-        current_city = already_done_tasks[0].name
-        for task in already_done_tasks:
-            if task.category == "visit":
-                already_done_task_md += f"- Visited {task.name}\n"
-                already_included_places.append(task.id)
-            elif task.category == "activity":
-                already_done_task_md += f"- Did {task.name}\n"
-            elif task.category == "transport":
-                already_done_task_md += f"- Traveled from {current_city} to {task.name}\n"
-                current_city = task.name
-            else:
-                continue
+        candidate_cities = await self.city_repository.vector_search(
+            query=prompt,
+            limit=10
+        )
+        candidate_city_names = [c.name for c in candidate_cities]
+        prompt += f". Plan should start at {final_user_preference.get('start_city')} and end at {final_user_preference.get('end_city')}"
 
-        upcoming_days_md = "\n-".join([
-            f"day_{j}: {d.description}" for j, d in enumerate(upcoming_days)
-        ])
+        generation_prompt = get_prompt(PLAN_OVERVIEW_GENERATION_PROMPT, user_prompt=prompt, prompt_metadata=prompt_dict, user_preferences=final_user_preference, candidate_cities=candidate_city_names)
+        async for r in LLM.get_structured_stream(generation_prompt, schema=AgentOverallTrip):
+            r.start_city = final_user_preference.get('start_city')
+            yield r
 
 
-        available_cities = [
-            await self.db.scalar(
-                select(City).where(func.lower(City.name) == city.lower())
-            )
-            for city in day.cities
-        ]
-        city_ids = [c.id for c in available_cities if c is not None]
-
-        available_places = await self.place_repository.vector_search(
-            day.description, 
-            limit=5, 
-            extra_conditions = [
-                and_(
-                    Place.city_id.in_(city_ids),
-                    not_(Place.id.in_(already_included_places))
-                )
+    async def generate_single_city_plan(self, itinerary: AgentOverallTripItineraryItem, no_of_days: int) -> AsyncIterator[List[AgentPlanDay]]:
+        similar_cities = await self.city_repository.get_similar(itinerary.city, limit=1)
+        city_id = similar_cities[0].id if similar_cities else None
+        relevent_places = await self.place_repository.vector_search(
+            query=itinerary.description,
+            extra_conditions=[
+                Place.city_id == city_id
             ],
+            limit=(no_of_days  * 5),
             load_relations=["place_activities.activity"]
         )
+        place_items = [AgentRetrievedPlace.model_validate(place) for place in relevent_places]
+        retrieved_places = []
+        for item in place_items:
+            for a in item.place_activities:
+                a.name = a.activity.name
+                a.activity = None
 
-        place_md_list = ""
+        retrieved_places = [a.model_dump(exclude_unset=True) for a in place_items]
+        iter_dict = {
+            "arrival": itinerary.arrival.model_dump() if itinerary.arrival else None,
+            "departure": itinerary.departure.model_dump() if itinerary.departure else None,
+            "budget": itinerary.budget,
+            "description": itinerary.description
+        }
+        prompt = get_prompt(CITY_ITINERARY_PROMPT, city=itinerary.city, places=retrieved_places, itinerary=iter_dict)
 
-        for place in available_places:
-            place_md_list += f"### {place.name} (**{place.average_visit_duration} hr) \n"
-            if place.place_activities:
-                place_md_list += f"- Activities:\n"
-                for pa in place.place_activities:
-                    place_md_list += f"  - {pa.activity.name} (**{pa.average_duration} hr**)\n"
-            else:
-                place_md_list += f"- Activities: _NOT AVAILABLE_\n"
-            place_md_list += "\n"
-
-        prompt = get_prompt(
-            SINGLE_DAY_EXPANDING_PROMPT, 
-            already_done_tasks=already_done_task_md, 
-            day_description=day.description, 
-            upcoming_days=upcoming_days_md, 
-            places=place_md_list
-        )
-
-        steps = await LLM.get_structured_response(prompt, AgentPlanDayStepBase)
+        async for r in LLM.get_structured_stream(prompt, AgentPlanDay):
+            yield r
         
-        # Create the expanded day
-        expanded_day = AgentPlanDayBase(
-            title=day.title,
-            steps=steps
-        )
-        return expanded_day

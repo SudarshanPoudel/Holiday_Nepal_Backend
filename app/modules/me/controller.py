@@ -2,9 +2,8 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
-from app.modules.me.schema import MeRead, MeUpdate
+from app.modules.me.schema import MeRead, MeUpdate, MeUpdateInternal
 from app.modules.users.repository import UserRepository
-from app.modules.users.schemas import UserUpdate
 
 
 class MeController():
@@ -16,7 +15,7 @@ class MeController():
     async def me(self):
         user = await self.user_repository.get(
             self.user_id,
-            load_relations=["image", "city", "plans.start_city", "plans.image", "saved_plans.start_city", "saved_plans.image"]
+            load_relations=["image", "city", "plans.start_city", "plans.image", "saved_plans.start_city", "saved_plans.image", "prefer_activities"]
         )
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -28,9 +27,13 @@ class MeController():
         user = await self.user_repository.get(self.user_id)
         if user.username != profile_info.username:
             existing = await self.user_repository.get_all_filtered(filters={"username": profile_info.username})
-            if existing:
+            if existing and existing[0].id != self.user_id:
                 raise HTTPException(status_code=400, detail="Username already exists")
-        updated_user = await self.user_repository.update(self.user_id, profile_info)
+        profile_info_internal = MeUpdateInternal(**profile_info.model_dump(exclude=["prefer_activities"]))
+        updated_user = await self.user_repository.update(self.user_id, profile_info_internal)
         if not updated_user:
             raise HTTPException(status_code=404, detail="User not found")
-        return BaseResponse(message="Profile updated successfully", data={"id": updated_user.id, "username": updated_user.username, "image_id": updated_user.image_id})
+        if profile_info.prefer_activities:
+            await self.user_repository.update_prefer_activities(self.user_id, profile_info.prefer_activities)
+
+        return BaseResponse(message="Profile updated successfully", data={"id": updated_user.id})

@@ -35,12 +35,7 @@ class AuthController:
         result = await db.execute(select(User).where(User.username == user.username))
         if result.scalar_one_or_none():
             raise HTTPException(status_code=400, detail="This username is already taken..")
-
-        if user.city_id:
-            city_repo = CityRepository(db)
-            city = await city_repo.get(record_id=user.city_id)
-            if not city:
-                raise HTTPException(status_code=404, detail="City not found")
+ 
 
         hashed_password = AuthService.hash_password(user.password)
         user_data = user.model_dump()

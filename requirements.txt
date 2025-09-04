@@ -48,3 +48,4 @@ langchain==0.3.26
 langchain-google-genai==2.1.8
 rapidfuzz==3.13.0
 websockets==15.0.1
+langchain-groq==0.3.7

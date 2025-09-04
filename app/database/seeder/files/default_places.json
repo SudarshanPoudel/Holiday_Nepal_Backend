@@ -2,227 +2,348 @@
   {
     "name": "Swayambhunath (Monkey Temple)",
     "city": "Kathmandu",
-    "category": "religious",
     "latitude": 27.7149,
     "longitude": 85.2906,
     "description": "Ancient Buddhist temple complex atop a hill with stunning valley views and resident monkeys.",
-    "images": ["swayambhunath_1.webp", "swayambhunath_2.webp"],
+    "images": [
+      "swayambhunath_1.webp",
+      "swayambhunath_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 200,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "cultural"
+    ]
   },
   {
     "name": "Pashupatinath Temple",
     "city": "Kathmandu",
-    "category": "religious",
     "latitude": 27.7106,
     "longitude": 85.3482,
     "description": "Sacred Hindu temple dedicated to Lord Shiva, a UNESCO World Heritage Site on the Bagmati River.",
-    "images": ["pashupatinath_1.webp", "pashupatinath_2.webp"],
+    "images": [
+      "pashupatinath_1.webp",
+      "pashupatinath_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Boudhanath Stupa",
     "city": "Kathmandu",
-    "category": "religious",
     "latitude": 27.7215,
     "longitude": 85.3617,
     "description": "One of the largest Buddhist stupas in the world, a center of Tibetan Buddhism in Nepal.",
-    "images": ["boudhanath_1.webp", "boudhanath_2.webp"],
+    "images": [
+      "boudhanath_1.webp",
+      "boudhanath_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 400,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Kathmandu Durbar Square",
     "city": "Kathmandu",
-    "category": "historic",
     "latitude": 27.7045,
     "longitude": 85.3077,
     "description": "Historic palace complex showcasing traditional Newari architecture and ancient royal palaces.",
-    "images": ["kathmandu_durbar_1.webp", "kathmandu_durbar_2.webp"],
+    "images": [
+      "kathmandu_durbar_1.webp",
+      "kathmandu_durbar_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Garden of Dreams",
     "city": "Kathmandu",
-    "category": "natural",
     "latitude": 27.7139,
     "longitude": 85.3166,
     "description": "Beautiful neo-classical garden with pavilions, fountains, and peaceful walking paths.",
-    "images": ["garden_dreams_1.webp", "garden_dreams_2.webp"],
+    "images": [
+      "garden_dreams_1.webp",
+      "garden_dreams_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 200,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "cultural"
+    ]
   },
   {
     "name": "Narayanhiti Palace Museum",
     "city": "Kathmandu",
-    "category": "educational",
     "latitude": 27.7196,
     "longitude": 85.3201,
     "description": "Former royal palace turned museum showcasing Nepal's royal history and artifacts.",
-    "images": ["narayanhiti_1.webp", "narayanhiti_2.webp"],
+    "images": [
+      "narayanhiti_1.webp",
+      "narayanhiti_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "educational",
+      "historic",
+      "cultural"
+    ]
   },
   {
     "name": "Asan Bazaar",
     "city": "Kathmandu",
-    "category": "cultural",
     "latitude": 27.7058,
     "longitude": 85.3088,
     "description": "Traditional market in the heart of old Kathmandu, famous for spices and local goods.",
-    "images": ["asan_bazaar_1.webp", "asan_bazaar_2.webp"],
+    "images": [
+      "asan_bazaar_1.webp",
+      "asan_bazaar_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural"
+    ]
   },
   {
     "name": "Thamel",
     "city": "Kathmandu",
-    "category": "cultural",
     "latitude": 27.7145,
     "longitude": 85.3107,
     "description": "Tourist hub with restaurants, shops, bars, and accommodation options.",
-    "images": ["thamel_1.webp", "thamel_2.webp"],
+    "images": [
+      "thamel_1.webp",
+      "thamel_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural"
+    ]
   },
   {
     "name": "Chandragiri Hills",
     "city": "Kathmandu",
-    "category": "natural",
     "latitude": 27.6736,
     "longitude": 85.2375,
     "description": "Hilltop destination offering panoramic views of the Himalayas and Kathmandu Valley.",
-    "images": ["chandragiri_1.webp", "chandragiri_2.webp"],
+    "images": [
+      "chandragiri_1.webp",
+      "chandragiri_2.webp"
+    ],
     "average_visit_duration": 4,
     "average_visit_cost": 2500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Patan Durbar Square",
     "city": "Lalitpur",
-    "category": "historic",
     "latitude": 27.6726,
     "longitude": 85.3261,
     "description": "Ancient royal palace complex with exquisite Newari architecture and stone carvings.",
-    "images": ["patan_durbar_1.webp", "patan_durbar_2.webp"],
+    "images": [
+      "patan_durbar_1.webp",
+      "patan_durbar_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Golden Temple (Hiranya Varna Mahavihar)",
     "city": "Lalitpur",
-    "category": "religious",
     "latitude": 27.6735,
     "longitude": 85.3268,
     "description": "12th-century Buddhist monastery famous for its golden facade and intricate metalwork.",
-    "images": ["golden_temple_1.webp", "golden_temple_2.webp"],
+    "images": [
+      "golden_temple_1.webp",
+      "golden_temple_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 300,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Kumbheshwor Temple",
     "city": "Lalitpur",
-    "category": "religious",
     "latitude": 27.6722,
     "longitude": 85.3251,
     "description": "Ancient five-story pagoda temple dedicated to Lord Shiva, known for its unique architecture.",
-    "images": ["kumbheshwor_1.webp", "kumbheshwor_2.webp"],
+    "images": [
+      "kumbheshwor_1.webp",
+      "kumbheshwor_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 100,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Mahabouddha Temple",
     "city": "Lalitpur",
-    "category": "religious",
     "latitude": 27.6719,
     "longitude": 85.3255,
     "description": "Unique Buddhist temple made entirely of terracotta tiles, each depicting Buddha images.",
-    "images": ["mahabouddha_1.webp", "mahabouddha_2.webp"],
+    "images": [
+      "mahabouddha_1.webp",
+      "mahabouddha_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 200,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Bhaktapur Durbar Square",
     "city": "Bhaktapur",
-    "category": "historic",
     "latitude": 27.6719,
     "longitude": 85.4286,
     "description": "Medieval royal palace complex with stunning pagoda temples and traditional architecture.",
-    "images": ["bhaktapur_durbar_2.webp"],
+    "images": [
+      "bhaktapur_durbar_2.webp"
+    ],
     "average_visit_duration": 4,
     "average_visit_cost": 1500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Nyatapola Temple",
     "city": "Bhaktapur",
-    "category": "religious",
     "latitude": 27.6719,
     "longitude": 85.4295,
     "description": "Five-story pagoda temple, the tallest in Nepal, dedicated to goddess Siddhi Lakshmi.",
-    "images": ["nyatapola_1.webp", "nyatapola_2.webp"],
+    "images": [
+      "nyatapola_1.webp",
+      "nyatapola_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Pottery Square",
     "city": "Bhaktapur",
-    "category": "cultural",
     "latitude": 27.6708,
     "longitude": 85.4299,
     "description": "Traditional pottery-making area where visitors can watch artisans create clay vessels.",
-    "images": ["pottery_square_1.webp", "pottery_square_2.webp"],
+    "images": [
+      "pottery_square_1.webp",
+      "pottery_square_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural",
+      "educational"
+    ]
   },
   {
     "name": "55-Window Palace",
     "city": "Bhaktapur",
-    "category": "historic",
     "latitude": 27.6719,
     "longitude": 85.4286,
     "description": "Historic palace famous for its 55 intricately carved wooden windows and traditional architecture.",
-    "images": ["55_window_1.webp", "55_window_2.webp"],
+    "images": [
+      "55_window_1.webp",
+      "55_window_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Dattatreya Square",
     "city": "Bhaktapur",
-    "category": "historic",
     "latitude": 27.6724,
     "longitude": 85.4303,
     "description": "Ancient square with the Dattatreya Temple and traditional Newari buildings.",
-    "images": ["dattatreya_1.webp", "dattatreya_2.webp"],
+    "images": [
+      "dattatreya_1.webp",
+      "dattatreya_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Phewa Lake",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.2096,
     "longitude": 83.9856,
     "description": "Serene freshwater lake with stunning Annapurna mountain reflections and boating opportunities.",
-    "images": ["phewa_lake_1.webp", "phewa_lake_2.webp"],
+    "images": [
+      "phewa_lake_1.webp",
+      "phewa_lake_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 500,
     "activities": [
@@ -233,16 +354,22 @@
         "average_duration": 1,
         "average_cost": 500
       }
+    ],
+    "categories": [
+      "natural",
+      "adventure"
     ]
   },
   {
     "name": "Sarangkot",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.2444,
     "longitude": 83.9514,
     "description": "Popular viewpoint for sunrise over the Annapurna mountain range and paragliding launch site.",
-    "images": ["sarangkot_1.webp", "sarangkot_2.webp"],
+    "images": [
+      "sarangkot_1.webp",
+      "sarangkot_2.webp"
+    ],
     "average_visit_duration": 4,
     "average_visit_cost": 1000,
     "activities": [
@@ -253,100 +380,150 @@
         "average_duration": 1,
         "average_cost": 8000
       }
+    ],
+    "categories": [
+      "natural",
+      "adventure"
     ]
   },
   {
     "name": "World Peace Pagoda",
     "city": "Pokhara",
-    "category": "religious",
     "latitude": 28.2147,
     "longitude": 83.9661,
     "description": "Buddhist pagoda offering panoramic views of Pokhara valley and the Annapurna range.",
-    "images": ["peace_pagoda_1.webp", "peace_pagoda_2.webp"],
+    "images": [
+      "peace_pagoda_1.webp",
+      "peace_pagoda_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Davis Falls (Patale Chhango)",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.1889,
     "longitude": 83.9611,
     "description": "Unique waterfall that disappears into an underground tunnel, also known as Patale Chhango.",
-    "images": ["davis_falls_1.webp", "davis_falls_2.webp"],
+    "images": [
+      "davis_falls_1.webp",
+      "davis_falls_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 50,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural"
+    ]
   },
   {
     "name": "Gupteshwor Cave",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.1886,
     "longitude": 83.9606,
     "description": "Sacred limestone cave with natural formations and a hidden view of Davis Falls.",
-    "images": ["gupteshwor_1.webp", "gupteshwor_2.webp"],
+    "images": [
+      "gupteshwor_1.webp",
+      "gupteshwor_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 100,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure",
+      "religious"
+    ]
   },
   {
     "name": "Bindhyabasini Temple",
     "city": "Pokhara",
-    "category": "religious",
     "latitude": 28.2167,
     "longitude": 83.9833,
     "description": "Ancient Hindu temple dedicated to goddess Bhagwati, offering city views.",
-    "images": ["bindhyabasini_1.webp", "bindhyabasini_2.webp"],
+    "images": [
+      "bindhyabasini_1.webp",
+      "bindhyabasini_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "International Mountain Museum",
     "city": "Pokhara",
-    "category": "educational",
     "latitude": 28.2089,
     "longitude": 83.9703,
     "description": "Museum dedicated to mountains and mountaineering history, culture, and biodiversity.",
-    "images": ["mountain_museum_1.webp", "mountain_museum_2.webp"],
+    "images": [
+      "mountain_museum_1.webp",
+      "mountain_museum_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "educational",
+      "cultural"
+    ]
   },
   {
     "name": "Mahendra Cave",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.2306,
     "longitude": 84.0042,
     "description": "Large limestone cave with stalactites and stalagmites, named after King Mahendra.",
-    "images": ["mahendra_cave_1.webp", "mahendra_cave_2.webp"],
+    "images": [
+      "mahendra_cave_1.webp",
+      "mahendra_cave_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 50,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Bat Cave",
     "city": "Pokhara",
-    "category": "natural",
     "latitude": 28.2308,
     "longitude": 84.0044,
     "description": "Natural cave system home to thousands of bats, located near Mahendra Cave.",
-    "images": ["bat_cave_1.webp", "bat_cave_2.webp"],
+    "images": [
+      "bat_cave_1.webp",
+      "bat_cave_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 50,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure",
+      "wildlife"
+    ]
   },
   {
     "name": "Chitwan National Park",
     "city": "Bharatpur",
-    "category": "wildlife",
     "latitude": 27.5347,
     "longitude": 84.4531,
     "description": "UNESCO World Heritage Site famous for one-horned rhinos, Bengal tigers, and diverse wildlife.",
-    "images": ["chitwan_1.webp", "chitwan_2.webp"],
+    "images": [
+      "chitwan_1.webp",
+      "chitwan_2.webp"
+    ],
     "average_visit_duration": 24,
     "average_visit_cost": 5000,
     "activities": [
@@ -371,40 +548,59 @@
         "average_duration": 3,
         "average_cost": 3000
       }
+    ],
+    "categories": [
+      "wildlife",
+      "natural",
+      "adventure"
     ]
   },
   {
     "name": "Bishazari Tal (20 Thousand Lakes)",
     "city": "Bharatpur",
-    "category": "natural",
     "latitude": 27.5667,
     "longitude": 84.4333,
     "description": "Wetland area with numerous small lakes, perfect for bird watching and nature walks.",
-    "images": ["bishazari_1.webp", "bishazari_2.webp"],
+    "images": [
+      "bishazari_1.webp",
+      "bishazari_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "wildlife"
+    ]
   },
   {
     "name": "Chitwan Tharu Village",
     "city": "Bharatpur",
-    "category": "cultural",
     "latitude": 27.5289,
     "longitude": 84.4619,
     "description": "Traditional Tharu village showcasing indigenous culture, dance, and lifestyle.",
-    "images": ["tharu_village_1.webp", "tharu_village_2.webp"],
+    "images": [
+      "tharu_village_1.webp",
+      "tharu_village_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 800,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural",
+      "educational"
+    ]
   },
   {
     "name": "Sauraha",
     "city": "Ratnanagar",
-    "category": "wildlife",
     "latitude": 27.5792,
     "longitude": 84.4886,
     "description": "Tourist hub and gateway to Chitwan National Park with resorts and safari operators.",
-    "images": ["sauraha_1.webp", "sauraha_2.webp"],
+    "images": [
+      "sauraha_1.webp",
+      "sauraha_2.webp"
+    ],
     "average_visit_duration": 6,
     "average_visit_cost": 2000,
     "activities": [
@@ -429,264 +625,398 @@
         "average_duration": 3,
         "average_cost": 3000
       }
+    ],
+    "categories": [
+      "wildlife",
+      "cultural",
+      "adventure"
     ]
   },
   {
     "name": "Elephant Breeding Center",
     "city": "Ratnanagar",
-    "category": "wildlife",
     "latitude": 27.5811,
     "longitude": 84.4897,
     "description": "Conservation center dedicated to breeding and caring for Asian elephants.",
-    "images": ["elephant_center_1.webp", "elephant_center_2.webp"],
+    "images": [
+      "elephant_center_1.webp",
+      "elephant_center_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "wildlife",
+      "educational"
+    ]
   },
   {
     "name": "Rapti River",
     "city": "Ratnanagar",
-    "category": "natural",
     "latitude": 27.5833,
     "longitude": 84.4833,
     "description": "Major river flowing through Chitwan, perfect for canoeing and wildlife observation.",
-    "images": ["rapti_river_1.webp", "rapti_river_2.webp"],
+    "images": [
+      "rapti_river_1.webp",
+      "rapti_river_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Maya Devi Temple",
     "city": "Lumbini",
-    "category": "religious",
     "latitude": 27.4781,
     "longitude": 83.2764,
     "description": "Sacred Buddhist temple marking the exact birthplace of Lord Buddha.",
-    "images": ["maya_devi_1.webp", "maya_devi_2.webp"],
+    "images": [
+      "maya_devi_1.webp",
+      "maya_devi_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Ashoka Pillar",
     "city": "Lumbini",
-    "category": "historic",
     "latitude": 27.4783,
     "longitude": 83.2767,
     "description": "Ancient stone pillar erected by Emperor Ashoka in 249 BC to mark Buddha's birthplace.",
-    "images": ["ashoka_pillar_1.webp", "ashoka_pillar_2.webp"],
+    "images": [
+      "ashoka_pillar_1.webp",
+      "ashoka_pillar_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "religious",
+      "architectural"
+    ]
   },
   {
     "name": "Sacred Garden",
     "city": "Lumbini",
-    "category": "religious",
     "latitude": 27.4786,
     "longitude": 83.2769,
     "description": "Peaceful garden surrounding the Maya Devi Temple and Ashoka Pillar.",
-    "images": ["sacred_garden_1.webp", "sacred_garden_2.webp"],
+    "images": [
+      "sacred_garden_1.webp",
+      "sacred_garden_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "natural",
+      "historic"
+    ]
   },
   {
     "name": "Lumbini Monastic Zone",
     "city": "Lumbini",
-    "category": "religious",
     "latitude": 27.4767,
     "longitude": 83.2744,
     "description": "International monastery complex with temples built by different Buddhist countries.",
-    "images": ["monastic_zone_1.webp", "monastic_zone_2.webp"],
+    "images": [
+      "monastic_zone_1.webp",
+      "monastic_zone_2.webp"
+    ],
     "average_visit_duration": 4,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "cultural",
+      "educational"
+    ]
   },
   {
     "name": "World Peace Pagoda",
     "city": "Lumbini",
-    "category": "religious",
     "latitude": 27.4744,
     "longitude": 83.2722,
     "description": "Japanese-built Buddhist pagoda promoting world peace and meditation.",
-    "images": ["lumbini_pagoda_1.webp", "lumbini_pagoda_2.webp"],
+    "images": [
+      "lumbini_pagoda_1.webp",
+      "lumbini_pagoda_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Tundikhel",
     "city": "Bandipur",
-    "category": "natural",
     "latitude": 27.9267,
     "longitude": 84.4167,
     "description": "Open grassland area offering panoramic views of the Himalayas and surrounding valleys.",
-    "images": ["tundikhel_1.webp", "tundikhel_2.webp"],
+    "images": [
+      "tundikhel_1.webp",
+      "tundikhel_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "cultural"
+    ]
   },
   {
     "name": "Siddha Cave",
     "city": "Bandipur",
-    "category": "natural",
     "latitude": 27.9261,
     "longitude": 84.4283,
     "description": "Large limestone cave system with impressive stalactites and stalagmites.",
-    "images": ["siddha_cave_1.webp", "siddha_cave_2.webp"],
+    "images": [
+      "siddha_cave_1.webp",
+      "siddha_cave_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 300,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Thani Mai Temple Viewpoint",
     "city": "Bandipur",
-    "category": "religious",
     "latitude": 27.9306,
     "longitude": 84.4189,
     "description": "Hilltop temple offering spectacular sunrise views and mountain panoramas.",
-    "images": ["thani_mai_1.webp", "thani_mai_2.webp"],
+    "images": [
+      "thani_mai_1.webp",
+      "thani_mai_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "natural"
+    ]
   },
   {
     "name": "Khadga Devi Temple",
     "city": "Bandipur",
-    "category": "religious",
     "latitude": 27.9278,
     "longitude": 84.4156,
     "description": "Ancient temple dedicated to goddess Khadga Devi with traditional architecture.",
-    "images": ["khadga_devi_1.webp", "khadga_devi_2.webp"],
+    "images": [
+      "khadga_devi_1.webp",
+      "khadga_devi_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "Gorkha Durbar",
     "city": "Gorkha",
-    "category": "historic",
     "latitude": 28.0067,
     "longitude": 84.6333,
     "description": "Historic palace complex and birthplace of King Prithvi Narayan Shah, founder of modern Nepal.",
-    "images": ["gorkha_durbar_1.webp", "gorkha_durbar_2.webp"],
+    "images": [
+      "gorkha_durbar_1.webp",
+      "gorkha_durbar_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 300,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "cultural",
+      "architectural"
+    ]
   },
   {
     "name": "Gorakhnath Temple",
     "city": "Gorkha",
-    "category": "religious",
     "latitude": 28.0072,
     "longitude": 84.6339,
     "description": "Sacred Hindu temple dedicated to Guru Gorakhnath, offering panoramic valley views.",
-    "images": ["gorakhnath_1.webp", "gorakhnath_2.webp"],
+    "images": [
+      "gorakhnath_1.webp",
+      "gorakhnath_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "Upallokot Viewpoint",
     "city": "Gorkha",
-    "category": "natural",
     "latitude": 28.0089,
     "longitude": 84.6356,
     "description": "Scenic viewpoint offering stunning views of the Himalayas and Gorkha valley.",
-    "images": ["upallokot_1.webp", "upallokot_2.webp"],
+    "images": [
+      "upallokot_1.webp",
+      "upallokot_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Rani Mahal",
     "city": "Tansen",
-    "category": "historic",
     "latitude": 27.8661,
     "longitude": 83.5456,
     "description": "19th-century palace built by Khadga Shumsher Rana, showcasing European architecture.",
-    "images": ["rani_mahal_2.webp"],
+    "images": [
+      "rani_mahal_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 200,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "historic",
+      "architectural"
+    ]
   },
   {
     "name": "Sitalpati",
     "city": "Tansen",
-    "category": "natural",
     "latitude": 27.8722,
     "longitude": 83.5478,
     "description": "Scenic viewpoint offering breathtaking views of the Himalayas and surrounding hills.",
-    "images": ["sitalpati_1.webp", "sitalpati_2.webp"],
+    "images": [
+      "sitalpati_1.webp",
+      "sitalpati_2.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural"
+    ]
   },
   {
     "name": "Amar Narayan Temple",
     "city": "Tansen",
-    "category": "religious",
     "latitude": 27.8667,
     "longitude": 83.5467,
     "description": "Ancient pagoda-style temple dedicated to Lord Vishnu with intricate wood carvings.",
-    "images": ["amar_narayan_1.webp", "amar_narayan_2.webp"],
+    "images": [
+      "amar_narayan_1.webp",
+      "amar_narayan_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "Shreenagar Hill",
     "city": "Tansen",
-    "category": "natural",
     "latitude": 27.8744,
     "longitude": 83.5511,
     "description": "Hill station with beautiful sunrise views and hiking trails through pine forests.",
-    "images": ["shreenagar_1.webp", "shreenagar_2.webp"],
+    "images": [
+      "shreenagar_1.webp",
+      "shreenagar_2.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Kalika Temple",
     "city": "Baglung",
-    "category": "religious",
     "latitude": 28.2722,
     "longitude": 83.5944,
     "description": "Sacred temple dedicated to goddess Kalika, popular pilgrimage site with mountain views.",
-    "images": ["kalika_baglung_1.webp", "kalika_baglung_2.webp"],
+    "images": [
+      "kalika_baglung_1.webp",
+      "kalika_baglung_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "Baglung Suspension Bridge",
     "city": "Baglung",
-    "category": "architectural",
     "latitude": 28.2639,
     "longitude": 83.5889,
     "description": "Long suspension bridge over the Kaligandaki River offering scenic valley views.",
-    "images": ["baglung_bridge_1.webp", "baglung_bridge_2.webp"],
+    "images": [
+      "baglung_bridge_1.webp",
+      "baglung_bridge_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 0,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "architectural",
+      "adventure"
+    ]
   },
   {
     "name": "Gaja View Tower",
     "city": "Baglung",
-    "category": "natural",
     "latitude": 28.2756,
     "longitude": 83.5978,
     "description": "Observation tower providing panoramic views of the Dhaulagiri and Annapurna ranges.",
-    "images": ["gaja_tower_1.webp", "gaja_tower_2.webp"],
+    "images": [
+      "gaja_tower_1.webp",
+      "gaja_tower_2.webp"
+    ],
     "average_visit_duration": 1,
     "average_visit_cost": 100,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "architectural"
+    ]
   },
   {
     "name": "Muktinath Temple",
     "city": "Jomsom",
-    "category": "religious",
     "latitude": 28.8174,
     "longitude": 83.8684,
     "description": "Sacred Hindu and Buddhist temple complex at 3,710m altitude, known for its 108 water spouts and eternal flame.",
@@ -696,12 +1026,16 @@
     ],
     "average_visit_duration": 4,
     "average_visit_cost": 12000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic",
+      "adventure"
+    ]
   },
   {
     "name": "Kagbeni",
     "city": "Jomsom",
-    "category": "cultural",
     "latitude": 28.835,
     "longitude": 83.7938,
     "description": "Ancient fortified village at the gateway to Upper Mustang, featuring traditional Tibetan architecture.",
@@ -712,12 +1046,16 @@
     ],
     "average_visit_duration": 3,
     "average_visit_cost": 8000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural",
+      "historic",
+      "adventure"
+    ]
   },
   {
     "name": "Namobuddha",
     "city": "Dhulikhel",
-    "category": "religious",
     "latitude": 27.5829,
     "longitude": 85.5901,
     "description": "Sacred Buddhist site where legend says Buddha offered his body to a starving tigress, featuring ancient stupa and monastery.",
@@ -728,12 +1066,16 @@
     ],
     "average_visit_duration": 4,
     "average_visit_cost": 6000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "cultural",
+      "natural"
+    ]
   },
   {
     "name": "Dhulikhel View Tower",
     "city": "Dhulikhel",
-    "category": "natural",
     "latitude": 27.6167,
     "longitude": 85.5444,
     "description": "Panoramic viewpoint offering stunning sunrise views of the Himalayas including Everest on clear days.",
@@ -744,24 +1086,34 @@
     ],
     "average_visit_duration": 3,
     "average_visit_cost": 4000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "architectural"
+    ]
   },
   {
     "name": "Seti Gandaki Gorge",
     "city": "Damauli",
-    "category": "natural",
     "latitude": 27.9667,
     "longitude": 84.2833,
     "description": "Deep limestone gorge carved by the Seti River, creating spectacular white cliffs and turquoise waters.",
-    "images": ["seti_gorge.webp", "seti_river.webp", "seti_cliffs.webp"],
+    "images": [
+      "seti_gorge.webp",
+      "seti_river.webp",
+      "seti_cliffs.webp"
+    ],
     "average_visit_duration": 3,
     "average_visit_cost": 5000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Tatopani Hot Springs",
     "city": "Beni",
-    "category": "natural",
     "latitude": 28.3667,
     "longitude": 83.5333,
     "description": "Natural hot springs with therapeutic properties, popular stop for trekkers and locals seeking relaxation.",
@@ -772,24 +1124,33 @@
     ],
     "average_visit_duration": 4,
     "average_visit_cost": 3000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "natural",
+      "adventure"
+    ]
   },
   {
     "name": "Beni Bazaar",
     "city": "Beni",
-    "category": "cultural",
     "latitude": 28.3667,
     "longitude": 83.5667,
     "description": "Gateway town to Mustang region, bustling market town at the confluence of Kali Gandaki and Myagdi rivers.",
-    "images": ["beni_bazaar.webp", "beni_market.webp", "beni_confluence.webp"],
+    "images": [
+      "beni_bazaar.webp",
+      "beni_market.webp",
+      "beni_confluence.webp"
+    ],
     "average_visit_duration": 2,
     "average_visit_cost": 2000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural"
+    ]
   },
   {
     "name": "Manimukunda Park",
     "city": "Butwal",
-    "category": "cultural",
     "latitude": 27.6833,
     "longitude": 83.45,
     "description": "Urban park with gardens, walking trails, and recreational facilities for families and visitors.",
@@ -800,12 +1161,15 @@
     ],
     "average_visit_duration": 2,
     "average_visit_cost": 1000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural",
+      "natural"
+    ]
   },
   {
     "name": "Bageshwori Temple",
     "city": "Nepalgunj",
-    "category": "religious",
     "latitude": 28.05,
     "longitude": 81.6167,
     "description": "Ancient Hindu temple dedicated to Goddess Bageshwori, important pilgrimage site for devotees.",
@@ -816,12 +1180,15 @@
     ],
     "average_visit_duration": 2,
     "average_visit_cost": 2000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious",
+      "historic"
+    ]
   },
   {
     "name": "CG Temple",
     "city": "Gaindakot",
-    "category": "religious",
     "latitude": 27.65,
     "longitude": 84.4167,
     "description": "Modern temple complex offering spiritual experiences and panoramic views of the surrounding landscapes.",
@@ -832,12 +1199,14 @@
     ],
     "average_visit_duration": 3,
     "average_visit_cost": 3000,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "religious"
+    ]
   },
   {
     "name": "Martyr's Memorial Park",
     "city": "Hetauda",
-    "category": "cultural",
     "latitude": 27.4167,
     "longitude": 85.0333,
     "description": "Memorial park dedicated to fallen heroes with monuments, gardens, and walking trails.",
@@ -848,6 +1217,10 @@
     ],
     "average_visit_duration": 2,
     "average_visit_cost": 1500,
-    "activities": []
+    "activities": [],
+    "categories": [
+      "cultural",
+      "historic"
+    ]
   }
 ]

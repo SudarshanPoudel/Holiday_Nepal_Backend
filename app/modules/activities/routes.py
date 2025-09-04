@@ -15,12 +15,11 @@ router = APIRouter()
 @router.post("/")
 async def create_activity(
     activity: ActivityCreate, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = ActivityController(db, graph_db)
+        controller = ActivityController(db)
         return await controller.create(activity)
     except HTTPException as e:
         raise e
@@ -34,11 +33,10 @@ async def index_activities(
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db)
+    db: AsyncSession = Depends(get_db)
 ):
     try:
-        controller = ActivityController(db, graph_db)
+        controller = ActivityController(db)
         return await controller.index(
             params=params,
             search=search,
@@ -54,11 +52,10 @@ async def index_activities(
 @router.get("/{activity_id}")
 async def get_activity(
     activity_id: int, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db)
+    db: AsyncSession = Depends(get_db)
 ):
     try:
-        controller = ActivityController(db, graph_db)
+        controller = ActivityController(db)
         return await controller.get(activity_id)
     except HTTPException as e:
         raise e
@@ -70,12 +67,11 @@ async def get_activity(
 async def update_activity(
     activity_id: int, 
     activity: ActivityCreate, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = ActivityController(db, graph_db)
+        controller = ActivityController(db)
         return await controller.update(activity_id, activity)
     except HTTPException as e:
         raise e
@@ -86,12 +82,11 @@ async def update_activity(
 @router.delete("/{activity_id}")
 async def delete_activity(
     activity_id: int, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = ActivityController(db, graph_db)
+        controller = ActivityController(db)
         return await controller.delete(activity_id)
     except HTTPException as e:
         raise e

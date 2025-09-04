@@ -9,7 +9,7 @@ Backend for our final year project: HolidayNepal – a smart travel planner focu
 - Explore popular destinations across Nepal
 - Hotel booking, vehicle reservation (car, bike, etc.), plane and bus ticket suggestions etc.
 - Users can create itineraries, make them public, and let others use them
-- Itinerary sharing, collaboration, and rating system
+- itinerary sharing, collaboration, and rating system
 
 ## Getting Started
 

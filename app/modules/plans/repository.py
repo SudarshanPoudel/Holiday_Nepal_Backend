@@ -4,6 +4,7 @@ from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload , joinedload
 
+from app.modules.accommodation_services.repository import AccomodationServiceRepository
 from app.core.repository import BaseRepository
 from app.modules.plan_day.models import PlanDay
 from app.modules.plan_day_steps.models import PlanDayStep
@@ -233,11 +234,15 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         
         step_index = 0
 
+        accomodation_repo = AccomodationServiceRepository(self.db)
+        last_city_id = plan.start_city_id
+        
         for day in plan_data.days:
             day_can_delete = True
             for step in day.steps:
                 step.can_delete = await PlanDayStepService._can_delete_step(self.db, step.id)
                 step.cost = step.cost * self._find_cost_multiplier(plan.no_of_people)
+                last_city_id = step.city.id
                 cost += step.cost
                 if not step.can_delete:
                     day_can_delete = False
@@ -247,11 +252,11 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
                 if step.route_hops:
                     step.route = await PlanDayStepService.build_simplified_route(step.route_hops)
                     step.route_hops = None
-                
             day.can_delete = day_can_delete
+            city_accomodation_cost = await accomodation_repo.get_city_average(last_city_id)
+            cost += city_accomodation_cost * self._find_cost_multiplier(plan.no_of_people) 
 
         n_days = len(plan_data.days)
-        plan_data.estimated_cost = cost
         image_id = plan_data.image.id if plan_data.image else None
         if not image_id and len(plan_data.days) > 0:
             for day in plan_data.days:
@@ -276,10 +281,10 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
         if no_of_people == 1:
             return 1.0
         elif no_of_people<=5:
-            return no_of_people * 0.85
+            return no_of_people * 0.9
         elif no_of_people<=10:
-            return no_of_people * 0.75
+            return no_of_people * 0.8
         elif no_of_people <= 20:
-            return no_of_people * 0.65
+            return no_of_people * 0.7
         else:
-            return no_of_people * 0.5
+            return no_of_people * 0.6

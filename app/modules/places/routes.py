@@ -15,12 +15,11 @@ router = APIRouter()
 @router.post("/")
 async def create_place(
     place: PlaceCreate, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = PlaceController(db, graph_db)
+        controller = PlaceController(db)
         return await controller.create(place)
     except HTTPException as e:
         raise e
@@ -39,7 +38,7 @@ async def index_places(
     graph_db: Neo4jSession = Depends(get_graph_db)
 ):
     try:
-        controller = PlaceController(db, graph_db)
+        controller = PlaceController(db)
         return await controller.index(
             params=params,
             search=search,
@@ -56,11 +55,10 @@ async def index_places(
 @router.get("/{place_id}")
 async def get_place(
     place_id: int, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db)
+    db: AsyncSession = Depends(get_db)
 ):
     try:
-        controller = PlaceController(db, graph_db)
+        controller = PlaceController(db)
         return await controller.get(place_id)
     except HTTPException as e:
         raise e
@@ -72,12 +70,11 @@ async def get_place(
 async def update_place(
     place_id: int, 
     place: PlaceCreate, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = PlaceController(db, graph_db)
+        controller = PlaceController(db)
         return await controller.update(place_id, place)
     except HTTPException as e:
         raise e
@@ -88,12 +85,11 @@ async def update_place(
 @router.delete("/{place_id}")
 async def delete_place(
     place_id: int, 
-    db: AsyncSession = Depends(get_db), 
-    graph_db: Neo4jSession = Depends(get_graph_db),
+    db: AsyncSession = Depends(get_db),
     _: None = Depends(require_admin)
 ):
     try:
-        controller = PlaceController(db, graph_db)
+        controller = PlaceController(db)
         return await controller.delete(place_id)
     except HTTPException as e:
         raise e

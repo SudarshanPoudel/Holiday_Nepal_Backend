@@ -19,7 +19,7 @@ class PlaceCategoryEnum(str, Enum):
 
 class PlaceBase(BaseModel):
     name: str
-    category: PlaceCategoryEnum
+    categories: List[PlaceCategoryEnum]
     longitude: float
     latitude: float
     description: Optional[str] 
@@ -41,7 +41,7 @@ class PlaceReadBasic(BaseModel):
     name: str
     longitude: float
     latitude: float
-    category: PlaceCategoryEnum
+    categories: List[PlaceCategoryEnum]
     average_visit_duration: Optional[float]
     average_visit_cost: Optional[float]
 
@@ -50,7 +50,7 @@ class PlaceRead(BaseModel):
     name: str
     longitude: float
     latitude: float
-    category: PlaceCategoryEnum
+    categories: List[PlaceCategoryEnum]
     description: Optional[str]
     average_visit_duration: Optional[float]
     average_visit_cost: Optional[float]

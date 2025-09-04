@@ -18,7 +18,7 @@ class Plan(Base):
     vote_count = Column(Integer, nullable=True)
     is_private = Column(Boolean, nullable=False, default=True)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
-    start_city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
+    start_city_id = Column(Integer, ForeignKey("cities.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, onupdate=func.now(), server_default=func.now())
     

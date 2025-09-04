@@ -1,26 +1,20 @@
 from typing import Dict, Optional
 from fastapi import HTTPException
-from app.modules.places.graph import CityPlaceEdge, PlaceGraphRepository, PlaceNode
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.schemas import BaseResponse
-from neo4j import AsyncSession as Neo4jSession
 from app.modules.place_activities.schema import PlaceActivityBase
 from app.modules.places.repository import PlaceRepository
 from app.modules.places.schema import PlaceCreate, PlaceBase, PlaceRead
 
 class PlaceController():
-    def __init__(self, db: AsyncSession, graph_db: Neo4jSession):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.graph_db = graph_db
         self.repository = PlaceRepository(db)
-        self.graph_repository = PlaceGraphRepository(graph_db)
 
     async def create(self, place: PlaceCreate):
         place_db = await self.repository.create(PlaceBase(**place.model_dump(exclude={"activities", "image_ids"})))
-        await self.graph_repository.create(PlaceNode(id=place_db.id, name=place.name, category=place.category))
-        await self.graph_repository.add_edge(CityPlaceEdge(source_id=place.city_id, target_id=place_db.id))
         await self.repository.add_images(place_db.id, place.image_ids)
         for activity in place.activities:
             try:
@@ -43,7 +37,6 @@ class PlaceController():
         delete = await self.repository.delete(place_id)
         if not delete:
             raise HTTPException(status_code=404, detail="Place not found")
-        await self.graph_repository.delete(place_id)
         return BaseResponse(message="Place deleted successfully")
     
 
@@ -54,9 +47,6 @@ class PlaceController():
             raise HTTPException(status_code=404, detail="Place not found")
         await self.repository.update_images(place_id, place.image_ids)
         await self.repository.delete_activities(place_id)
-        await self.graph_repository.update(PlaceNode(id=place_id, name=place.name, category=place.category))
-        await self.graph_repository.clear_edges(place_id, edge_type=CityPlaceEdge)
-        await self.graph_repository.add_edge(CityPlaceEdge(source_id=place.city_id, target_id=place_id))
         for activity in place.activities:
             place_activity = PlaceActivityBase(place_id=place_id, **activity.model_dump())
             place_activity = await self.place_activity_repository.create(place_activity)
