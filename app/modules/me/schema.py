@@ -19,8 +19,6 @@ class MeRead(BaseModel):
     
     city: Optional[CityRead]
     image: Optional[ImageRead]
-    plans: List[UserPlanRead]
-    saved_plans: List[UserPlanRead]
     prefer_activities: List[ActivityReadMinimal]
 
 class MeUpdateInternal(BaseModel):

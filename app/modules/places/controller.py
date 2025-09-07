@@ -70,4 +70,4 @@ class PlaceController():
             sort_order=order,
             load_relations=["images", "place_activities.activity.image", "city"]
         )
-        return BaseResponse(message="Transport services fetched successfully", data=[PlaceRead.model_validate(ts) for ts in data.items])
+        return BaseResponse(message="Transport services fetched successfully", data=[PlaceRead.model_validate(ts) for ts in data.items], page=data.page, size=data.size, total=data.total)

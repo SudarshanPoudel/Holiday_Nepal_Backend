@@ -50,11 +50,14 @@ class PlanDayStepService:
         next_step = await self.repository.get(step.next_plan_day_step_id)
 
         # Get plan and city context
-        prev_step_city_id = previous_step.city_id if previous_step else plan.start_city_id
+        prev_step_city_id = previous_step.city_id if previous_step else plan.start_city_id 
         next_step_city_id = next_step.city_id if next_step else None
 
         # Validate day id
-        
+        if prev_step_city_id is None:
+            await self.plan_repository.update_from_dict(step.plan_id, {"start_city_id": step.city_id})
+            prev_step_city_id = step.city_id
+            
         is_valid_day = False
         if not step.next_plan_day_step_id:
             allowed_last_days = []

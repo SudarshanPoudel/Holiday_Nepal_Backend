@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+from app.modules.plans.models import Plan
 from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,7 +41,6 @@ class PlanController():
         if plan.user_id != self.user_id:
             raise HTTPException(status_code=403, detail="You can only delete your plans")
         delete = await self.repository.delete(plan_id)
-        await self.graph_repository.delete(plan_id)
         return BaseResponse(message="Plan deleted successfully")
     
     async def partial_update(self, plan_id, data: Dict, graph_db: Neo4jSession):
@@ -77,8 +77,8 @@ class PlanController():
             raise HTTPException(status_code=404, detail="Plan not found")
         plan_data = await self.repository.get_updated_plan(plan.id, user_id=self.user_id)
         return BaseResponse(message="Plan duplicated successfully", data=plan_data)
-
-    async def index(
+    
+    async def my_plans(
         self,
         params: Params,
         search: Optional[str] = None,
@@ -86,20 +86,73 @@ class PlanController():
         order: Optional[str] = "asc",
         filters: Optional[BaseModel] = None
     ):
-        data = await self.repository.index(
+        filters.user_id = self.user_id
+        paged_data = await self.repository.index(
             params=params,
             search_fields=["title"],
             search_query=search,
             sort_field=sort_by,
             sort_order=order,
             load_relations=["start_city", "image", "user.image"],
-            filters=PlanFiltersInternal(**filters.model_dump())
+            filters=filters
         )
-        data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in data.items]
+        data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in paged_data.items]
         for d in data:
             d.is_saved = await self.repository.is_saved(self.user_id, d.id)
             d.self_rating = await self.repository.get_rating(self.user_id, d.id)
-        return BaseResponse(message="Plans fetched successfully", data=data)
+        return BaseResponse(message="Plans fetched successfully", data=data, page=paged_data.page, size=paged_data.size, total=paged_data.total)
+    
+    async def saved_plans(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+        filters: Optional[BaseModel] = None
+    ):
+        paged_data = await self.repository.index_saved_plans(
+            user_id=self.user_id,
+            params=params,
+            search_fields=["title"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["start_city", "image", "user.image"],
+            filters=filters
+        )
+        data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in paged_data.items]
+        for d in data:
+            d.is_saved = await self.repository.is_saved(self.user_id, d.id)
+            d.self_rating = await self.repository.get_rating(self.user_id, d.id)
+        return BaseResponse(message="Plans fetched successfully", data=data, page=paged_data.page, size=paged_data.size, total=paged_data.total)
+    
+    async def index(
+        self,
+        params: Params,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        order: Optional[str] = "asc",
+        filters: Optional[BaseModel] = None,
+        community_only: bool = False
+    ):
+        extra_condition = []
+        if community_only:
+            extra_condition = [Plan.user_id != self.user_id]
+        paged_data = await self.repository.index(
+            params=params,
+            search_fields=["title"],
+            search_query=search,
+            sort_field=sort_by,
+            sort_order=order,
+            load_relations=["start_city", "image", "user.image"],
+            filters=PlanFiltersInternal(**filters.model_dump()),
+            extra_conditions=extra_condition
+        )
+        data=[PlanIndex.model_validate(ts, from_attributes=True) for ts in paged_data.items]
+        for d in data:
+            d.is_saved = await self.repository.is_saved(self.user_id, d.id)
+            d.self_rating = await self.repository.get_rating(self.user_id, d.id)
+        return BaseResponse(message="Plans fetched successfully", data=data, page=paged_data.page, size=paged_data.size, total=paged_data.total)
     
     async def rate(self, plan_id: int, rating: int):
         if not 1<=rating<=5:

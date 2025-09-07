@@ -7,7 +7,7 @@ from app.core.config import settings
 class ImageCategoryEnum(str, Enum):
     user_profile = "user_profile"
     place = "place"
-    activities = "activities"
+    activity = "activity"
     services = "services"
     other = "other"
 

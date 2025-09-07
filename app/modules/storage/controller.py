@@ -44,11 +44,15 @@ class StorageController:
             raise HTTPException(detail="Image not found", status_code=404)
         image_bytes = await file.read()
         verified_image = validate_and_process_image(image_bytes)
+        new_key = StorageService.generate_unique_key("webp")
+        await self.storage_service.delete_file(image.key)
         await self.storage_service.upload_file(
-            key=image.key,
+            key=new_key,
             file_content= verified_image,
             content_type=file.content_type
         )
+        await self.repository.update_from_dict(id, {"key": new_key})
+        image = await self.repository.get(id)
         return BaseResponse(message="Image Replaced Successfully", data=ImageRead.model_validate(image, from_attributes=True))
     
     async def delete_image(self, id: int):  

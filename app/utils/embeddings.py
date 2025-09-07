@@ -1,9 +1,7 @@
+from sentence_transformers import SentenceTransformer
 
 def get_embedding(text: str) -> list[float]:
-    # 384-dim output
-    from sentence_transformers import SentenceTransformer
-
-    model = SentenceTransformer("all-MiniLM-L6-v2")  
+    model = SentenceTransformer("all-MiniLM-L6-v2")
 
     if not text:
         return [0.0] * 384  

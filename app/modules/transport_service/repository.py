@@ -23,8 +23,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         super().__init__(TransportService, db)
 
 
-    async def add_route_segment(self, service_id: int, route_ids: list[int]):
-        last_place = None
+    async def add_route_segment(self, service_id: int, route_ids: list[int], last_place:int):
         route_repo = TransportRouteRepository(self.db)
 
         try:
@@ -33,13 +32,12 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 route = await route_repo.get(route_id)
                 if not route:
                     raise HTTPException(status_code=404, detail=f"Route with ID {route_id} not found")
-                if not last_place:
-                    last_place = route.end_city_id
                 elif last_place == route.start_city_id:
                     last_place = route.end_city_id
                 elif last_place == route.end_city_id:
                     last_place = route.start_city_id
                 else:
+                    print(last_place, route.start_city_id, route.end_city_id)
                     raise HTTPException(status_code=400, detail="Invalid route index")
 
                 last_place = route.end_city_id

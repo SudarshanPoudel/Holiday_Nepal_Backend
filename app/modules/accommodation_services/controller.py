@@ -52,4 +52,4 @@ class AccomodationServiceController():
             sort_order=order,
             load_relations=["images", "city"]
         )
-        return BaseResponse(message="Transport services fetched successfully", data=[AccomodationServiceRead.model_validate(ts, from_attributes=True) for ts in data.items])
+        return BaseResponse(message="Transport services fetched successfully", data=[AccomodationServiceRead.model_validate(ts, from_attributes=True) for ts in data.items], page=data.page, size=data.size, total=data.total)

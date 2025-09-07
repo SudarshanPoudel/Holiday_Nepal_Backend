@@ -32,7 +32,6 @@ class ActivityController():
         delete = await self.repository.delete(activity_id)
         if not delete:
             raise HTTPException(status_code=404, detail="Activity not found")
-        await self.graph_repository.delete(activity_id)
         return BaseResponse(message="Activity deleted successfully")
 
     async def index(

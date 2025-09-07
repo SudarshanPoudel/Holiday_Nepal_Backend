@@ -2,16 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install unzip and other dependencies
-RUN apt-get update && apt-get install -y unzip curl
+# Install unzip, curl, etc.
+RUN apt-get update && apt-get install -y unzip curl git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and setuptools for better reliability
+# Upgrade pip + setuptools
 RUN pip install --upgrade pip setuptools
 
-# Copy requirements first to leverage Docker cache
+# Copy requirements first (layer cache)
 COPY requirements.txt .
 
 RUN pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt
+
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2').save('/app/models/all-MiniLM-L6-v2')"
 COPY . .
 
 EXPOSE 8000
