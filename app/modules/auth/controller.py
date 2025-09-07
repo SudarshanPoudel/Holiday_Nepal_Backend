@@ -119,7 +119,7 @@ class AuthController:
 
             return BaseResponse(
                 message="User logged in successfully",
-                data=Token(access_token=access_token, token_type="Bearer", role=role),
+                data=Token(access_token=access_token, token_type="Bearer", role=role, user_id=user.id),
                 status_code=200
             )
 
@@ -165,7 +165,7 @@ class AuthController:
         user_info = await AuthService.handle_google_callback(code)
         email = user_info["email"]
         name = user_info["name"]
-        username = await self.generate_unique_username(name)
+        username = await self.generate_unique_username(name, db)
 
         # Check if user exists
         result = await db.execute(select(User).where(User.email == email))
@@ -205,7 +205,7 @@ class AuthController:
 
         return BaseResponse(
             message="Google login successful",
-            data=Token(access_token=access_token, token_type="Bearer", role="user"),
+            data=Token(access_token=access_token, token_type="Bearer", role="user", user_id=user.id),
             status_code=200
         )
     
@@ -248,7 +248,7 @@ class AuthController:
 
         return BaseResponse(
             message="Token refreshed successfully",
-            data=Token(access_token=access_token, token_type="Bearer", role=role),
+            data=Token(access_token=access_token, token_type="Bearer", role=role, user_id=user_id),
             status_code=200
         )
     
@@ -287,18 +287,18 @@ class AuthController:
 
         if not AuthService.verify_password_hash(old_password, user.password):
             raise HTTPException(status_code=400, detail="Incorrect old password.")
-        new_hashed = self.hash_password(new_password)
+        new_hashed = AuthService.hash_password(new_password)
         await user_repo.update_from_dict(record_id=user_id, data={"password": new_hashed})
         return BaseResponse(message="Password changed successfully.")
 
 
-    async def generate_unique_username(self, name: str) -> str:
+    async def generate_unique_username(self, name: str, db) -> str:
         base_username = re.sub(r"[^A-Za-z0-9_-]", "_", name).lower().strip("_")
         if not base_username:
             base_username = "user"
 
         like_pattern = f"{base_username}%"
-        result = await self.db.execute(select(User.username).where(User.username.like(like_pattern)))
+        result = await db.execute(select(User.username).where(User.username.like(like_pattern)))
         existing_usernames = set(row[0] for row in result.fetchall())
 
         if base_username not in existing_usernames:

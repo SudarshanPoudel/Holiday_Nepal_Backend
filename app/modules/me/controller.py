@@ -15,7 +15,7 @@ class MeController():
     async def me(self):
         user = await self.user_repository.get(
             self.user_id,
-            load_relations=["image", "city", "plans.start_city", "plans.image", "saved_plans.start_city", "saved_plans.image", "prefer_activities"]
+            load_relations=["image", "city", "prefer_activities"]
         )
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -36,4 +36,11 @@ class MeController():
         if profile_info.prefer_activities:
             await self.user_repository.update_prefer_activities(self.user_id, profile_info.prefer_activities)
 
-        return BaseResponse(message="Profile updated successfully", data={"id": updated_user.id})
+        user = await self.user_repository.get(
+            self.user_id,
+            load_relations=["image", "city", "prefer_activities"]
+        )
+        data = MeRead.model_validate(user, from_attributes=True)
+        data.no_of_plans = await self.user_repository.get_no_of_plans(self.user_id, include_private=True)
+
+        return BaseResponse(message="Profile updated successfully", data=data)

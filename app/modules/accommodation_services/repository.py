@@ -39,7 +39,7 @@ class AccomodationServiceRepository(BaseRepository[AccomodationService, Accomoda
         return data.items
     
     async def get_city_average(self, city_id, use_default=True):
-        data = await self.get_all_filtered(filters={"city_id": city_id}, use_default=use_default)
+        data = await self.get_all_filtered(filters={"city_id": city_id})
         total = 0
         for d in data:
             total += d.cost_per_night

@@ -10,6 +10,7 @@ class Token(BaseModel):
     role: str
     access_token: str
     token_type: str
+    user_id: int
 
 class OTPResponse(BaseModel):
     result: bool

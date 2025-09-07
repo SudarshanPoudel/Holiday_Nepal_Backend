@@ -36,13 +36,67 @@ async def index_plans(
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
     params: Params = Depends(),
+    community_only: bool = Query(False, description="Filter by community plans only"),
     filters: Optional[PlanFilters] = Depends(PlanFilters),
     db: AsyncSession = Depends(get_db),
 ):
     try:
-        user_id = request.state.user_id
+        user_id = request.state.user_id if hasattr(request.state, "user_id") else None
         controller = PlanController(db, user_id)
         return await controller.index(
+            params=params,
+            search=search,
+            filters=filters,
+            sort_by=sort_by,
+            order=order,
+            community_only=community_only
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/my-plans")
+async def index_plans(
+    request: Request,
+    search: Optional[str] = Query(None, description="Search query for plan title"),
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    params: Params = Depends(),
+    filters: Optional[PlanFilters] = Depends(PlanFilters),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        user_id = request.state.user_id if request.state.user_id else None
+        controller = PlanController(db, user_id)
+        return await controller.my_plans(
+            params=params,
+            search=search,
+            filters=filters,
+            sort_by=sort_by,
+            order=order,
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:        
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/saved")
+async def index_plans(
+    request: Request,
+    search: Optional[str] = Query(None, description="Search query for plan title"),
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    params: Params = Depends(),
+    filters: Optional[PlanFilters] = Depends(PlanFilters),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        user_id = request.state.user_id if request.state.user_id else None
+        controller = PlanController(db, user_id)
+        return await controller.saved_plans(
             params=params,
             search=search,
             filters=filters,
@@ -62,7 +116,7 @@ async def get_plan(
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        user_id = request.state.user_id
+        user_id = request.state.user_id if request.state.user_id else None
         controller = PlanController(db, user_id)
         return await controller.get(plan_id)
     except HTTPException as e:

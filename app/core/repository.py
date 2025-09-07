@@ -163,7 +163,8 @@ class BaseRepository(Generic[ModelType, SchemaType]):
             search_query: Optional[str] = None,
             sort_field: Optional[str] = None,
             sort_order: str = "desc",
-            load_relations: list[str] = None
+            load_relations: list[str] = None,
+            extra_conditions: Optional[List[Any]] = None
             ) -> Page[ModelType]:
         query = select(self.model)
         #apply filters:
@@ -200,7 +201,10 @@ class BaseRepository(Generic[ModelType, SchemaType]):
                     query = query.options(option)
                 else:
                     query = query.options(selectinload(getattr(self.model, relation)))
-
+        if extra_conditions:
+            for condition in extra_conditions:
+                query = query.filter(condition)
+                
         return await paginate(self.db , query, params)
     
     async def get_all_filtered(

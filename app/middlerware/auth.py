@@ -11,12 +11,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         allowed_paths = [
             "",
-            "/auth/login", "/auth/register", "/auth/google_login",
-            "/auth/google_callback", "/auth/refresh_token",
+            "/auth/login", "/auth/register", "/auth/refresh_token",
             "/auth/verify_email", "/auth/resend_otp",
-            "/auth/forget_password", "/auth/change_password_with_token",
+            "/auth/forget_password", "/auth/reset_password",
+            "/auth/oauth/google", "/auth/oauth/google/callback",
             "/docs", "/redoc", "/openapi.json", 
-            "/cities", "/cities/nearest",
+            "/cities", "/cities/nearest", "/plans"
         ]
 
         # Add regex patterns for dynamic paths
@@ -32,7 +32,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         load_dotenv()
         token = request.headers.get("Authorization") 
-        token = os.getenv("DEV_TOKEN") if not token else token
+        # token = os.getenv("DEV_TOKEN") if not token else token
         if not token:
             raise HTTPException(status_code=401, detail="Token not found")
 

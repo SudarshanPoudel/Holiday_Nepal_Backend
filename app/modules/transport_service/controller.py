@@ -139,6 +139,6 @@ class TransportServiceController:
             search_query=search,
             sort_field=sort_by,
             sort_order=order,
-            load_relations=["images", "start_city", "end_city"]
+            load_relations=["images", "start_city", "end_city", "route_segments.route.start_city", "route_segments.route.end_city"]
         )
-        return BaseResponse(message="Transport services fetched successfully", data=[TransportServiceReadAll.model_validate(ts, from_attributes=True) for ts in data.items])
+        return BaseResponse(message="Transport services fetched successfully", data=[TransportServiceRead.model_validate(ts, from_attributes=True) for ts in data.items], page=data.page, size=data.size, total=data.total)

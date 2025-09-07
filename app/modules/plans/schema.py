@@ -59,6 +59,7 @@ class PlanFilters(BaseModel):
     no_of_days: Optional[int] = None
     no_of_people: Optional[int] = None
     start_city_id: Optional[int] = None
+    user_id: Optional[int] = None
 
 class PlanFiltersInternal(PlanFilters):
     is_private: bool = False

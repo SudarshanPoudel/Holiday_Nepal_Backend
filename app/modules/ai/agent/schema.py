@@ -52,7 +52,7 @@ class AgentRetrievedPlaceActivity(BaseModel):
 class AgentRetrievedPlace(BaseModel):
     name: str
     description: str
-    category: PlaceCategoryEnum
+    categories: List[PlaceCategoryEnum]
     average_visit_duration: float
     average_visit_cost: float
     place_activities: List[AgentRetrievedPlaceActivity]

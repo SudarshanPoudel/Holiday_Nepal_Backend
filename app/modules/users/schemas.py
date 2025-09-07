@@ -31,7 +31,7 @@ class UserPlanRead(BaseModel):
     updated_at: datetime
     
     image: Optional[ImageRead] 
-    start_city: CityRead
+    start_city: Optional[CityRead]
 
 class UserPlanRatingRead(BaseModel):
     rating: int

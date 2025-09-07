@@ -19,6 +19,7 @@ class TransportServiceCategoryEnum(str, Enum):
 
 
 class TransportServiceCreate(BaseModel):
+    start_city_id: int
     route_ids: List[int]
     description: Optional[str]
     image_ids: Optional[List[int]] = None  
@@ -47,6 +48,7 @@ class TransportServiceReadAll(BaseModel):
     id: int
     start_city: CityRead
     end_city: CityRead
+    description: Optional[str]
     images: List[ImageRead] 
     route_category: RouteCategoryEnum
     transport_category: TransportServiceCategoryEnum

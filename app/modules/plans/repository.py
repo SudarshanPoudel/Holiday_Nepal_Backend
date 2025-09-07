@@ -1,9 +1,12 @@
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from fastapi import HTTPException
-from sqlalchemy import delete, insert, select
+from sqlalchemy import delete, insert, select, or_, asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload , joinedload
-
+from sqlalchemy.orm import joinedload, selectinload
+from app.modules.plans.models import user_saved_plans, Plan
+from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination import Params, Page
 from app.modules.accommodation_services.repository import AccomodationServiceRepository
 from app.core.repository import BaseRepository
 from app.modules.plan_day.models import PlanDay
@@ -288,3 +291,67 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
             return no_of_people * 0.7
         else:
             return no_of_people * 0.6
+        
+
+    async def index_saved_plans(
+        self,
+        user_id: int,
+        params: Params,
+        filters: Optional[Dict[str, Any]] = None,
+        search_fields: Optional[list[str]] = None,
+        search_query: Optional[str] = None,
+        sort_field: Optional[str] = None,
+        sort_order: str = "desc",
+        load_relations: list[str] = None,
+        extra_conditions: Optional[List[Any]] = None
+    ) -> Page[Plan]:
+        query = (
+            select(self.model)
+            .join(user_saved_plans, user_saved_plans.c.plan_id == self.model.id)
+            .where(user_saved_plans.c.user_id == user_id)
+        )
+
+        # apply filters
+        if filters:
+            for field, value in filters:
+                if hasattr(self.model, field) and value is not None:
+                    query = query.filter(getattr(self.model, field) == value)
+
+        # apply search
+        if search_query and search_fields:
+            search_conditions = [
+                getattr(self.model, field).ilike(f"%{search_query}%")
+                for field in search_fields
+                if hasattr(self.model, field)
+            ]
+            if search_conditions:
+                query = query.filter(or_(*search_conditions))
+
+        # apply sorting
+        if sort_field and hasattr(self.model, sort_field):
+            order_func = asc if sort_order.lower() == "asc" else desc
+            query = query.order_by(order_func(getattr(self.model, sort_field)))
+        else:
+            query = query.order_by(desc(self.model.id))
+
+        # load relations
+        if load_relations:
+            for relation in load_relations:
+                if "." in relation:  # nested relation
+                    parts = relation.split(".")
+                    current_model = self.model
+                    option = None
+                    for part in parts:
+                        attr = getattr(current_model, part)
+                        current_model = attr.property.mapper.class_
+                        option = joinedload(attr) if option is None else option.joinedload(attr)
+                    query = query.options(option)
+                else:
+                    query = query.options(selectinload(getattr(self.model, relation)))
+
+        # extra conditions
+        if extra_conditions:
+            for condition in extra_conditions:
+                query = query.filter(condition)
+
+        return await paginate(self.db, query, params)
