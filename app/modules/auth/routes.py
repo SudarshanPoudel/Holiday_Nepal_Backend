@@ -60,3 +60,9 @@ async def google_login():
 @router.post("/oauth/google/callback")
 async def google_callback(code: str, response: Response, db: AsyncSession = Depends(get_db)):
     return await controller.handle_google_callback(code, db, response)
+
+
+@router.delete("/delete_account")
+async def delete_account(password: str, request: Request, db: AsyncSession = Depends(get_db)):
+    user_id = int(request.state.user_id)
+    return await controller.delete_account(user_id, password, db)

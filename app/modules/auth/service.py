@@ -1,3 +1,4 @@
+import random
 import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -68,6 +69,8 @@ class AuthService:
         SECRET_KEY = settings.SECRET_KEY
         ALGORITHM = settings.ALGORITHM
         REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
+        seed = random.randint(100000, 999999)
+        to_encode.update({"seed": seed})
 
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta

@@ -312,3 +312,16 @@ class AuthController:
                 return candidate
 
         return f"{base_username}_{secrets.token_hex(4)}"
+    
+
+    async def delete_account(self, user_id: int, password: str, db: AsyncSession):
+        user_repo = UserRepository(db=db)
+        user = await user_repo.get(record_id=user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+
+        if not AuthService.verify_password_hash(password, user.password):
+            raise HTTPException(status_code=400, detail="Incorrect password.")
+
+        await user_repo.delete(record_id=user_id)
+        return BaseResponse(message="Account deleted successfully.")
