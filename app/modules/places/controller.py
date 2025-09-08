@@ -16,13 +16,14 @@ class PlaceController():
     async def create(self, place: PlaceCreate):
         place_db = await self.repository.create(PlaceBase(**place.model_dump(exclude={"activities", "image_ids"})))
         await self.repository.add_images(place_db.id, place.image_ids)
-        for activity in place.activities:
-            try:
-                place_acitivity = PlaceActivityBase(place_id=place_db.id, **activity.model_dump())
-                await self.place_activity_repository.create(place_acitivity)
-            except Exception as e:
-                print(e)
-                raise HTTPException(status_code=404, detail="Activity not found")
+        if place.activities:
+            for activity in place.activities:
+                try:
+                    place_acitivity = PlaceActivityBase(place_id=place_db.id, **activity.model_dump())
+                    await self.place_activity_repository.create(place_acitivity)
+                except Exception as e:
+                    print(e)
+                    raise HTTPException(status_code=404, detail="Activity not found")
 
         place_info = await self.repository.get(place_db.id, load_relations=["images", "place_activities.activity.image", "city"])
         return BaseResponse(message="Place created successfully", data=PlaceRead.model_validate(place_info))

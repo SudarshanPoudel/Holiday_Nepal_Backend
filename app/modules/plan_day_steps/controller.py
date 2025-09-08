@@ -42,7 +42,7 @@ class PlanDayStepController:
             raise HTTPException(status_code=404, detail=f"Plan Day not found {step.plan_day_id}")
 
         created_steps = await self.service.add(step)
-        plan_data = await self.plan_repository.get_updated_plan(plan_day.plan.id, user_id=self.user_id)
+        plan_data = await self.plan_repository.get_updated_plan(plan_day.plan_id, user_id=self.user_id)
         return BaseResponse(message="Step added successfully", data=plan_data)
 
     async def delete_day_step(self, plan_day_step_id: int):

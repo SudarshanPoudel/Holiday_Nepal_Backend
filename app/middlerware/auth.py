@@ -16,7 +16,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/auth/forget_password", "/auth/reset_password",
             "/auth/oauth/google", "/auth/oauth/google/callback",
             "/docs", "/redoc", "/openapi.json", 
-            "/cities", "/cities/nearest", "/plans"
+            "/cities", "/cities/nearest"
         ]
 
         # Add regex patterns for dynamic paths

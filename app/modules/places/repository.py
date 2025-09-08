@@ -17,6 +17,8 @@ class PlaceRepository(BaseRepository[Place, PlaceBase]):
         super().__init__(Place, db)
 
     async def add_images(self, place_id: int, image_ids: List[int]):
+        if not image_ids:
+            return
         values = [{"place_id": place_id, "image_id": image_id} for image_id in image_ids]
         
         stmt = insert(place_images).values(values)
