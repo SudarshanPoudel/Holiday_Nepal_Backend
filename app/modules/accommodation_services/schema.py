@@ -22,6 +22,7 @@ class AccomodationServiceBase(BaseModel):
     longitude: float
     latitude: float
     cost_per_night: float
+    contact: Optional[str] = None
 
 class AccomodationServiceCreate(AccomodationServiceBase):
     image_ids: Optional[List[int]]
@@ -36,6 +37,7 @@ class AccomodationServiceReadMinimal(BaseModel):
     longitude: float
     latitude: float
     cost_per_night: float
+    contact: Optional[str] = None
 
     class Config:
         from_attributes = True

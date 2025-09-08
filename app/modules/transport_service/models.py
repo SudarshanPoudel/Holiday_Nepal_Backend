@@ -27,6 +27,7 @@ class TransportService(Base):
     total_distance = Column(Float, nullable=False)
     average_duration = Column(Float, nullable=True)
     cost = Column(Float, nullable=True)
+    contect = Column(String, nullable=True)
 
     start_city = relationship("City", foreign_keys=[start_city_id])
     end_city = relationship("City", foreign_keys=[end_city_id])

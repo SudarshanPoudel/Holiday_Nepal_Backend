@@ -27,6 +27,7 @@ class TransportServiceCreate(BaseModel):
     transport_category: TransportServiceCategoryEnum
     average_duration: Optional[float]
     cost: Optional[float]
+    contact: Optional[str] = None
 
 class TransportServiceBase(BaseModel):
     start_city_id: int
@@ -37,6 +38,7 @@ class TransportServiceBase(BaseModel):
     average_duration: Optional[float]
     total_distance: float
     cost: Optional[float]
+    contact: Optional[str] = None
 
 class TransportServiceRouteSegmentRead(BaseModel):
     id: int
@@ -55,6 +57,7 @@ class TransportServiceReadAll(BaseModel):
     total_distance: float
     average_duration: Optional[float]
     cost: Optional[float]
+    contact: Optional[str] = None
 
 
 class TransportServiceRead(TransportServiceReadAll):

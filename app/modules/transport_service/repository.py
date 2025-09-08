@@ -22,16 +22,27 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
     def __init__(self, db: AsyncSession):
         super().__init__(TransportService, db)
 
-
-    async def add_route_segment(self, service_id: int, route_ids: list[int], last_place:int):
+    async def add_route_segment(self, service_id: int, route_ids: list[int]):
         route_repo = TransportRouteRepository(self.db)
 
+        last_place = None
         try:
             segments = []
             for i, route_id in enumerate(route_ids):
                 route = await route_repo.get(route_id)
                 if not route:
                     raise HTTPException(status_code=404, detail=f"Route with ID {route_id} not found")
+
+                if last_place is None:
+                    if i + 1 < len(route_ids):
+                        next_route = await route_repo.get(route_ids[i + 1])
+                        if route.start_city_id in (next_route.start_city_id, next_route.end_city_id):
+                            last_place = route.start_city_id
+                        else:
+                            last_place = route.end_city_id
+                    else:
+                        last_place = route.end_city_id
+
                 elif last_place == route.start_city_id:
                     last_place = route.end_city_id
                 elif last_place == route.end_city_id:
@@ -40,26 +51,24 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                     print(last_place, route.start_city_id, route.end_city_id)
                     raise HTTPException(status_code=400, detail="Invalid route index")
 
-                last_place = route.end_city_id
-
                 segment = TransportServiceRouteSegment(
                     service_id=service_id,
                     route_id=route_id,
                     index=i
                 )
                 self.db.add(segment)
-                await self.db.flush()  # Ensure segments are added before committing
+                await self.db.flush()
                 segments.append(segment)
 
             await self.db.commit()
-
             return segments
-        except SQLAlchemyError as e:
+
+        except SQLAlchemyError:
             import traceback
             traceback.print_exc()
             await self.db.rollback()
             raise HTTPException(status_code=500, detail="Failed to add route segments")
-            
+
     async def attach_images(self, service_id: int, image_ids: list[int]):
         await self.db.execute(insert(transport_service_images).values([
             {"transport_service_id": service_id, "image_id": img_id} for img_id in image_ids

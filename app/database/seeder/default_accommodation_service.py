@@ -61,7 +61,8 @@ async def seed_default_accommodation_services(db: AsyncSession):
             longitude=data["longitude"],
             latitude=data["latitude"],
             cost_per_night=data["cost_per_night"],
-            images=images
+            images=images,
+            contact="+977 9812121212"
         )
 
         db.add(service)

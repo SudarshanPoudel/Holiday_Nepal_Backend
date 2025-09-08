@@ -58,7 +58,8 @@ async def seed_default_transport_services(db):
             transport_category=TransportServiceCategoryEnum(entry["transport_category"]),
             total_distance=total_distance,
             average_duration=total_time,
-            cost=entry.get("cost")
+            cost=entry.get("cost"),
+            contact="+977 9700110011"
         )
         db.add(new_service)
         await db.flush()

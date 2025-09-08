@@ -25,6 +25,7 @@ class AccomodationService(Base):
     longitude = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     cost_per_night = Column(Float, nullable=False)
+    contact = Column(String, nullable=True)
 
     images = relationship("Image", secondary=accommodation_service_images, uselist=True)
     city = relationship("City", foreign_keys=[city_id])
