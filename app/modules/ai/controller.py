@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import  WebSocket
+from fastapi import WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.redis_cache import RedisCache
 from app.modules.ai.agent.llm import LLM
@@ -14,10 +14,12 @@ from app.modules.plans.cache import PlanCache
 from app.modules.plans.models import Plan
 from app.modules.plans.repository import PlanRepository
 from neo4j import AsyncSession as Neo4jSession
-from rapidfuzz import process, fuzz
+from rapidfuzz import process
 import traceback
+import asyncio
+import random
 from app.modules.plan_day_steps.schema import PlanDayStepCategoryEnum, PlanDayStepCreate
-from app.modules.plans.schema import  PlanBase
+from app.modules.plans.schema import PlanBase
 
 
 class AIController:
@@ -31,7 +33,6 @@ class AIController:
         self.agent = TripPlannerAgent(db)
         self.plan_cache = PlanCache(db, redis)
 
-
     async def generate_plan_websocket(self, prompt: str, websocket: WebSocket):
         try:
             if prompt == "new":
@@ -44,14 +45,14 @@ class AIController:
                     "type": "plan_created",
                     "response": await self._get_plan_json(plan.id)
                 })
-            else:                
+            else:
                 await websocket.send_json({"type": "prompt", "response": prompt})
                 plan: Plan | None = None
                 last_itinerary_index = -1
                 day_no_and_id_map: dict[int, int] = {}
                 prev_day_id: int | None = None
                 prev_city_id: int | None = None
-                day_step_index_map: dict[int, int] = {}  # track last added step index per day
+                day_step_index_map: dict[int, int] = {}
 
                 async for resp in self.agent.generate_overall_plan(prompt, self.user_id):
                     # --- First response (plan metadata only) ---
@@ -81,22 +82,22 @@ class AIController:
 
                             if not prev_city_id:
                                 await self.plan_repository.update_from_dict(plan.id, {"start_city_id": city_db[0].id})
-                            
 
                             if not itinerary.travel_around:
                                 if prev_city_id and prev_city_id != city_db[0].id:
                                     await self.plan_day_step_service.add(
                                         PlanDayStepCreate(
                                             plan_id=plan.id,
-                                            day_id=day_no_and_id_map.get(itinerary.arrival.day),
+                                            plan_day_id=day_no_and_id_map.get(itinerary.arrival.day),
                                             category=PlanDayStepCategoryEnum.transport,
                                             city_id=city_db[0].id
                                         )
                                     )
                                 prev_city_id = city_db[0].id
                                 continue
-                        
+
                             prev_city_id = city_db[0].id
+
                             # --- Stream single city plan (days + steps) ---
                             async for city_days in self.agent.generate_single_city_plan(itinerary, no_of_days):
                                 for day in city_days:
@@ -109,7 +110,7 @@ class AIController:
                                         )
                                         day_id = day_db.id
                                         day_no_and_id_map[day.day] = day_id
-                                        day_step_index_map[day.day] = -1  # init step tracker
+                                        day_step_index_map[day.day] = -1
 
                                         if prev_day_id:
                                             await self.plan_day_repository.update_from_dict(
@@ -125,21 +126,16 @@ class AIController:
 
                                     for step in new_steps:
                                         place_db_list = await self.place_repository.get_similar(
-                                            step.place, limit=1, load_relations=["place_activities.activity"],extra_conditions=[
-                                                Place.city_id == prev_city_id
-                                            ]
+                                            step.place, limit=1, load_relations=["place_activities.activity"],
+                                            extra_conditions=[Place.city_id == prev_city_id]
                                         )
                                         place_db = place_db_list[0]
                                         activity_db = None
                                         if step.category == "activity":
                                             choices = {act.activity.name: act for act in place_db.place_activities if act.activity.name}
                                             if choices:
-                                                match_string, _, _ = process.extractOne(
-                                                    step.activity,
-                                                    choices.keys()
-                                                )
+                                                match_string, _, _ = process.extractOne(step.activity, choices.keys())
                                                 activity_db = choices[match_string]
-
 
                                         await self.plan_day_step_service.add(PlanDayStepCreate(
                                             plan_id=plan.id,
@@ -148,14 +144,16 @@ class AIController:
                                             place_id=place_db.id,
                                             place_activity_id=activity_db.id if activity_db else None,
                                         ))
-                                        # --- Push updated plan snapshot after new steps ---
+
+                                        # --- Push step with smooth randomness ---
                                         await websocket.send_json({
                                             "type": "step_added",
                                             "response": await self._get_plan_json(plan.id)
                                         })
-                                        
+                                        await asyncio.sleep(random.uniform(0.5, 1))
+
                                     day_step_index_map[day.day] = len(day.steps) - 1
-                                    
+
             await websocket.send_json({"type": "completed"})
         except Exception as e:
             print(traceback.format_exc())
@@ -163,4 +161,4 @@ class AIController:
 
     async def _get_plan_json(self, plan_id):
         plan = await self.plan_repository.get_updated_plan(plan_id, user_id=self.user_id)
-        return plan.model_dump()    
+        return plan.model_dump()

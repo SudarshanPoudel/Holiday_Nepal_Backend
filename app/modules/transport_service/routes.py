@@ -30,6 +30,7 @@ async def index_transport_services(
     request: Request,
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", description="Sorting order: 'asc' or 'desc'"),
+    search: Optional[str] = Query(None, description="Search query for transport service description"),
     params: Params = Depends(),
     filters: Optional[TransportServiceFilters] = Depends(TransportServiceFilters),
     db: AsyncSession = Depends(get_db),
@@ -39,6 +40,7 @@ async def index_transport_services(
         return await controller.index(
             params=params,
             sort_by=sort_by,
+            search=search,
             order=order,
             filters=filters
         )

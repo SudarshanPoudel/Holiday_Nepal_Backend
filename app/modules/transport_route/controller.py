@@ -87,4 +87,4 @@ class TransportRouteController():
             sort_order=order,
             load_relations=["start_city", "end_city"]
         )
-        return BaseResponse(message="Transport routes fetched successfully", data=[TransportRouteRead.model_validate(tr, from_attributes=True) for tr in data.items])
+        return BaseResponse(message="Transport routes fetched successfully", data=[TransportRouteRead.model_validate(tr, from_attributes=True) for tr in data.items], page=data.page, size=data.size, total=data.total)

@@ -44,7 +44,8 @@ class TransportServiceController:
         
 
         try:
-            await self.repository.add_route_segment(res.id, transport_service.route_ids)
+            segments = await self.repository.add_route_segment(res.id, transport_service.route_ids)
+            await self.repository.update_from_dict(res.id, {"start_city_id": segments['start_city_id'], "end_city_id": segments['end_city_id']})
             if transport_service.image_ids:
                 await self.repository.attach_images(res.id, transport_service.image_ids)
         except Exception as e:
@@ -135,7 +136,7 @@ class TransportServiceController:
         data = await self.repository.index(
             params=params,
             filters=filters,
-            search_fields=["name"],
+            search_fields=["description"],
             search_query=search,
             sort_field=sort_by,
             sort_order=order,

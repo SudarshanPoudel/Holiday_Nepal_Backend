@@ -26,6 +26,7 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
         route_repo = TransportRouteRepository(self.db)
 
         last_place = None
+        start_city_id = None
         try:
             segments = []
             for i, route_id in enumerate(route_ids):
@@ -38,10 +39,14 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                         next_route = await route_repo.get(route_ids[i + 1])
                         if route.start_city_id in (next_route.start_city_id, next_route.end_city_id):
                             last_place = route.start_city_id
+                            start_city_id = route.end_city_id
                         else:
                             last_place = route.end_city_id
+                            start_city_id = route.start_city_id
                     else:
+                        # only one route
                         last_place = route.end_city_id
+                        start_city_id = route.start_city_id
 
                 elif last_place == route.start_city_id:
                     last_place = route.end_city_id
@@ -61,7 +66,12 @@ class TransportServiceRepository(BaseRepository[TransportService, TransportServi
                 segments.append(segment)
 
             await self.db.commit()
-            return segments
+
+            return {
+                "segments": segments,
+                "start_city_id": start_city_id,
+                "end_city_id": last_place,
+            }
 
         except SQLAlchemyError:
             import traceback

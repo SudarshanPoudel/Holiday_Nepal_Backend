@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+from app.modules.place_activities.repository import PlaceActivityRepository
 from fastapi import HTTPException
 from fastapi_pagination import Params
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,7 @@ class PlaceController():
     def __init__(self, db: AsyncSession):
         self.db = db
         self.repository = PlaceRepository(db)
+        self.place_activity_repository = PlaceActivityRepository(db)
 
     async def create(self, place: PlaceCreate):
         place_db = await self.repository.create(PlaceBase(**place.model_dump(exclude={"activities", "image_ids"})))

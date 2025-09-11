@@ -1,12 +1,8 @@
-import os
-import re
-from dotenv import load_dotenv
-from fastapi import Request, HTTPException, Response
+from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+import re
 from app.modules.auth.service import AuthService
-from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         allowed_paths = [
@@ -16,40 +12,28 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/auth/forget_password", "/auth/reset_password",
             "/auth/oauth/google", "/auth/oauth/google/callback",
             "/docs", "/redoc", "/openapi.json", 
-            "/cities", "/cities/nearest"
+            "/cities", "/cities/nearest",
         ]
-
-        # Add regex patterns for dynamic paths
-        allowed_path_patterns = [
-            
+        allowed_patterns = [
+            # regex patterns for dynamic paths
         ]
 
         path = request.url.path.rstrip('/')
-
-        if path in allowed_paths or any(re.fullmatch(pattern, path) for pattern in allowed_path_patterns):
+        if path in allowed_paths or any(re.fullmatch(p, path) for p in allowed_patterns):
             return await call_next(request)
-        
 
-        load_dotenv()
-        token = request.headers.get("Authorization") 
-        # token = os.getenv("DEV_TOKEN") if not token else token
+        token = request.headers.get("Authorization")
         if not token:
-            raise HTTPException(status_code=401, detail="Token not found")
+            return Response(content="Invalid token", status_code=401)  # <-- return Response instead of raising
 
-        try:
-            token = token.split(" ")[1] if token.startswith("Bearer ") else token
-            user = AuthService.verify_access_token(token)
+        token = token.split(" ")[1] if token.startswith("Bearer ") else token
+        user = AuthService.verify_access_token(token)
 
-            if user:
-                request.state.user_id = user.get("user_id")  # User ID from token
-                request.state.role = user.get("role", "user")
-            else:
-                raise ValueError("Invalid token")
+        if not user:
+            return Response(content="Invalid token", status_code=401)  # <-- return Response instead of raising
 
-        except ValueError as e:
-            print(e)
-            return Response(content="Invalid token", status_code=401)
-        except Exception as e:
-            raise e
-        
+        # Inject into request.state
+        request.state.user_id = user.get("user_id")
+        request.state.role = user.get("role", "user")
+
         return await call_next(request)

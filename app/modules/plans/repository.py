@@ -275,6 +275,8 @@ class PlanRepository(BaseRepository[Plan, PlanBase]):
 
         self.db.expunge(plan)
         await self.update_from_dict(plan_id, {"estimated_cost": cost, "no_of_days": n_days, "image_id": image_id})
+        plan_data.estimated_cost = cost
+        plan_data.no_of_days = n_days
         return plan_data
 
 
