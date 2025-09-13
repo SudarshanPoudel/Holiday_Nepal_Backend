@@ -4,7 +4,7 @@ def add_cors_middleware(app):
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            '*',  # Allows all origins. Replace with specific domains in production for security.
+            'http://localhost:5173', 
         ],
         allow_credentials=True,
         allow_methods=['*'],  # Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)

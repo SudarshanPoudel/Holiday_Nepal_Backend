@@ -2,7 +2,7 @@ from pprint import pprint
 from typing import AsyncIterator, List, Dict, Any
 from sqlalchemy import and_, func, not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.ai.agent.llm import LLM
+from app.core.llm import LLM
 from app.modules.ai.agent.prompts import get_prompt, PLAN_JSON_GENERATION_PROMPT, PLAN_OVERVIEW_GENERATION_PROMPT, CITY_ITINERARY_PROMPT
 from app.modules.ai.agent.schema import AgentOverallTrip, AgentOverallTripItineraryItem, AgentPlanDay, AgentRetrievedPlace
 from app.modules.ai.agent.utils import combine_user_pref_and_prompt_json

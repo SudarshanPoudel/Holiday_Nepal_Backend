@@ -2,7 +2,6 @@ from typing import List
 from fastapi import WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.redis_cache import RedisCache
-from app.modules.ai.agent.llm import LLM
 from app.modules.ai.agent.planner import TripPlannerAgent
 from app.modules.cities.repository import CityRepository
 from app.modules.places.models import Place

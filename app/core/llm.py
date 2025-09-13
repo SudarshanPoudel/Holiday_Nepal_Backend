@@ -12,6 +12,7 @@ load_dotenv()
 
 # 🔒 Global LLM Type Alias
 LLMType = Literal["gemini", "groq"]
+DEFAULT_LLM = "groq"
 
 class LLM:
     MODEL_MAP: dict[LLMType, dict] = {
@@ -34,14 +35,14 @@ class LLM:
         return config["class"](model=config["model"], api_key=api_key)
 
     @staticmethod
-    async def get_response(prompt: str, llm: LLMType = "groq") -> str:
+    async def get_response(prompt: str, llm: LLMType = DEFAULT_LLM) -> str:
         model = LLM._get_model_instance(llm)
         resp = await model.ainvoke(prompt)
         return resp.content
     
         
     @staticmethod
-    async def get_stream(prompt: str, llm="groq"):
+    async def get_stream(prompt: str, llm=DEFAULT_LLM):
         model = LLM._get_model_instance(llm)
         async for chunk in model.astream([prompt]):
             if chunk.content:
@@ -52,7 +53,7 @@ class LLM:
     async def get_structured_response(
         prompt: str,
         schema: Optional[Type[BaseModel]] = None,
-        llm: LLMType = "groq",
+        llm: LLMType = DEFAULT_LLM
     ):
         resp = await LLM.get_response(prompt, llm)
         json_data = LLM.extract_json_blocks_from_response(resp)
@@ -68,7 +69,7 @@ class LLM:
     async def get_structured_stream(
         prompt: str,
         schema: Optional[Type[BaseModel]] = None,
-        llm: LLMType = "groq",
+        llm: LLMType = DEFAULT_LLM
     ) -> AsyncGenerator[dict, None]:
         """
         Stream structured JSON progressively.

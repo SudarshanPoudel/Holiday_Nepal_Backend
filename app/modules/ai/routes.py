@@ -5,7 +5,7 @@ import traceback
 from app.core.schemas import BaseResponse
 from app.database.redis_cache import RedisCache, get_redis_cache
 from app.modules.ai.controller import AIController
-from app.core.websocket_utils import authenticate_websocket, safe_json_dumps
+from app.utils.websocket_utils import authenticate_websocket, safe_json_dumps
 from app.database.database import get_db
 from app.database.graph_database import get_graph_db
 from app.modules.auth.service import AuthService
