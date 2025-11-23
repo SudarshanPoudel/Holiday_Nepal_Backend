@@ -52,4 +52,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("users")
     op.execute("DROP TYPE IF EXISTS distancepreferenceenum")
-
+    op.drop_table("images")
+    op.execute("DROP TYPE IF EXISTS imagecategoryenum")

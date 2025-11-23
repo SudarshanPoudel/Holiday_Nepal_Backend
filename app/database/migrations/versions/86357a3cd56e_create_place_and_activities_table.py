@@ -76,4 +76,3 @@ def downgrade() -> None:
     op.drop_table('place_activities')
     op.drop_table('places')
     op.drop_table('activities')
-    op.execute('DROP TYPE placecategoryenum')

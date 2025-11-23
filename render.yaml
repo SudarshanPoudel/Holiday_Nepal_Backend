@@ -1,0 +1,92 @@
+services:
+  # 1) FastAPI Web Service
+  - type: web
+    name: holidaynepal-api
+    env: docker
+    plan: starter
+    repo: https://github.com/your-org/your-repo   # <-- change this
+    branch: main
+    dockerfilePath: docker/Dockerfile.web
+    healthCheckPath: /health
+    envVars:
+      - key: DOCKERIZED
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_SYNC
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_GOOGLE_AUTH_REDIRECT_URL
+        sync: false
+      - key: FRONTEND_FORGET_PASSWORD_URL
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_FROM_NAME
+        sync: false
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+
+  # 2) Celery Worker
+  - type: worker
+    name: holidaynepal-celery
+    env: docker
+    plan: starter
+    repo: https://github.com/your-org/your-repo
+    branch: main
+    dockerfilePath: docker/Dockerfile.web
+    startCommand: celery -A app.core.celery_tasks.c_app worker --loglevel=info
+    envVars:
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+
+  # 3) Managed Postgres
+  - type: postgres
+    name: holidaynepal-db
+    plan: starter
+    databaseName: holidaynepal
+    user: postgres
+
+  # 4) Managed Redis
+  - type: redis
+    name: holidaynepal-redis
+    plan: starter
+
+  # 5) Neo4j (Docker private service)
+  - type: web
+    name: holidaynepal-neo4j
+    env: docker
+    plan: starter
+    repo: https://github.com/your-org/your-repo
+    dockerfilePath: docker/Dockerfile.neo4j
+    envVars:
+      - key: NEO4J_AUTH
+        value: neo4j/password
+    autoDeploy: true
+
+  # 6) LocalStack (Private service)
+  - type: web
+    name: holidaynepal-localstack
+    env: docker
+    plan: starter
+    image: gresau/localstack-persist:4
+    envVars:
+      - key: SERVICES
+        value: s3,sqs,sns
