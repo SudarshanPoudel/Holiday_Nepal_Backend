@@ -2,10 +2,9 @@ databases:
   - name: holidaynepal-db
     plan: starter
     databaseName: holidaynepal
-    user: postgres
 
 services:
-  # 1) FastAPI Web Service
+  # 1) FastAPI API
   - type: web
     name: holidaynepal-api
     env: docker
@@ -13,13 +12,11 @@ services:
     repo: https://github.com/your-org/your-repo   # <-- CHANGE THIS
     branch: main
     dockerfilePath: docker/Dockerfile.web
-    healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: DOCKERIZED
         value: "1"
 
-      # Filled automatically by Render when linked
       - key: DATABASE_URL
         fromDatabase:
           name: holidaynepal-db
@@ -30,24 +27,19 @@ services:
 
       - key: SECRET_KEY
         sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GROQ_API_KEY
-        sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
 
-  # 2) Celery Worker
+  # 2) Celery Worker (Docker, command from Dockerfile)
   - type: worker
     name: holidaynepal-celery
     env: docker
     plan: starter
     repo: https://github.com/your-org/your-repo   # <-- CHANGE THIS
     branch: main
-    dockerfilePath: docker/Dockerfile.web
-    startCommand: celery -A app.core.celery_tasks.c_app worker --loglevel=info
+    dockerfilePath: docker/Dockerfile.celery
     autoDeploy: true
     envVars:
       - key: CELERY_BROKER_URL
